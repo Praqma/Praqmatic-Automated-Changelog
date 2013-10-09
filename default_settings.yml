@@ -1,0 +1,25 @@
+:general:
+  date_template: "%Y-%m-%d"
+  changelog_name: "Changelog"
+  changelog_formats:
+    - "html"
+    - "pdf"
+  changelog_css: 
+  verbose: false
+
+:fogbugz:
+  fogbugz_url: "https://my.fogbugz.site"
+  fogbugz_usr: user
+  fogbugz_pwd: pass
+  fogbugz_fields: "sTitle,sStatus,sUrl,sCategory,sTags,sPriority,sReleaseNotes"
+
+:trac: 
+  trac_url: "https://my.trac.site"
+  trac_usr: "user"
+  trac_pwd: "pass"
+  
+:vcs:
+  type: git
+  usr:
+  pwd:
+  repo_location: "/path/to/my/repo"
