@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 require "mercurial-ruby"
-require 'date'
 
 module Vcs
 
@@ -61,10 +60,9 @@ module Vcs
       if headTime.nil?
         headTime = headCommitDate.to_time
       else
-        headTime = date_converter(headTime)
+        headTime = date_converter(headTime.to_s)
       end
-  
-      tailTime = date_converter(tailTime)
+      tailTime = date_converter(tailTime.to_s)
   
       commit_messages = []
   
