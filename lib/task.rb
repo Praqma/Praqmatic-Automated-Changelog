@@ -152,7 +152,7 @@ module Task
     
     def write_markdown(commits)             
       #Use a file block instead. This way we avoid having to expricitly close the file
-      mdPath = @path.nil? == true ? "changelog.md" : File.join(@path, "changelog.md")
+      mdPath = @path.nil? == true ? "changelog.md" : File.join(@path, "#{@settings[:general]['changelog_name']}.md")
       result = filter(commits)                 
       File.open(mdPath.to_s, 'w') do |file|
         file << "# #{@settings[:general]['changelog_name']}\n"
@@ -181,7 +181,7 @@ module Task
      
     #Write HTML uses the release-notes field from fogbugz to generate a a list of release notes. 
     def write_html(commits)
-      htmlPath = @path.nil? == true  ? "changelog.html" : File.join(@path, "changelog.html")
+      htmlPath = @path.nil? == true  ? "changelog.html" : File.join(@path, "#{@settings[:general]['changelog_name']}.html")
       tasks = filter(commits)
       
       File.open(htmlPath,'w+') do |file|
@@ -226,6 +226,7 @@ module Task
     
     
     def write_changelog(commits, path)
+      @path = path
       write_markdown(commits)
       unless @settings[:general]['changelog_formats'].nil?
         if @settings[:general]['changelog_formats'].include?("html")
@@ -246,7 +247,7 @@ module Task
     end
     
     def write_markdown(commits, path)
-      md_path = path.nil? == true ? "changelog.md" : File.join(path, "changelog.md")
+      md_path = path.nil? == true ? "changelog.md" : File.join(path, "#{@settings[:general]['changelog_name']}.md")
       File.open(md_path,'w:UTF-8') do |file|
         file << "# #{@settings[:general]['changelog_name']}\n"
         file << "\n"
@@ -308,23 +309,6 @@ module Task
       if @settings[:general]['changelog_formats'].include?("pdf")
         write_pdf(file_path_markdown)
       end
-    end
-        
-    def write_changelog2
-      ticketList = parse_commit_extract_identifier(@commits)      
-      filteredData = Task.filter(fetch_task(ticketList))
-           
-      #Call write_markdown
-      file_path_markdown = write_markdown(ticketList, filteredData)
-      
-      if @settings[:general]['changelog_formats'].include?("html")
-        write_html(file_path_markdown)
-      end
-      
-      if @settings[:general]['changelog_formats'].include?("pdf")
-        write_pdf(file_path_markdown)
-      end
-            
     end
     
     def filter(commit)
