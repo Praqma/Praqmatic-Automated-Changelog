@@ -45,6 +45,7 @@ Below is an example of an example that uses FogBugz and git. If you want to use 
 Show help
 
     ./pac.rb -h
+    
 Get commits using tags. tail tag provided
 
     ./pac.rb -t Release-1.0 --settings=./pacfogbugz_pac_settings.yml --outpath=/usr/share/changelog #Using tags.
@@ -57,6 +58,10 @@ Get commits using time
 
     ./pac.rb -d 2013-10-01 --settings=./pacfogbugz_pac_settings.yml --outpath=/usr/share/changelog #Using date as selector.
     
+Get all commits since latest point release. Given a specified pattern. Default is 'tags'
+
+	./pac.rb -t LATEST --settings=./pacfogbugz_pac_settings.yml --outpath=/usr/share/changelog --pattern='tags/Release-1.*'
+
 ## Prerequisites
 If you are going to be using the tool to generate PDF files which we use kramdown and pdfkit to generate you'll need to run the following command and a linux machine
 

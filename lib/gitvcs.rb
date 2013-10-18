@@ -107,7 +107,12 @@ module Vcs
           mycommit.target.time
         else
           commitTimes = []
-          tailTagReference = @repository.refs(RELEASE_TAG_REGEX).each do |ref|
+          release_regex = /tags/
+          unless @settings[:release_regex].nil?
+            release_regex =  Regexp.new @settings[:release_regex]  
+          end
+          
+          tailTagReference = @repository.refs(release_regex).each do |ref|
             commitToSort = @repository.lookup(ref.target)                   
             if commitToSort.class == Rugged::Tag
               commitTimes << { :oid => ref.target, :time => commitToSort.target.time, :name  => commitToSort.name  }
@@ -116,6 +121,7 @@ module Vcs
           
           raise ArgumentError, "No tags on current branch found" if commitTimes.empty?
           sorted = commitTimes.sort { |x,y| y[:time] <=> x[:time] }
+          puts sorted.first[:name]
           sorted.first[:time]        
         end
       end
@@ -128,7 +134,11 @@ module Vcs
           tailTagReference.first.target
         else
           commitTimes = []
-          tailTagReference = @repository.refs(RELEASE_TAG_REGEX).each do |ref|
+          release_regex = /tags/
+          unless @settings[:release_regex].nil?
+            release_regex =  Regexp.new @settings[:release_regex]  
+          end
+          tailTagReference = @repository.refs(release_regex).each do |ref|
             commitToSort = @repository.lookup(ref.target)
             
             if commitToSort.class == Rugged::Tag

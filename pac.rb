@@ -7,9 +7,9 @@ doc = <<DOCOPT
 Pragmatic changelog 
 
 Usage:
-  #{__FILE__} (-d | --date) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>]     
-  #{__FILE__} (-s | --sha) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>]
-  #{__FILE__} (-t | --tag) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>]  
+  #{__FILE__} (-d | --date) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>] [--pattern=<rel_pattern>]     
+  #{__FILE__} (-s | --sha) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>] [--pattern=<rel_pattern>]
+  #{__FILE__} (-t | --tag) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>] [--pattern=<rel_pattern>]  
   #{__FILE__} -h|--help
 
 Options:
@@ -35,7 +35,11 @@ Options:
     
   --formats=<format>
   
-    Comma delimited string of which formats to use. We currently support html and pdf, markdown is always created    
+    Comma delimited string of which formats to use. We currently support html and pdf, markdown is always created
+    
+  --pattern=<rel_pattern>
+  
+    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.        
 DOCOPT
 
 begin
@@ -49,6 +53,12 @@ begin
   end
   
   settings = YAML::load(File.open(settings_file))
+  
+  unless input['--pattern'].nil? 
+    settings[:vcs][:release_regex] = input['--pattern']
+  end
+  
+  puts settings
   
   Core.load(settings)
   
