@@ -58,8 +58,6 @@ begin
     settings[:vcs][:release_regex] = input['--pattern']
   end
   
-  puts settings
-  
   Core.load(settings)
   
   if (input['--sha'] || input['-s'])

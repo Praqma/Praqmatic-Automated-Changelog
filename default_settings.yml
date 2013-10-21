@@ -12,6 +12,9 @@
   fogbugz_usr: user
   fogbugz_pwd: pass
   fogbugz_fields: "sTitle,sStatus,sUrl,sCategory,sTags,sPriority,sReleaseNotes"
+  regex:
+    - '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
+    - '/(?<id>JENKINS-[0-9]+)/i'
 
 :trac: 
   trac_url: "https://my.trac.site"
