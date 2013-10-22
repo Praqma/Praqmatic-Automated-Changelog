@@ -101,6 +101,7 @@ module Task
         end
       end
       descending = -1
+      pp hashes
       hashes.uniq { |x| x[:ixBug] }.sort_by { |hv| hv[:ixBug].to_i * descending }
     end
 
