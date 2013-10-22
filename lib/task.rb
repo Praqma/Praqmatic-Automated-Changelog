@@ -59,49 +59,49 @@ module Task
 
     #Filter commits method. This is wehre we apply our regexes.
     def filter(cmits)
-      caseNumbers  = []
+      caseNumbers = []
       titleSearchStrings = []
-      
+
       cmits.each do |cMsg|
+        
         res = @filterpatterns.match(cMsg)
         if !res.nil?
-          if res[:id].is_number?            
+          if res[:id].is_number?
             caseNumbers << res[:id]
           else
             titleSearchStrings << res[:id]
           end
         end
       end
-      cases_xml_array = []
+      
       #If the results of the parsing yields something that is not a case number (IE 1200, 2332 etc). Each item has to seperated with OR.
       if titleSearchStrings.length > 0
-        titleSearchStrings.each do |title|
-          xmloutput_title = @instance.command(:search, :q => "title:#{title}", :cols => @settings[:fogbugz]["fogbugz_fields"])
-          cases_xml_array.push(xmloutput_title)
-        end
+        xmloutput_title = @instance.command(:search, :q => "title:"+titleSearchStrings.join(" OR "), :cols => @settings[:fogbugz]["fogbugz_fields"])
       end
-
+      
+      cases_xml_array = []
       if caseNumbers.length > 0
+        #xmloutput_cases = @instance.command(:search, :q => caseNumbers.uniq.join(","), :cols => @settings[:fogbugz]["fogbugz_fields"])
         caseNumbers.each do |c|
           case_xml = @instance.command(:search, :q => c, :cols => @settings[:fogbugz]["fogbugz_fields"])
           cases_xml_array.push(case_xml)
         end
       end
-
+      
       hashes = []
       unless cases_xml_array.empty?
         cases_xml_array.each do |x|
           unless x.nil?
-            h = Hash.new
-            x["cases"]["case"].each do |aKey, aValue|
-              h[aKey.to_sym] = aValue
-            end
-          hashes.push(h)
+             h = Hash.new
+              x["cases"]["case"].each do |aKey, aValue|
+                h[aKey.to_sym] = aValue
+              end
+              hashes.push(h)
           end
         end
       end
       descending = -1
-      hashes.uniq { |x| x[:ixBug] }.sort_by { |hv| hv[:ixBug].to_i * descending  }
+      hashes.uniq { |x| x[:ixBug] }.sort_by { |hv| hv[:ixBug].to_i * descending }
     end
 
     #Markup version of the task link.
