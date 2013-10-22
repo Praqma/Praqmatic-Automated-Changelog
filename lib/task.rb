@@ -74,12 +74,14 @@ module Task
         end
       end
       
+      cases_xml_array = []
       #If the results of the parsing yields something that is not a case number (IE 1200, 2332 etc). Each item has to seperated with OR.
       if titleSearchStrings.length > 0
         xmloutput_title = @instance.command(:search, :q => "title:"+titleSearchStrings.join(" OR "), :cols => @settings[:fogbugz]["fogbugz_fields"])
+        cases_xml_array.push(xmloutput_title)
       end
       
-      cases_xml_array = []
+      
       if caseNumbers.length > 0
         #xmloutput_cases = @instance.command(:search, :q => caseNumbers.uniq.join(","), :cols => @settings[:fogbugz]["fogbugz_fields"])
         caseNumbers.each do |c|
@@ -101,7 +103,6 @@ module Task
         end
       end
       descending = -1
-      pp hashes
       hashes.uniq { |x| x[:ixBug] }.sort_by { |hv| hv[:ixBug].to_i * descending }
     end
 
