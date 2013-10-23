@@ -121,7 +121,6 @@ module Vcs
           
           raise ArgumentError, "No tags on current branch found" if commitTimes.empty?
           sorted = commitTimes.sort { |x,y| y[:time] <=> x[:time] }
-          puts sorted.first[:name]
           sorted.first[:time]        
         end
       end
@@ -175,7 +174,7 @@ module Vcs
       else
         headTagOid = getTagReferenceOid.call(headTag)
         #Use same method to extract the head time.
-        headTime = getTaggedCommitTime(headTag).to_i
+        headTime = getTaggedCommitTime.call(headTag).to_i
         headCommitOid = getCommitOid.call(headTagOid)      
         walker.push(headCommitOid)
       end
