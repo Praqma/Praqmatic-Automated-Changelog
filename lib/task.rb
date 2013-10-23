@@ -83,7 +83,6 @@ module Task
       
       
       if caseNumbers.length > 0
-        #xmloutput_cases = @instance.command(:search, :q => caseNumbers.uniq.join(","), :cols => @settings[:fogbugz]["fogbugz_fields"])
         caseNumbers.each do |c|
           case_xml = @instance.command(:search, :q => c, :cols => @settings[:fogbugz]["fogbugz_fields"])
           cases_xml_array.push(case_xml)
@@ -95,10 +94,19 @@ module Task
         cases_xml_array.each do |x|
           unless x.nil?
              h = Hash.new
-              x["cases"]["case"].each do |aKey, aValue|
-                h[aKey.to_sym] = aValue
-              end
-              hashes.push(h)
+             if x["cases"]["case"].class == Hash
+                x["cases"]["case"].each do |aKey, aValue|
+                  h[aKey.to_sym] = aValue
+                end
+                hashes.push(h)
+             else
+               x["cases"]["case"].each do |value|
+                 value.each do |k,v|
+                   h[k.to_sym] = v                    
+                 end
+                 hashes.push(h)
+               end
+             end  
           end
         end
       end
@@ -161,18 +169,16 @@ module Task
         file << "\n"
         unless result.nil?
           result.each do |task|
-            unless task[:sStatus].downcase.include? "duplicate"
-              file << "\n"
-
+            unless task[:sStatus].downcase.include? "duplicate"        
               unless task[:sReleaseNotes].nil?
+                file << "\n"
                 file << "**Release note:** #{task[:sReleaseNotes]}\n"
                 file << "\n"
+                file << "**Status:** #{task[:sStatus]}\n"
+                file << "\n"
+                file << "**Title:** #{task[:sTitle]}\n"
+                file << "\n"
               end
-
-              file << "**Status:** #{task[:sStatus]}\n"
-              file << "\n"
-              file << "**Title:** #{task[:sTitle]}\n"
-              file << "\n"
             end
           end
         end
@@ -199,21 +205,21 @@ module Task
         unless tasks.nil?
           tasks.each do |task|
             unless task[:sStatus].downcase.include? "duplicate"
-              file << "<div class ='change-item'>"
-              file << ""
+              unless task[:sReleaseNotes].nil? 
+                file << "<div class ='change-item'>"
+                file << ""
 
-              title_case = "<div class='change-title' >
-            <div class='issue-type-#{task[:sCategory]} issue-type'>&nbsp;</div>
-            #{task[:sTitle]} (#{case_link_html(task[:ixBug])})</div>"
-              title_case_escaped = html_escape_non_ascii(title_case)
-              file << title_case_escaped
+                title_case = "<div class='change-title' > <div class='issue-type-#{task[:sCategory]} issue-type'>&nbsp;</div>#{task[:sTitle]} (#{case_link_html(task[:ixBug])})</div>"
+                title_case_escaped = html_escape_non_ascii(title_case)
+                file << title_case_escaped
 
-              unless task[:sReleaseNotes].nil?
+              
                 rel_note = "<div class='release-note'>#{task[:sReleaseNotes]} </div>"
                 rel_note_escaped = html_escape_non_ascii(rel_note)
-              file << rel_note_escaped
+                file << rel_note_escaped
+              
+                file << '</div>'
               end
-              file << '</div>'
             end
           end
         end
