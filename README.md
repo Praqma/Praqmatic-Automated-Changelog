@@ -33,6 +33,9 @@ Below is an example of an example that uses FogBugz and git. If you want to use 
       fogbugz_usr: my@companymail.net
       fogbugz_pwd: p455w0rd
       fogbugz_fields: "sTitle,sStatus,sUrl,sCategory,sTags,sPriority,sReleaseNotes"
+      regex:
+    	- '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
+    	- '/(?<id>JENKINS-[0-9]+)/i'
     
     :vcs:
       type: git
