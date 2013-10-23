@@ -61,7 +61,7 @@ begin
   Core.load(settings)
   
   if (input['--sha'] || input['-s'])
-    changes = Core.vcs.get_changeset_using_shas(input['<to>'], input['<from>'])
+    changes = Core.vcs.get_commit_messages_by_commit_sha(input['<to>'], input['<from>'])
   elsif (input['--date'] || input['-d'])
     toTime = Core.to_time(input['<to>'])
     unless input['<from>'].nil?
