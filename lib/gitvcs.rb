@@ -104,7 +104,13 @@ module Vcs
           end
           
           mycommit = @repository.lookup(tagCommitTime.first.target)
-          mycommit.target.time
+
+          #If target is another tag, get the time of that
+          if (mycommit.class == Rugged::Tag)
+            mycommit.target.time
+          elsels
+            mycommit.time
+          end
         else
           commitTimes = []
           release_regex = /tags/
