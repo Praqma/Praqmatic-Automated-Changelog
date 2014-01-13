@@ -108,7 +108,7 @@ module Vcs
           #If target is another tag, get the time of that
           if (mycommit.class == Rugged::Tag)
             mycommit.target.time
-          elsels
+          else
             mycommit.time
           end
         else
