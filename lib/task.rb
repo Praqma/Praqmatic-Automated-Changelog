@@ -151,7 +151,7 @@ module Task
           <div id='metadata'>
           <p>
             This changelog contains<strong> #{commits.length}</strong> commits<br/>
-            Number of referenced commits is <strong>#{taskReferenceCount}</strong> which is <strong>#{healthgauge}%</strong> of all commits<br/>
+            Number of referenced commits is <strong>#{taskReferenceCount}</strong> which is <strong>#{healthgauge.round(1)}%</strong> of all commits<br/>
             Which leaves out <strong>#{unspecifiedCommitCount}</strong> commits without proper commit messages<br/>
             #{footer_html}
           </p>
