@@ -92,7 +92,7 @@ module Task
       hashes = []
       unless cases_xml_array.empty?
         cases_xml_array.each do |x|
-          unless x.nil?
+          if x["cases"]["count"].to_i > 0
              if x["cases"]["case"].class == Hash
 		h = Hash.new
                 x["cases"]["case"].each do |aKey, aValue|
