@@ -77,7 +77,7 @@ module Task
       cases_xml_array = []
       #If the results of the parsing yields something that is not a case number (IE 1200, 2332 etc). Each item has to seperated with OR.
       if titleSearchStrings.length > 0
-        xmloutput_title = @instance.command(:search, :q => "title:"+titleSearchStrings.join(" OR "), :cols => @settings[:fogbugz]["fogbugz_fields"])
+        xmloutput_title = @instance.command(:search, :q => "title:"+titleSearchStrings.uniq.join(" OR "), :cols => @settings[:fogbugz]["fogbugz_fields"])
         cases_xml_array.push(xmloutput_title)
       end
       
@@ -92,15 +92,16 @@ module Task
       hashes = []
       unless cases_xml_array.empty?
         cases_xml_array.each do |x|
-          unless x.nil?
-             h = Hash.new
+          if x["cases"]["count"].to_i > 0
              if x["cases"]["case"].class == Hash
+		h = Hash.new
                 x["cases"]["case"].each do |aKey, aValue|
                   h[aKey.to_sym] = aValue
                 end
                 hashes.push(h)
              else
                x["cases"]["case"].each do |value|
+		 h = Hash.new
                  value.each do |k,v|
                    h[k.to_sym] = v                    
                  end
@@ -150,7 +151,7 @@ module Task
           <div id='metadata'>
           <p>
             This changelog contains<strong> #{commits.length}</strong> commits<br/>
-            Number of referenced commits is <strong>#{taskReferenceCount}</strong> which is <strong>#{healthgauge}%</strong> of all commits<br/>
+            Number of referenced commits is <strong>#{taskReferenceCount}</strong> which is <strong>#{healthgauge.round(1)}%</strong> of all commits<br/>
             Which leaves out <strong>#{unspecifiedCommitCount}</strong> commits without proper commit messages<br/>
             #{footer_html}
           </p>
