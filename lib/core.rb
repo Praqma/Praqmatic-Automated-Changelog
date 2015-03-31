@@ -22,8 +22,10 @@ module Core extend self
   def task_system
     if @settings.include? :fogbugz
       Task::FogBugzTaskSystem.new(@settings)
-    else
+    elsif @settings.include? :trac
       Task::TracTaskSystem.new(@settings)
+    else 
+      Task::NoneTaskSystem.new(@settings)
     end
   end
   

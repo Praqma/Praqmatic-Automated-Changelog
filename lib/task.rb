@@ -1,13 +1,13 @@
 # encoding: utf-8
-require 'trac4r'
 require 'kramdown'
 require 'pdfkit'
-
 begin
+  require 'trac4r'
   require 'fogbugz'
 rescue LoadError => error
 
 end
+
 class String
   def is_number?
     !!(self =~ /^[-+]?[0-9]+$/)
@@ -18,10 +18,11 @@ module Task
   #The task system is responsible for writing the changelog. We feed it with a list of commits, and an output directory for the changelogs
   #unless otherwise specified the path will be the current directory.
   class TaskSystem
-    attr_accessor :path, :settings
+    attr_accessor :path, :settings, :filterpatterns
     def initialize(settings, path = nil)
       @settings = settings
       @path = path
+      @filterpatterns = filterpatterns
     end
 
     def footer
@@ -39,11 +40,80 @@ module Task
     def html_escape_non_ascii(text)
       text.gsub(/Æ/,'&AElig;').gsub(/æ/,'&aelig;').gsub(/Ø/,'&Oslash;').gsub(/ø/,'&oslash;').gsub(/Å/,'&Aring;').gsub(/å/,'&aring;')
     end
+
+    #Takes a series of unique 'identifiers'. Creates a hash map where the key of a particular case points to a series of identifiers pointing to other stuff
+    #{
+    # "9923333"=>
+    #  {
+    #    "85c76dd6a4037085a5b0f6c986e392d4386395cd"=>"Second commit for fixed case 9923333", 
+    #    "56bf0ea3ef12676c3bf555b24224e50695e10440"=>"Second commit for case 9923333", 
+    #    "72e16e848926d491704236571e6e06b89bd8eed3"=>"Fixed some case 9923333"
+    #  }, 
+    # "9923838"=>
+    #  {
+    #    "37aed128ab4185e19bd5b5cca45a4c3aa1e6b963"=>"Fixed some case 9923838"
+    #  }
+    #}
+    def task_id_list(commits)
+      grouped_by_task_id = Hash.new
+
+      #TODO: How do i share this filterpatterns?
+      regex_arr = []
+      @settings[:none]['regex'].each do |rx|
+        regex_arr.push( eval(rx) )
+      end
+      @filterpatterns = Regexp.union(regex_arr) 
+
+      commits.each do |k,v| 
+         #Return the resulting ID of the regex
+        res = @filterpatterns.match(v)
+        if !res.nil? 
+          #puts "#{res[:id]} - #{k} - #{v}"
+          if(!grouped_by_task_id.has_key?(res[:id]))  
+            grouped_by_task_id[res[:id]] = Hash.new
+          end
+          grouped_by_task_id[res[:id]][k] = v
+        end     
+      end
+      grouped_by_task_id       
+    end
+
+    #This one has become a tad too specific for git. We get the short shar (first 8 digits). And
+    #we trim the subject (That is the first element in the list when splitting the message on a newline.  
+    def task_id_report(commits) 
+      tasks = task_id_list(commits)
+      mdPath = @path.nil? == true ? "ids.md" : File.join(@path, "#{@settings[:general]['id_log_name']}.md")
+
+      File.open(mdPath,'w:UTF-8') do |file| 
+        file << "\#PAC id report\n\n"
+        tasks.each do |k,v|
+          file << "\#\##{k}\n"
+          v.each do |k1,v2| 
+            file << " - #{k1.slice(0..7)}: #{v2.split(/\n/).first}\n"
+          end
+          file << "\n"
+        end
+      end
+
+      html = Kramdown::Document.new(File.read(mdPath)).to_html
+      output_file_path = mdPath.sub(/\.md$/, '.pdf')
+      kit = PDFKit.new(html, :page_size => 'A4')
+      kit.to_file(output_file_path)
+
+    end
+  end
+
+  #Very simple task system.
+  class NoneTaskSystem < TaskSystem
+    attr_accessor :filterpatterns
+    def intialize(settings) 
+      super(settings) 
+    end
   end
 
   class FogBugzTaskSystem < TaskSystem
 
-    attr_accessor :instance, :fields, :filterpatterns
+    attr_accessor :instance, :fields
 
     def initialize(settings)
       super(settings)

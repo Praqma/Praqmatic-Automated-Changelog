@@ -37,14 +37,15 @@ module Vcs
       headTime = headTime.to_i
       tailTime = tailTime.to_i
   
-      commit_messages = []
+      commit_messages = Hash.new
   
       walker = createWalker
       walker.push(headCommit.oid)
       
       walker.each do |commit|
         if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-          commit_messages.push(commit.message)        
+          #commit_messages.push(commit.message)        
+          commit_messages[commit.oid] = commit.message
         end
       end
        
@@ -73,16 +74,16 @@ module Vcs
       walker = createWalker
       walker.push(headCommitSHA)
   
-      commit_messages = []
+      commit_messages = Hash.new      
   
       begin
         walker.each do |commit|
           if commit.oid == tailCommitSHA
-            commit_messages.push(commit.message)
+            commit_messages[commit.oid] = commit.message
             break
           end
   
-          commit_messages.push(commit.message)
+          commit_messages[commit.oid] = commit.message
         end
       rescue RuntimeError
         puts "Failed to load changeset"
@@ -185,7 +186,7 @@ module Vcs
         walker.push(headCommitOid)
       end
   
-      commitMessages = []
+      commitMessages = Hash.new
   
       begin
         walker.each do |commit| 
@@ -199,7 +200,7 @@ module Vcs
   
           #commitMessages.push(commit.message)
           if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-            commitMessages.push(commit.message)        
+            commitMessages.push[commit.oid] = commit.message        
           end
         end
       rescue RuntimeError
