@@ -48,10 +48,11 @@ Below is an example of an example that uses FogBugz and git. If you want to use 
 We also implemented a setting if you do not wish to talk to your external task tracking, but still want to get a list of the id's associated with your task management system. Replace
 `:fogbugz:` or `:trac:` with `:none:`
 
-   :none:
-     regex:
+```
+    :none:
+      regex:
        - '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
-
+```
 	
 
 ## Usage examples
