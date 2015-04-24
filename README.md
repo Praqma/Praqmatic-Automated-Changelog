@@ -51,8 +51,7 @@ We also implemented a setting if you do not wish to talk to your external task t
 	:none:
 		regex:
 		 - '/.*Issue:\s*(?<id>[\d+|[,|\s]]+).*/im'
-		delimiter:
-		- '/,|\s/'
+		delimiter: '/,|\s/'
 
 The above example will match issue reference, in the commit message and return them as capturing group 'id'. If your regexp returns a match, that needs to be split you can use the _optional_ delimiter regexp to split the 'id' match data.
 
