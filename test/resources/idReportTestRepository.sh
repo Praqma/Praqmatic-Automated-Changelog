@@ -72,7 +72,7 @@ echo "" >> README.md
 git add README.md
 git commit -m "Test for multiple
 
-Issue; 1,2
+Issue: 1,2
 "
 echo "The final repository looks like this:" >> $LOG
 echo "-------------------------------------" >> $LOG
