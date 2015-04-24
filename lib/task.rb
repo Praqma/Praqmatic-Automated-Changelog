@@ -41,6 +41,33 @@ module Task
       text.gsub(/Æ/,'&AElig;').gsub(/æ/,'&aelig;').gsub(/Ø/,'&Oslash;').gsub(/ø/,'&oslash;').gsub(/Å/,'&Aring;').gsub(/å/,'&aring;')
     end
 
+    def statistics_html(commits)
+      taskReferenceCount = commits.values.select { |e| !@filterpatterns.match(e).nil? }.length
+      unspecifiedCommitCount = commits.length - taskReferenceCount
+      healthgauge = health(commits)*100
+      html =  
+      <<-EOM
+<div id="metadata-section">
+  <h2 id="metadata-details-header">Details</h2>
+  <div id='metadata'>
+  <p>
+    This changelog contains<strong> #{commits.length}</strong> commits<br/>
+    Number of referenced commits is <strong>#{taskReferenceCount}</strong> which is <strong>#{healthgauge.round(1)}%</strong> of all commits<br/>
+    Which leaves out <strong>#{unspecifiedCommitCount}</strong> commits without proper commit messages<br/>
+    #{footer_html}
+  </p>
+  </div>
+</div>
+      EOM
+    end
+
+    #Returns a value representing the percentage of referenced commits
+    def health(commits)
+      taskReferenceCount = commits.values.select { |e| !@filterpatterns.match(e).nil? }.length
+      unspecifiedCommitCount = commits.length - taskReferenceCount
+      return (taskReferenceCount / commits.length.to_f)
+    end
+
     #Takes a series of unique 'identifiers'. Creates a hash map where the key of a particular case points to a series of identifiers pointing to other stuff
     #{
     # "9923333"=>
@@ -62,17 +89,32 @@ module Task
       @settings[:none]['regex'].each do |rx|
         regex_arr.push( eval(rx) )
       end
+
+
+      if @settings[:none].has_key?('delimiter')
+        split_pattern = eval(@settings[:none]['delimiter']) 
+      end 
+
       @filterpatterns = Regexp.union(regex_arr) 
 
       commits.each do |k,v| 
          #Return the resulting ID of the regex
         res = @filterpatterns.match(v)
         if !res.nil? 
-          #puts "#{res[:id]} - #{k} - #{v}"
-          if(!grouped_by_task_id.has_key?(res[:id]))  
-            grouped_by_task_id[res[:id]] = Hash.new
+
+          if not split_pattern.nil?
+            res[:id].split(split_pattern).each do |split_value|
+              if(!grouped_by_task_id.has_key?(split_value))  
+                grouped_by_task_id[split_value] = Hash.new
+              end
+              grouped_by_task_id[split_value][k] = v                              
+            end
+          else
+            if(!grouped_by_task_id.has_key?(res[:id]))  
+              grouped_by_task_id[res[:id]] = Hash.new
+            end
+            grouped_by_task_id[res[:id]][k] = v 
           end
-          grouped_by_task_id[res[:id]][k] = v
         end     
       end
       grouped_by_task_id       
@@ -93,6 +135,8 @@ module Task
           end
           file << "\n"
         end
+        file << "\n"
+        file << statistics_html(commits)
       end
 
       html = Kramdown::Document.new(File.read(mdPath)).to_html
@@ -202,33 +246,6 @@ module Task
       else
         return "<link rel='stylesheet' type='text/css' href='#{@settings[:general]['changelog_css']}'/>"
       end
-    end
-
-    #Returns a value representing the percentage of referenced commits
-    def health(commits)
-      taskReferenceCount = commits.select { |e| !@filterpatterns.match(e).nil? }.length
-      unspecifiedCommitCount = commits.length - taskReferenceCount
-      return (taskReferenceCount / commits.length.to_f)
-    end
-
-    def statistics_html(commits)
-      taskReferenceCount = commits.select { |e| !@filterpatterns.match(e).nil? }.length
-      unspecifiedCommitCount = commits.length - taskReferenceCount
-      healthgauge = health(commits)*100
-      html =  <<-EOM
-        <div id="metadata-section">
-          <h2 id="metadata-details-header">Details</h2>
-          <div id='metadata'>
-          <p>
-            This changelog contains<strong> #{commits.length}</strong> commits<br/>
-            Number of referenced commits is <strong>#{taskReferenceCount}</strong> which is <strong>#{healthgauge.round(1)}%</strong> of all commits<br/>
-            Which leaves out <strong>#{unspecifiedCommitCount}</strong> commits without proper commit messages<br/>
-            #{footer_html}
-          </p>
-          </div>
-        </div>
-      EOM
-
     end
 
     def write_markdown(commits)
