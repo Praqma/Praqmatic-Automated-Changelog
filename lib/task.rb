@@ -115,7 +115,7 @@ module Task
             end
             grouped_by_task_id[res[:id]][k] = v 
           end
-        end     
+        end 
       end
       grouped_by_task_id       
     end
@@ -133,8 +133,14 @@ module Task
           v.each do |k1,v2| 
             file << " - #{k1.slice(0..7)}: #{v2.split(/\n/).first}\n"
           end
-          file << "\n"
+          file << "\n"          
         end
+        file << "\#\#Unspecified\n"
+        
+        commits.select { |k,v| @filterpatterns.match(v).nil? }.each do |kCommit,vCommit|
+          file << " - #{kCommit.slice(0..7)}: #{vCommit.split(/\n/).first}\n"
+        end
+
         file << "\n"
         file << statistics_html(commits)
       end
