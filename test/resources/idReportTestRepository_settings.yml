@@ -9,12 +9,12 @@
   verbose: false
 
 :none:
-  delimiter: '/,/'
-  regex: 
-    - '/Issue\:\s(?<id>[\d+|,]+)/i'
+  regex:
+    - '/.*Issue:\s*(?<id>[\d+|[,|\s]]+).*/im'
+  delimiter: '/,|\s/'
 
 :vcs:
   type: git
   usr:
   pwd:
-  repo_location: "test/resources/idReportTestRepository"
+  repo_location: "idReportTestRepository"

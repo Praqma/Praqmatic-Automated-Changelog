@@ -30,11 +30,13 @@ module PAC__TestCases_IdReport
 
     # Test setup: executed before each test
     def setup
-   
+      assert_true(system("unzip test/resources/idReportTestRepository.zip"))
+
     end
 
     # Executed after each test
     def teardown
+      assert_true(system("rm -rf idReportTestRepository"))
    
     end
 
@@ -44,9 +46,9 @@ module PAC__TestCases_IdReport
     def test_runIdReport
       # Examples... should not used hardcoded commands
       assert_true(system("pwd"))
-      assert_true(system("unzip test/resources/idReportTestRepository.zip"))
+      assert_true(system("ls -al test/resources"))
       assert_true(system("./pac.rb -d 2012-01-01 --settings=test/resources/idReportTestRepository_settings.yml"))
-      assert_true(system("rm -rf idReportTestRepository"))
+      
     end
     
 
