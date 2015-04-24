@@ -1,0 +1,69 @@
+# Repository view and commits
+
+Git version:
+git version 1.8.5
+
+The final repository looks like this:
+-------------------------------------
+* [31m17c0285[m -[33m (HEAD, master)[m Test for multiple [32m(0 seconds ago) [1;34m<Praqma Support>[m
+* [31m32ca499[m -[33m[m Test for empty [32m(0 seconds ago) [1;34m<Praqma Support>[m
+* [31mc100369[m -[33m[m Test for none reference [32m(0 seconds ago) [1;34m<Praqma Support>[m
+* [31me62d01c[m -[33m[m Updated readme file again - third commit [32m(0 seconds ago) [1;34m<Praqma Support>[m
+* [31m19ae102[m -[33m[m Revert "Updated readme file" [32m(0 seconds ago) [1;34m<Praqma Support>[m
+* [31m694946d[m -[33m[m Updated readme file [32m(0 seconds ago) [1;34m<Praqma Support>[m
+* [31m7047925[m -[33m[m Initial commit - added README [32m(0 seconds ago) [1;34m<Praqma Support>[m
+
+commit 17c02853eceeb3f691e2cae4798ff9c6b9874f38
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Test for multiple
+    
+    Issue; 1,2
+
+commit 32ca499e0a0d022c6449b6f9a5b436213541c6b1
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Test for empty
+
+commit c10036985d6c3ba8892bd532cb5e7a9bca3952ee
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Test for none reference
+    
+    Issue: none
+
+commit e62d01c7548117dbf529f2eb93c448b3d1d865a9
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Updated readme file again - third commit
+    
+    Issue: 1
+
+commit 19ae102a802dce3a8f457891a2da18ff43d75815
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Revert "Updated readme file"
+    
+    This reverts commit 694946d80d69703cf70e9d77d58fca879157c158.
+    Issue: 1
+
+commit 694946d80d69703cf70e9d77d58fca879157c158
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Updated readme file
+    
+    Issue: 3
+
+commit 7047925b7a29fac846c2842973fe828c22ac3a51
+Author: Praqma Support <support@praqma.net>
+Date:   Fri Apr 24 11:54:02 2015 +0200
+
+    Initial commit - added README
+
+

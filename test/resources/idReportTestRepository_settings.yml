@@ -1,0 +1,20 @@
+:general:
+  date_template: "%Y-%m-%d"
+  changelog_name: "Changelog"
+  id_log_name: "ids"
+  changelog_formats:
+    - "html"
+    - "pdf"
+  changelog_css: 
+  verbose: false
+
+:none:
+  delimiter: '/,/'
+  regex: 
+    - '/Issue\:\s(?<id>[\d+|,]+)/i'
+
+:vcs:
+  type: git
+  usr:
+  pwd:
+  repo_location: "test/resources/idReportTestRepository"
