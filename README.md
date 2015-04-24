@@ -48,11 +48,50 @@ Below is an example of an example that uses FogBugz and git. If you want to use 
 We also implemented a setting if you do not wish to talk to your external task tracking, but still want to get a list of the id's associated with your task management system. Replace
 `:fogbugz:` or `:trac:` with `:none:`
 
-```
-    :none:
-      regex:
-       - '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
-```
+	:none:
+		regex:
+		 - '/.*Issue:\s*(?<id>[\d+|[,|\s]]+).*/im'
+		delimiter:
+		- '/,|\s/'
+
+The above example will match issue reference, in the commit message and return them as capturing group 'id'. If your regexp returns a match, that needs to be split you can use the _optional_ delimiter regexp to split the 'id' match data.
+
+In the source code we use the regexp you give in the configuration like this:
+
+	ids = /.*Issue:\s*(?<id>[\d+|[,|\s]]+).*/im.match(commit_message)[:id]
+	list_of_ids = ids.split(/,|\s/)
+
+(in the real implementation we also handles if there are not matches or the split doesn't give more ids)
+
+__Note:__ You typically want the delimiter to be part of your regexp also when collecting references. The delimiter is just needed to be repeated to ensure the program can determine what is delimiter and what not.
+
+When you construct your regexp, the IRB is helpful. 
+
+Example one, checking the above example regexp works as we expect:
+
+	irb(main):147:0> commit_message="Commit message header
+	irb(main):148:0" 
+	irb(main):149:0" More lines in commit message.
+	irb(main):150:0" Issue: 12"
+	=> "Commit message header\n\nMore lines in commit message.\nIssue: 12"
+	
+	irb(main):166:0> ids = /.*Issue:\s*(?<id>[\d+|[,|\s]]+).*/im.match(commit_message)[:id]
+	=> "12"
+	irb(main):167:0> list_of_ids = ids.split(/,|\s/)
+	=> ["12"]
+
+Another example on how the regexp matches:
+
+	irb(main):174:0> commit_message="Commit message header short
+	irb(main):175:0" 
+	irb(main):176:0" Issue: 14, 45, 3"
+	
+	irb(main):178:0> ids = /.*Issue:\s*(?<id>[\d+|[,|\s]]+).*/im.match(commit_message)[:id]
+	=> "14, 45, 3"
+	irb(main):179:0> list_of_ids = ids.split(/,|\s/)
+	=> ["14", "", "45", "", "3"]
+	
+
 	
 
 ## Usage examples
