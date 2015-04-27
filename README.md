@@ -90,7 +90,15 @@ Another example on how the regexp matches:
 	irb(main):179:0> list_of_ids = ids.split(/,|\s/)
 	=> ["14", "", "45", "", "3"]
 	
+### Try the ID report feature
 
+If you want to try out the ID report feature, you can use one of the test resources we already have and uses for testing.
+
+Here is how...
+
+1. unzip the test repositoyr `test/resources/idReportTestRepository.zip` into `test/resources/`
+1. Run from the root of your current directory (where the README file you currently are reading, not the unzipped one) the following command: `./pac.rb -d 2012-01-01 --settings=test/resources/idReportTestRepository_settings.yml`
+1. Look at the ids.md file created in your current directory  
 	
 
 ## Usage examples
