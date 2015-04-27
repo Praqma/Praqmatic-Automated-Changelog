@@ -129,3 +129,17 @@ Also you'll need to install the gems specified in the Gemfile in order to get it
 * Martin Georgiev (mvgeorgiev@praqma.net)
 * Mads Nielsen (man@praqma.net)
 * Bue Petersen (bue@praqma.net)
+
+
+
+## Developer info
+
+### Tests
+
+Source code is not yet very testable, but for now a simple test suite on latest feature have been added.
+
+Run with:
+
+		ruby test/functional/testSuite_idReport.rb
+
+The test uses a git repository, that is added as test resource and thus tests are running against known content. 

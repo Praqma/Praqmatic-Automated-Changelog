@@ -42,8 +42,9 @@ module Task
     end
 
     def statistics_html(commits)
+      tasks = task_id_list(commits)
       taskReferenceCount = commits.values.select { |e| !@filterpatterns.match(e).nil? }.length
-      unspecifiedCommitCount = commits.length - taskReferenceCount
+      unspecifiedCommitCount = get_shas_without_reference(commits, tasks).length
       healthgauge = health(commits)*100
       html =  
       <<-EOM
@@ -99,30 +100,77 @@ module Task
 
       commits.each do |k,v| 
          #Return the resulting ID of the regex
-        res = @filterpatterns.match(v)
-        if !res.nil? 
-
-          if not split_pattern.nil?
-            res[:id].split(split_pattern).each do |split_value|
-              if(!grouped_by_task_id.has_key?(split_value))  
-                grouped_by_task_id[split_value] = Hash.new
+        match = @filterpatterns.match(v)
+        # we require regexp to return group id if matches
+        if !match.nil?
+          # we could match empty string...
+          if !match[:id].nil? or !match[:id].empty? or !match[:id].gsub!(/\s+/, "").empty?  then
+            res = match[:id]
+             if not split_pattern.nil?
+              res.split(split_pattern).each do |split_value|
+                if(!grouped_by_task_id.has_key?(split_value))
+                  grouped_by_task_id[split_value] = Hash.new
+                end
+                grouped_by_task_id[split_value][k] = v
               end
-              grouped_by_task_id[split_value][k] = v                              
+            else
+              if(!grouped_by_task_id.has_key?(res))
+                grouped_by_task_id[res] = Hash.new
+              end
+              grouped_by_task_id[res][k] = v
             end
-          else
-            if(!grouped_by_task_id.has_key?(res[:id]))  
-              grouped_by_task_id[res[:id]] = Hash.new
-            end
-            grouped_by_task_id[res[:id]][k] = v 
           end
         end 
       end
-      grouped_by_task_id       
+      grouped_by_task_id
+    end
+
+    # Returns the netto list of SHA that have not references.
+    # Expected input for "all_commits"
+    # commit list contains all SHAs, eg.
+        #        {"79cbf45541f76f00e3b1a96b028e66fe65e680b9"=>
+        #          "Test for multiple\n\nIssue: 1,2\n",
+        #         "32ca499e0a0d022c6449b6f9a5b436213541c6b1"=>"Test for empty\n",
+        #         "c10036985d6c3ba8892bd532cb5e7a9bca3952ee"=>
+        #          "Test for none reference\n\nIssue: none\n",
+        #         "e62d01c7548117dbf529f2eb93c448b3d1d865a9"=>
+        #          "Updated readme file again - third commit\n\nIssue: 1\n",
+        #         "19ae102a802dce3a8f457891a2da18ff43d75815"=>
+        #          "Revert \"Updated readme file\"\n\nThis reverts commit 694946d80d69703cf70e9d77d58fca879157c158.\nIssue: 1\n",
+        #         "694946d80d69703cf70e9d77d58fca879157c158"=>
+        #          "Updated readme file\n\nIssue: 3\n",
+        #         "7047925b7a29fac846c2842973fe828c22ac3a51"=>"Initial commit - added README\n"}
+        # The tasks list above contain all our SHAs that have task references, but in a bit different list:
+        #        {"1"=>
+        #          {"79cbf45541f76f00e3b1a96b028e66fe65e680b9"=>
+        #            "Test for multiple\n\nIssue: 1,2\n",
+        #           "e62d01c7548117dbf529f2eb93c448b3d1d865a9"=>
+        #            "Updated readme file again - third commit\n\nIssue: 1\n",
+        #           "19ae102a802dce3a8f457891a2da18ff43d75815"=>
+        #            "Revert \"Updated readme file\"\n\nThis reverts commit 694946d80d69703cf70e9d77d58fca879157c158.\nIssue: 1\n"},
+        #         "2"=>
+        #          {"79cbf45541f76f00e3b1a96b028e66fe65e680b9"=>
+        #            "Test for multiple\n\nIssue: 1,2\n"},
+        #         "3"=>
+        #          {"694946d80d69703cf70e9d77d58fca879157c158"=>
+        #            "Updated readme file\n\nIssue: 3\n"}}
+        #
+        # We want to diff those list, to generate a list of SHA that did reference a task
+    def get_shas_without_reference(all_commits, task_commits)
+      sha_list = Array.new
+      task_commits.values.each {|array_entry| sha_list << array_entry.keys }
+      task_shas = sha_list.flatten
+
+      commit_shas = all_commits.keys
+
+      # netto list of commit without tasks references:
+      unreferenced_shas = commit_shas - task_shas
+      return unreferenced_shas
     end
 
     #This one has become a tad too specific for git. We get the short shar (first 8 digits). And
     #we trim the subject (That is the first element in the list when splitting the message on a newline.  
-    def task_id_report(commits) 
+    def task_id_report(commits)
       tasks = task_id_list(commits)
       mdPath = @path.nil? == true ? "ids.md" : File.join(@path, "#{@settings[:general]['id_log_name']}.md")
 
@@ -137,8 +185,10 @@ module Task
         end
         file << "\#\#Unspecified\n"
         
-        commits.select { |k,v| @filterpatterns.match(v).nil? }.each do |kCommit,vCommit|
-          file << " - #{kCommit.slice(0..7)}: #{vCommit.split(/\n/).first}\n"
+
+        unreference_shas = get_shas_without_reference(commits, tasks)
+        unreference_shas.each do |sha|
+          file << " - #{ sha.slice(0..7) }: #{ commits[sha].split(/\n/).first }\n"
         end
 
         file << "\n"

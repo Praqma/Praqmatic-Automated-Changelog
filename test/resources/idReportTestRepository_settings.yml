@@ -17,4 +17,4 @@
   type: git
   usr:
   pwd:
-  repo_location: "idReportTestRepository"
+  repo_location: "test/resources/idReportTestRepository"
