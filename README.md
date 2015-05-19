@@ -102,6 +102,9 @@ Here is how...
 	
 
 ## Usage examples
+
+_Note there is a docker container available also, which makes the tools and environment setup easier: [Praqma/docker-pac](https://github.com/Praqma/docker-pac)_
+
 Show help
 
     ./pac.rb -h
@@ -122,6 +125,47 @@ Get all commits since latest point release. Given a specified pattern. Default i
 
 	./pac.rb -t LATEST --settings=./pacfogbugz_pac_settings.yml --outpath=/usr/share/changelog --pattern='tags/Release-1.*'
 
+## Using the Praqma/docker-pac container
+
+* [Praqma/docker-pac imagefile](https://github.com/Praqma/docker-pac)
+* [praqma/pac image](https://registry.hub.docker.com/u/praqma/pac/)
+
+The following usage example are actually based on test repository we supply with `idReportTestRepository` in `test/resources/idReportTestRepository.zip` so you can easy try the following yourself.
+
+* First create the `testing-PAC` folder somewhere on your local machine and accessible from docker.
+* enable display as described just above
+* clone latest [PAC](https://github.com/Praqma/Praqmatic-Automated-Changelog) (tagged release version) to the `testing-PAC`-folder as `PAC-0.9.0`
+
+Your should now have the following:
+
+```
+testing-PAC
+testing-PAC/PAC-0.9.0
+```
+
+* unzip the testing repository `test/resources/idReportTestRepository.zip` into `testing-PAC/idReportTestRepository`
+	* `unzip PAC-0.9.0/test/resources/idReportTestRepository.zip`
+
+
+Then you have:
+
+
+```
+testing-PAC
+testing-PAC/PAC-0.9.0
+testing-PAC/idReportTestRepository
+```
+
+* copy and edit the PAC configuration file to match repostiroy location:
+  * `cp PAC-0.9.0/test/resources/idReportTestRepository_settings.yml idReportTestRepository/`
+  * edit the line `repo_location:` to match `repo_location: "idReportTestRepository"`
+* Then run docker pac container v2 like this from the `testing-PAC` directory:
+  `docker run -v $(pwd):/data -v /tmp/.X11-unix:/tmp/.X11-unix:ro -e DISPLAY=$DISPLAY praqma/pac:v2 ruby PAC-0.9.0/pac.rb -s f9a66ca6d2e6 --settings=idReportTestRepository/idReportTestRepository_settings.yml`
+
+_and you will get ids.md (the ID report) as output_ and see that PAC is able to run and use the toolstack supplied.
+
+
+
 ## Prerequisites
 If you are going to be using the tool to generate PDF files which we use kramdown and pdfkit to generate you'll need to run the following command and a linux machine
 
@@ -131,6 +175,10 @@ If you are going to be using the tool to generate PDF files which we use kramdow
 
 
 Also you'll need to install the gems specified in the Gemfile in order to get it working. At the current state Linux support is much better than windows
+
+_Note there is a docker container available also, which makes the tools and environment setup easier: [Praqma/docker-pac](https://github.com/Praqma/docker-pac)_
+
+
 
 ## Contributors
 * Hugo Leote (hleote@praqma.net)
