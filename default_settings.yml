@@ -26,3 +26,4 @@
   usr:
   pwd:
   repo_location: "/path/to/my/repo"
+  release_regex: "/tags/"
