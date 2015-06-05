@@ -44,7 +44,6 @@ module Vcs
       
       walker.each do |commit|
         if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-          #commit_messages.push(commit.message)        
           commit_messages[commit.oid] = commit.message
         end
       end
@@ -192,13 +191,7 @@ module Vcs
         walker.each do |commit| 
           #This old method does not work as we expect. For example the ordering of the commits, which the walker
           #traverses differs from what is displayed on github. 
-                 
-          #if commit.oid == tailCommitOid
-          #  commitMessages.push(commit.message)
-          #  break
-          #end
-  
-          #commitMessages.push(commit.message)
+
           if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
             commitMessages[commit.oid] = commit.message        
           end

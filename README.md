@@ -42,6 +42,7 @@ Below is an example of an example that uses FogBugz and git. If you want to use 
       repo_location: "/home/myuser/myproject/repo"
       usr:
       pwd:
+      release_regex:  "tags"
 
 ## Special case with none task system
 
@@ -124,6 +125,8 @@ Get commits using time
 Get all commits since latest point release. Given a specified pattern. Default is 'tags'
 
 	./pac.rb -t LATEST --settings=./pacfogbugz_pac_settings.yml --outpath=/usr/share/changelog --pattern='tags/Release-1.*'
+
+Note that when using tags with a pattern that matches multiple tags, the latest is always used. The comparison is always compared to HEAD.
 
 ## Using the Praqma/docker-pac container
 
