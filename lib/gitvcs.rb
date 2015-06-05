@@ -118,7 +118,7 @@ module Vcs
           unless @settings[:release_regex].nil?
             release_regex =  Regexp.new @settings[:release_regex]  
           end
-          
+
           tailTagReference = @repository.refs(release_regex).each do |ref|
             commitToSort = @repository.lookup(ref.target)                   
             if commitToSort.class == Rugged::Tag
@@ -200,7 +200,7 @@ module Vcs
   
           #commitMessages.push(commit.message)
           if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-            commitMessages.push[commit.oid] = commit.message        
+            commitMessages[commit.oid] = commit.message        
           end
         end
       rescue RuntimeError
