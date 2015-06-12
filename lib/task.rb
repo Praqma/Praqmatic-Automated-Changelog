@@ -195,11 +195,16 @@ module Task
         file << statistics_html(commits)
       end
 
-      html = Kramdown::Document.new(File.read(mdPath)).to_html
-      output_file_path = mdPath.sub(/\.md$/, '.pdf')
-      kit = PDFKit.new(html, :page_size => 'A4')
-      kit.to_file(output_file_path)
-
+      unless @settings[:general]['changelog_formats'].nil?
+        if @settings[:general]['changelog_formats'].include?("html")
+          html = Kramdown::Document.new(File.read(mdPath)).to_html
+        end
+        if @settings[:general]['changelog_formats'].include?("pdf")
+           output_file_path = mdPath.sub(/\.md$/, '.pdf')
+           kit = PDFKit.new(html, :page_size => 'A4')
+           kit.to_file(output_file_path)
+        end
+      end
     end
   end
 
