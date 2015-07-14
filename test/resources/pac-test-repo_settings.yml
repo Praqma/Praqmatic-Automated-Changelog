@@ -1,0 +1,20 @@
+:general:
+  date_template: "%Y-%m-%d"
+  changelog_name: "Changelog"
+  id_log_name: "ids"
+  changelog_formats:
+    - "html"
+    - "pdf"
+  changelog_css: 
+  verbose: false
+
+:none:
+  regex:
+    - '/.*Issue\s*(?<id>[\d+|[,|\s]]+).*/im'
+  delimiter: '/,|\s/'
+
+:vcs:
+  type: git
+  usr:
+  pwd:
+  repo_location: "test/resources/pac-test-repo"

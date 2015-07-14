@@ -4,11 +4,11 @@
 # Copyright 2013 YXLON International A/S
 #
 module PAC__TestCases_IdReport
-  require 'rubygems'
-  require 'zip'
   require 'pp'
   require 'fileutils'
   gem 'test-unit'
+  require 'zip/zip'
+  require 'test/unit'
   require 'ci/reporter/rake/test_unit_loader.rb'
 
   # The idReport test cases tests our id report functionality
@@ -26,7 +26,7 @@ module PAC__TestCases_IdReport
 
     # Helper function to unzip our repo
     def unzip_file (file, destination)
-      Zip::File.open(file) { |zip_file|
+      Zip::ZipFile.open(file) { |zip_file|
         zip_file.each { |f|
           f_path=File.join(destination, f.name)
           FileUtils.mkdir_p(File.dirname(f_path))

@@ -1,0 +1,118 @@
+================================================================================
+$ git log --graph --source --all
+================================================================================
+
+*   commit d926b6bf510abcda2ceff4ad01693a694e65141a	refs/heads/master
+|\  Merge: f5bcb54 3e2b00a
+| | Author: Mads Nielsen <man@praqma.net>
+| | Date:   Tue Jul 14 11:00:13 2015 +0200
+| | 
+| |     Commited merge conflict
+| |   
+| * commit 3e2b00ad7b844d4708d7320788d2b54f917e4640	refs/heads/Branch4
+| | Author: Mads Nielsen <man@praqma.net>
+| | Date:   Tue Jul 14 11:00:13 2015 +0200
+| | 
+| |     Branch 4 commit 1
+| |     
+* |   commit f5bcb543a73e7d168f1c99c1da1ae0b9f84f3543	refs/heads/master
+|\ \  Merge: 1fbeb9e e364d0e
+| |/  Author: Mads Nielsen <man@praqma.net>
+|/|   Date:   Tue Jul 14 11:00:13 2015 +0200
+| |   
+| |       Merge branch 'branch3'
+| |   
+| * commit e364d0e8c58efcc1069d516f83f14660df0a7dcd	refs/heads/branch3
+|/  Author: Mads Nielsen <man@praqma.net>
+|   Date:   Tue Jul 14 11:00:13 2015 +0200
+|   
+|       Branch 3 commit 1
+|    
+*   commit 1fbeb9eda1d620d44208c919f326f7e16485b16f	refs/heads/Branch4
+|\  Merge: 24cf861 9439c82
+| | Author: Mads Nielsen <man@praqma.net>
+| | Date:   Tue Jul 14 11:00:13 2015 +0200
+| | 
+| |     Merge branch 'Branch2'
+| |   
+| * commit 9439c822426bff6ac8bfebb66a893a281872ba38	refs/heads/Branch2
+|/  Author: Mads Nielsen <man@praqma.net>
+|   Date:   Tue Jul 14 11:00:13 2015 +0200
+|   
+|       Issue 1
+|  
+* commit 24cf861d3ca6da1af780c72cd39ca16f5b90dc56	refs/heads/Branch2
+| Author: Mads Nielsen <man@praqma.net>
+| Date:   Tue Jul 14 11:00:13 2015 +0200
+| 
+|     Second commit on master
+|    
+*   commit 7088338c011cbcfaa69cb3a14bd12553f9b42584	refs/heads/Branch2
+|\  Merge: c1ece74 4069c10
+| | Author: Mads Nielsen <man@praqma.net>
+| | Date:   Tue Jul 14 11:00:13 2015 +0200
+| | 
+| |     Merge branch 'branch1'
+| |   
+| * commit 4069c1010c7536acb584411fd71657eeb27eda65	refs/heads/branch1
+|/  Author: Mads Nielsen <man@praqma.net>
+|   Date:   Tue Jul 14 11:00:13 2015 +0200
+|   
+|       Branch1 commit 1
+|  
+* commit c1ece74c3411d0f19c49a1b193d3a8aec7376aa1	refs/heads/branch1
+  Author: Mads Nielsen <man@praqma.net>
+  Date:   Tue Jul 14 11:00:13 2015 +0200
+  
+      Initial commit on master
+
+
+
+================================================================================
+$ git branch -a
+================================================================================
+  Branch2
+  Branch4
+  branch1
+  branch3
+* master
+
+
+
+================================================================================
+$ git show-branch --all
+================================================================================
+! [Branch2] Issue 1
+ ! [Branch4] Branch 4 commit 1
+  ! [branch1] Branch1 commit 1
+   ! [branch3] Branch 3 commit 1
+    * [master] Commited merge conflict
+-----
+    - [master] Commited merge conflict
+ +  * [Branch4] Branch 4 commit 1
+   +* [branch3] Branch 3 commit 1
+ - -- [master~2] Merge branch 'Branch2'
+++ +* [Branch2] Issue 1
+++ +* [master~3] Second commit on master
+-- -- [master~4] Merge branch 'branch1'
+++++* [branch1] Branch1 commit 1
+
+
+
+================================================================================
+$ git show-branch --all --sha1-name
+================================================================================
+! [Branch2] Issue 1
+ ! [Branch4] Branch 4 commit 1
+  ! [branch1] Branch1 commit 1
+   ! [branch3] Branch 3 commit 1
+    * [master] Commited merge conflict
+-----
+    - [d926b6b] Commited merge conflict
+ +  * [3e2b00a] Branch 4 commit 1
+   +* [e364d0e] Branch 3 commit 1
+ - -- [1fbeb9e] Merge branch 'Branch2'
+++ +* [9439c82] Issue 1
+++ +* [24cf861] Second commit on master
+-- -- [7088338] Merge branch 'branch1'
+++++* [4069c10] Branch1 commit 1

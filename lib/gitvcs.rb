@@ -40,6 +40,10 @@ module Vcs
       commit_messages = Hash.new
   
       walker = createWalker
+
+      #We need to sort topologically (since commits can be ooo)
+      walker.sorting(Rugged::SORT_TOPO)
+
       walker.push(headCommit.oid)
       
       walker.each do |commit|
@@ -71,6 +75,10 @@ module Vcs
       end
   
       walker = createWalker
+      
+      #We need to sort topologically (since commits can be ooo)
+      walker.sorting(Rugged::SORT_TOPO)
+
       walker.push(headCommitSHA)
   
       commit_messages = Hash.new      
@@ -172,6 +180,9 @@ module Vcs
       tailTagOid = getTagReferenceOid.call(tailTag)
       tailCommitOid = getCommitOid.call(tailTagOid)
       walker = createWalker
+      
+      #We need to sort topologically (since commits can be ooo)
+      walker.sorting(Rugged::SORT_TOPO)
   
       if headTag.nil?
         headCommit = @repository.lookup(@repository.head.target)
