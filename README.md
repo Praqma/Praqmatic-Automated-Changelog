@@ -202,3 +202,7 @@ Run with:
 		ruby test/functional/testSuite_idReport.rb
 
 The test uses a git repository, that is added as test resource and thus tests are running against known content. 
+
+####NOTES
+* Tests cannot be executed from any other location than the root of the repository. So do not cd into the folder with the testSuite
+* ....
