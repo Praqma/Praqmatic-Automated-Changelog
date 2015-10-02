@@ -1,6 +1,6 @@
 # Praqmatic Automated Changelog (PAC)
 
-Simple proof-of-concept for a automated, but pragmatic, changelog system.
+Tool for creating automated, but pragmatic, changelogs.
 
 Compared to other ways of extracting changes, typically from the SCM commit messages, this is based around getting information from another source by looking up references to such in the SCM commit message.
 
