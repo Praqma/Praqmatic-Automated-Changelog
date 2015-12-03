@@ -1,29 +1,38 @@
 :general:
-  date_template: "%Y-%m-%d"
-  changelog_name: "Changelog"
-  changelog_formats:
-    - "html"
-    - "pdf"
-  changelog_css: 
-  verbose: false
+  date_template: '%Y-%m-%d'
 
-:fogbugz:
-  fogbugz_url: "https://my.fogbugz.site"
-  fogbugz_usr: user
-  fogbugz_pwd: pass
-  fogbugz_fields: "sTitle,sStatus,sUrl,sCategory,sTags,sPriority,sReleaseNotes"
-  regex:
-    - '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
-    - '/(?<id>JENKINS-[0-9]+)/i'
+:templates:
+  - { location: templates/default_id_report.md, output: ids.md }
+  - { location: templates/default.md, output: default.md }
+  - { location: templates/default_html.html, pdf: true, output: default.html }
 
-:trac: 
-  trac_url: "https://my.trac.site"
-  trac_usr: "user"
-  trac_pwd: "pass"
+:task_systems:
+  - 
+    :name: none
+    :regex:
+      - { pattern: '/Issue:\s*(\d+)/i', label: none }
+      - { pattern: '/Issue:\s*(none)/i', label: none }
+      - { pattern: '/(#\d+)/', label: none }
+      - { pattern: '/us:(\d+)/', label: none }
+    :delimiter: '/,|\s/'
+  -
+    :name: jira
+    :query_string: "http//your.server.hostname/jira/rest/api/latest/#{task_id}"
+    :usr: "user"  
+    :pw: "password"
+    :regex:
+    - { pattern: '/PRJ-(\d+)/i', label: jira }      
+  -
+    :name: trac
+    :trac_url: "https://my.trac.site"
+    :trac_usr: "user"
+    :trac_pwd: "pass"
+    :regex:
+    - { pattern: '/Ticket-(\d+)/i', label: trac }  
   
 :vcs:
   type: git
   usr:
   pwd:
-  repo_location: "/path/to/my/repo"
-  release_regex: "tags"
+  repo_location: '/path/to/my/repo'
+  release_regex: 'tags'

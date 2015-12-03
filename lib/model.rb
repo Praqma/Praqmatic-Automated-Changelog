@@ -1,0 +1,240 @@
+module Model
+
+	#Model object representing a discovered task
+  class PACTask
+    def initialize(task_id = nil)
+      @task_id = task_id      
+      @commit_collection = PACCommitCollection.new 
+      @attributes = { }
+      @applies_to = Set.new      
+      @label = Set.new
+    end
+
+    def applies_to
+      @applies_to
+    end
+
+    def applies_to=(val)
+      @applies_to << val
+    end
+
+    def add_commit(commit)
+      @commit_collection.add(commit)
+    end
+
+    def commits
+      @commit_collection.commits
+    end
+
+    def to_s
+      @task_id      
+    end
+
+    def label
+      @label
+    end
+
+    def label=(val)
+      @label << val
+    end
+
+    #We need to override the equals method. A task is uniquely identified by it's identifier (id). This is usually what
+    #is used to fetch additonal information from the task management system
+    def ==(other) 
+      @task_id == other.task_id
+    end
+
+    def to_liquid
+      { 
+        'task_id' => @task_id, 
+        'commits' => @commit_collection, 
+        'attributes' => attributes,
+        'label' => label
+      }
+    end
+
+    def attributes
+      @attributes
+    end
+
+    def attributes=(value)
+       @attributes = value
+    end
+
+    attr_accessor :commit_collection
+    attr_accessor :task_id
+  end
+
+  #Model object representing a collection of tasks. Includes logic to append commits to existing tasks.
+  #The task with the id 'nil' holds all the commits that do not belong to a particular task.
+  class PACTaskCollection
+    def initialize
+      @tasks = []
+    end
+
+    #When you add a task to a collection. It will automatically add new commits to an existing task. You will 
+    #not get duplicate tasks in the collection.
+    def add(*t)
+      t.flatten.each do |task|   
+        unless @tasks.include? task
+          @tasks << task
+        else
+          task.commit_collection.each do |c|
+            @tasks[@tasks.index(task)].commit_collection.add(c) 
+          end     
+        end
+      end
+    end
+
+    #Enumeartion method. So that PACTaskCollection.each yields a PACTask object
+    def each 
+      @tasks.each { |task| yield task }
+    end
+
+    def length
+      @tasks.length
+    end
+
+    def unreferenced_commits
+      @tasks.select { |t| t.task_id.nil? }.first.commits
+    end
+
+    def referenced_tasks
+      @tasks.select { |t| !t.task_id.nil? }
+    end
+
+    #Indexer method for each collected task
+    def [](task_id) 
+      @tasks.select {|t| t.task_id == task_id}.first
+    end
+
+    #Group each task discovered by it's label
+    def by_label
+      @tasks.group_by { |task| task.label.to_a }  
+    end
+
+    def to_liquid 
+      liquid_hash = { 'tasks' => @tasks, 'referenced' => referenced_tasks, 'unreferenced' => unreferenced_commits }
+      #TODO: This fails
+      liquid_hash.merge! by_label
+      #liquid_hash << by_label
+
+      liquid_hash
+    end
+
+    attr_accessor :tasks, :attr
+  end
+
+  class PACCommitCollection
+  	def initialize 
+  		@commits = []
+  	end
+
+  	def add(*commit)
+  		@commits << commit
+      @commits.flatten!
+  	end
+
+  	def each
+  		@commits.each { |c| yield c }
+  	end
+
+    def count
+      @commits.length
+    end
+
+    def count_with
+      @commits.select{ |c| c.referenced == true }.size
+    end
+
+    def count_without
+      @commits.select{ |c| c.referenced == false }.size
+    end
+
+    def health 
+      count_with.to_f / count
+    end
+
+  	def to_liquid 
+  		@commits
+  	end
+
+  	attr_accessor :commits 
+  end
+
+	class PACCommit
+  	def initialize(sha, message = nil, date = nil)
+  		@sha = sha
+  		@message = message
+      @referenced = false
+      @date = date      		
+  	end
+
+  	def to_liquid 
+  		{ 
+        'sha' => @sha,
+        'message' => @message, 
+        'header' => header, 
+        'referenced' => referenced,
+        'shortsha' => shortsha
+      }
+  	end
+
+  	def ==(other) 
+  		@sha == other.sha  	
+  	end
+
+    def header      
+      @message.split(/\n/).first      
+    end
+
+    #Get default abbreviation from Git
+    def shortsha
+      @sha.slice(0,7)
+    end
+
+    #Match tasks agains this commit. Returns an array of matched tasks. Always contains atleast one element. Since the nil task is
+    #returned for unmatch commits. That is a PACTask with an id of 'nil'.
+    def matchtask(regex, split = nil)
+      tasks = []
+      regex.each do |r|        
+        @message.scan(eval(r['pattern'])).each do |arr|
+          if split.nil?
+            task = PACTask.new(arr[0])
+            task.add_commit(self)
+            self.referenced = true
+            task.label = r['label']
+            tasks << task
+          else
+            arr[0].split(split).each do |s|
+              task = PACTask.new(s)
+              task.add_commit(self)
+              task.label = r['label']
+              self.referenced = true
+              tasks << task              
+            end
+          end
+        end
+      end
+
+      if !self.referenced
+        task = PACTask.new
+        task.add_commit(self)
+        tasks << task
+      end
+
+
+      tasks
+    end
+
+    def to_s
+      'sha:'+@sha
+    end
+
+  	attr_accessor :sha
+  	attr_accessor :message
+    attr_accessor :referenced
+    attr_accessor :date
+	end
+
+end

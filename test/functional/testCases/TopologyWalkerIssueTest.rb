@@ -7,6 +7,7 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
   require 'ci/reporter/rake/test_unit_loader.rb'
   require 'fileutils'
   require 'open3'
+  require_relative '../../../lib/model'
 
   # This test class have tests that verifies that we collect the correct commits
   # for a given repository called pac-test-repo.zip.
@@ -72,7 +73,7 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
       system("cd test/resources/pac-test-repo && git checkout #{ branch}")
 
 
-      Core.load(settings)
+      Core.settings = settings
 
 
       # both these are on master, first and last commit on master
@@ -89,16 +90,15 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
       pp "########################################################################################"
 
       expected_SHAs = [
-        "d926b6bf510abcda2ceff4ad01693a694e65141a",
-        "f5bcb543a73e7d168f1c99c1da1ae0b9f84f3543",
-        "3e2b00ad7b844d4708d7320788d2b54f917e4640",
-        "1fbeb9eda1d620d44208c919f326f7e16485b16f",
-        "e364d0e8c58efcc1069d516f83f14660df0a7dcd",
-        "24cf861d3ca6da1af780c72cd39ca16f5b90dc56",
-        "9439c822426bff6ac8bfebb66a893a281872ba38",
-        "7088338c011cbcfaa69cb3a14bd12553f9b42584",
-        "c1ece74c3411d0f19c49a1b193d3a8aec7376aa1",
-        "4069c1010c7536acb584411fd71657eeb27eda65"
+        Model::PACCommit.new("d926b6bf510abcda2ceff4ad01693a694e65141a"),
+        Model::PACCommit.new("f5bcb543a73e7d168f1c99c1da1ae0b9f84f3543"),
+        Model::PACCommit.new("3e2b00ad7b844d4708d7320788d2b54f917e4640"),
+        Model::PACCommit.new("1fbeb9eda1d620d44208c919f326f7e16485b16f"),
+        Model::PACCommit.new("e364d0e8c58efcc1069d516f83f14660df0a7dcd"),
+        Model::PACCommit.new("24cf861d3ca6da1af780c72cd39ca16f5b90dc56"),
+        Model::PACCommit.new("9439c822426bff6ac8bfebb66a893a281872ba38"),
+        Model::PACCommit.new("7088338c011cbcfaa69cb3a14bd12553f9b42584"),
+        Model::PACCommit.new("4069c1010c7536acb584411fd71657eeb27eda65")
       ]
 
       # All branches are merged to master
@@ -106,18 +106,15 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
 
       pp "Checking with test asserts if the SHAs expected are found..."
       # based on our created test repository
-      expected_SHAs.each do |sha|
-        assert_true(commit_map.has_key?(sha), "Commit map didn't contain the expected SHA which is on #{ branch }: " + sha)
+      expected_SHAs.each do |commit|
+        assert_true(commit_map.commits.include?(commit), "Commit map didn't contain the expected SHA which is on #{ branch }: #{commit.sha}")
       end
       not_expected_SHAs.each do |sha|
-        assert_false(commit_map.has_key?(sha), "Commit map included SHA that was NOT expected (does not exist on #{ branch }): " + sha)
+        assert_false(commit_map.commits.include?(sha), "Commit map included SHA that was NOT expected (does not exist on #{branch}: #{commit.sha}")
       end
       pp "DONE - asserts okay for expected SHAs"
-      
 
-
-
-      grouped_by_task_id = Core.task_system.task_id_list(commit_map)
+      grouped_by_task_id = Core.task_id_list(commit_map)
       pp "########################################################################################"
       pp "List of all task ids (references) in the commits just found:"
       pp "########################################################################################"
@@ -130,54 +127,37 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
       expected_ids = [
         "1"
       ]
-      # obvious these ids are from the commits not found, thus the these task ids should be found either
-      not_expected_ids = [ ] # There are no un-expected ID as there is only one id and it is expect to eb found
 
       expected_ids.each do |id|
-        assert_true(grouped_by_task_id.has_key?(id), "Didn't find task reference for '#{ id }' as expected")
+        assert_not_nil(grouped_by_task_id[id], "Didn't find task reference for #{id} as expected: #{grouped_by_task_id.tasks}")
       end
-      not_expected_ids.each do |id|
-        assert_false(grouped_by_task_id.has_key?(id), "Found task reference for '#{ id }' which was NOT expected")
-      end
-      pp "DONE - asserts okay for expected ids"
-
-
-
-
-      unreferenced = Core.task_system.get_shas_without_reference(commit_map, grouped_by_task_id)
-      pp "########################################################################################"
-      pp "List of all commit that doesn't have a task ids (references):"
-      pp "########################################################################################"
-      pp unreferenced
-      pp "########################################################################################"
 
       # These commits does not have task id references, but are found on the branch we traverse
       expected_unreferenced_SHAs = [
-        "d926b6bf510abcda2ceff4ad01693a694e65141a",
-        "f5bcb543a73e7d168f1c99c1da1ae0b9f84f3543",
-        "3e2b00ad7b844d4708d7320788d2b54f917e4640",
-        "1fbeb9eda1d620d44208c919f326f7e16485b16f",
-        "e364d0e8c58efcc1069d516f83f14660df0a7dcd",
-        "24cf861d3ca6da1af780c72cd39ca16f5b90dc56",
-        "7088338c011cbcfaa69cb3a14bd12553f9b42584",
-        "c1ece74c3411d0f19c49a1b193d3a8aec7376aa1",
-        "4069c1010c7536acb584411fd71657eeb27eda65"
+        Model::PACCommit.new("d926b6bf510abcda2ceff4ad01693a694e65141a"),
+        Model::PACCommit.new("f5bcb543a73e7d168f1c99c1da1ae0b9f84f3543"),
+        Model::PACCommit.new("3e2b00ad7b844d4708d7320788d2b54f917e4640"),
+        Model::PACCommit.new("1fbeb9eda1d620d44208c919f326f7e16485b16f"),
+        Model::PACCommit.new("e364d0e8c58efcc1069d516f83f14660df0a7dcd"),
+        Model::PACCommit.new("24cf861d3ca6da1af780c72cd39ca16f5b90dc56"),
+        Model::PACCommit.new("7088338c011cbcfaa69cb3a14bd12553f9b42584"),
+        Model::PACCommit.new("4069c1010c7536acb584411fd71657eeb27eda65")
       ]
       
       # These are all commits on the branch we traverse, without a task id that matches our
       # regexp in the configuration file, as well as all those commits (with or without task ids
       # that is not on the branch
       referenced_SHAs = [
-        "9439c822426bff6ac8bfebb66a893a281872ba38" 
+        Model::PACCommit.new("9439c822426bff6ac8bfebb66a893a281872ba38" )
       ]
 
       pp "Checking with test asserts for un-referenced commits :"
       # Checking on unreferenced shas:
-      expected_unreferenced_SHAs.each do |sha|
-        assert_true(unreferenced.include?(sha), "Found a SHA in unreferenced SHAs, those without issue reference, that was not expected: " + sha)
+      expected_unreferenced_SHAs.each do |commit|
+        assert_true(grouped_by_task_id.unreferenced_commits.include?(commit), "Found a SHA in unreferenced SHAs, those without issue reference, that was not expected: #{commit.sha}")
       end      
-      referenced_SHAs.each do |sha|
-        assert_false(unreferenced.include?(sha), "Found a SHA in unreferenced SHAs, those without issue reference, that was not expected: " + sha)
+      referenced_SHAs.each do |commit|
+        assert_false(grouped_by_task_id.unreferenced_commits.include?(commit), "Found a SHA in unreferenced SHAs, those without issue reference, that was not expected: #{commit.sha}")
       end
       pp "DONE - assert okay for un-referenced commits"
 

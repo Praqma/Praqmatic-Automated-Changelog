@@ -39,14 +39,14 @@ module PAC__TestCases_IncludesSince
 
       settings = YAML::load(File.open(settings_file))
 
-      Core.load(settings)
-
-      commit_map = Core.vcs.get_commit_messages_by_tag_name('v1.0'); # Since Commit 1
+      Core.settings = settings
+      #Returns a PACCommitCollection
+      commit_map = Core.vcs.get_commit_messages_by_tag_name('v1.0') # Since Commit 1
       # These are the commits AFTER the 1.0 tag
-      assert_true(commit_map.include?("dfd8fd3ade868072f31701aac6fba1f2cf965dd7")) # Commit 3
-      assert_true(commit_map.include?("62f42e26a401524637839ba4ff969194303cff7c")) # Commit 2
-      # This is the commit OF the 1.0 tag
-      assert_true(!commit_map.include?("7164ed9cec32195e44c7f2a2abd764df37921863")) # Commit 1
+      assert_true(commit_map.commits.include?(Model::PACCommit.new("dfd8fd3ade868072f31701aac6fba1f2cf965dd7"))) # Commit 3
+      assert_true(commit_map.commits.include?(Model::PACCommit.new("62f42e26a401524637839ba4ff969194303cff7c"))) # Commit 2
+      # This is the commit OF the 1.0Modelg
+      assert_true(!commit_map.commits.include?(Model::PACCommit.new("7164ed9cec32195e44c7f2a2abd764df37921863"))) # Commit 1
     end
 
     def test_includesSince_sha
@@ -55,14 +55,14 @@ module PAC__TestCases_IncludesSince
 
       settings = YAML::load(File.open(settings_file))
 
-      Core.load(settings)
+      Core.settings = settings
 
-      commit_map = Core.vcs.get_commit_messages_by_commit_sha('7164ed9cec32195e44c7f2a2abd764df37921863'); # Since Commit 1
+      commit_map = Core.vcs.get_commit_messages_by_commit_sha('7164ed9cec32195e44c7f2a2abd764df37921863') # Since Commit 1
       # These are the commits AFTER the 1.0 tag
-      assert_true(commit_map.include?("dfd8fd3ade868072f31701aac6fba1f2cf965dd7")) # Commit 3
-      assert_true(commit_map.include?("62f42e26a401524637839ba4ff969194303cff7c")) # Commit 2
+      assert_true(commit_map.commits.include?(Model::PACCommit.new("dfd8fd3ade868072f31701aac6fba1f2cf965dd7"))) # Commit 3
+      assert_true(commit_map.commits.include?(Model::PACCommit.new("62f42e26a401524637839ba4ff969194303cff7c"))) # Commit 2
       # This is the commit OF the 1.0 tag
-      assert_true(!commit_map.include?("7164ed9cec32195e44c7f2a2abd764df37921863")) # Commit 1
+      assert_true(!commit_map.commits.include?(Model::PACCommit.new("7164ed9cec32195e44c7f2a2abd764df37921863"))) # Commit 1
     end
 
   end # class

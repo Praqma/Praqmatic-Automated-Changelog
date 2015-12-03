@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<title>{{title}}</title>
+	</head>
+	<body>
+		<h1>{{title}}</h1>
+		<h3>Referenced tasks</h3>
+		{% for task in tasks.referenced %}
+			<h5>{{task.task_id}}</h5>
+			<ul>
+			{% for commit in task.commits %}
+				<li> {{commit.shortsha}}:{{commit.header}}</li>
+			{% endfor %}				
+			</ul>
+		{% endfor %}
+		<h3>Unreferenced commits</h3>
+		<ul>
+			{% for commit in tasks.unreferenced %}
+			<li>{{commit.shortsha}}:{{commit.header}}</li>
+			{% endfor %}			
+		</ul>
+	</body>
+</html>

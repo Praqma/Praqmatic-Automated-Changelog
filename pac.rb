@@ -1,15 +1,17 @@
 #!/usr/bin/env ruby
 #encoding: utf-8
 require 'docopt'
+require 'liquid'
 require_relative 'lib/core'
+require_relative 'lib/report'
 
 doc = <<DOCOPT
 Pragmatic changelog 
 
 Usage:
-  #{__FILE__} (-d | --date) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>] [--pattern=<rel_pattern>]     
-  #{__FILE__} (-s | --sha) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>] [--pattern=<rel_pattern>]
-  #{__FILE__} (-t | --tag) <to> [<from>] [--outpath=<path>]  [--settings=<settings_file>] [--formats=<format>] [--pattern=<rel_pattern>]  
+  #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]     
+  #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]
+  #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]  
   #{__FILE__} -h|--help
 
 Options:
@@ -23,19 +25,11 @@ Options:
      
   -s --sha
               
-    Use SHAs to select the changesets.
-      
-  --output=<path>     
-    
-    Specify where the changelog should be written.
+    Use SHAs to select the changesets.      
   
   --settings=<settings_file> 
   
     Path to the settings file used. If nothing is specified default_settings.yml is used
-    
-  --formats=<format>
-  
-    Comma delimited string of which formats to use. We currently support html and pdf, markdown is always created
     
   --pattern=<rel_pattern>
   
@@ -51,44 +45,44 @@ begin
     settings_file = input['--settings']
   end
   
-  settings = YAML::load(File.open(settings_file))
-  
+
+  loaded = YAML::load(File.open(settings_file))
+
   unless input['--pattern'].nil? 
-    settings[:vcs][:release_regex] = input['--pattern']
+    loaded[:vcs][:release_regex] = input['--pattern']
   end
   
-  Core.load(settings)
-
+  #Load the settings
+  Core.settings = loaded 
 
   if (input['--sha'] || input['-s'])
     commit_map = Core.vcs.get_commit_messages_by_commit_sha(input['<to>'], input['<from>'])
-    changes = commit_map.values
   elsif (input['--date'] || input['-d'])
     toTime = Core.to_time(input['<to>'])
     unless input['<from>'].nil?
       fromTime = Core.to_time(input['<from>'])
     end
     commit_map = Core.vcs.get_commit_messages_by_commit_times(toTime, fromTime)     
-    changes = commit_map.values  
   else
     commit_map = Core.vcs.get_commit_messages_by_tag_name(input['<to>'], input['<from>'])    
-    changes = commit_map.values
   end
 
-  #Write an ID_REPORT based on task system and regex. This happenes just before we query the actual contents of the task system.   
-
-  Core.task_system.task_id_report(commit_map)
-
-  #Use core to write the changelog. Depending on the system use we use different ways to do it.
-  if !Core.task_system.is_a? Task::NoneTaskSystem
-    unless changes == []
-      options = []    
-      Core.task_system.write_changelog(changes, input['--outpath'])
-    else
-      puts "No changesets found"  
-    end 
+  #This is all our current tasks (PACTaskCollection) Each task is uniquely identified by an ID.
+  #We need to iterate each task system
+  tasks = Core.task_id_list(commit_map)
+  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)
+  #TODO:NOT DONE
+  Core.settings[:task_systems].each do |ts|
+    Core.apply_task_system(ts)
   end
-  #pp Docopt::docopt(doc)
+
+  #Write the ID report (Basically just a list of referenced and non-referenced issues)
+  #Takes the list of discovered tasks, and only needs the template settings
+  generator = Report::Generator.new
+
+  puts Core.settings
+  generator.generate(tasks, commit_map, Core.settings[:templates])
+
 rescue Docopt::Exit => e
   puts e.message
 end

@@ -6,43 +6,46 @@ Compared to other ways of extracting changes, typically from the SCM commit mess
 
 Currently proof-of-concepts handles
 
-* git dvcs, Trac case management system (unix and windows)
-* git dvcs, Fogbugz case management system (unix and windows)
-* hg dvcs, Trac case managenent system (unix)
-* hg dvcs, Fogbugz case managenebt system (unix)
+* git dvcs
+* hg dvcs
 
-The current script can output in three different formats
+You can output in any format you like using the liquid templating language. We have the option to turn html into pdf with the pdf switch in the template setup.
 
-* html
-* pdf
-* markdown (default, always on)
+## Settings file example (Jira)
 
-## Settings file example (Fogbugz and git)
+Below is an example of an example that uses Jira.
 
-Below is an example of an example that uses FogBugz and git. If you want to use trac replace `:fogbugz:` with `:trac:`
+	:general:
+	  date_template: '%Y-%m-%d'
 
-    :general:
-      date_template: "%Y-%m-%d"
-      changelog_name: "Changelog"
-      changelog_formats:
-        - "html"
-      changelog_css:
-    
-    :fogbugz:
-      fogbugz_url: "https://my.fogbugz.site"
-      fogbugz_usr: my@companymail.net
-      fogbugz_pwd: p455w0rd
-      fogbugz_fields: "sTitle,sStatus,sUrl,sCategory,sTags,sPriority,sReleaseNotes"
-      regex:
-    	- '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
-    	- '/(?<id>JENKINS-[0-9]+)/i'
-    
-    :vcs:
-      type: git
-      repo_location: "/home/myuser/myproject/repo"
-      usr:
-      pwd:
-      release_regex:  "tags"
+	:templates:
+	  - { location: templates/default_id_report.md, output: ids.md }
+	  - { location: templates/default.md, output: default.md }
+	  - { location: templates/default_html.html, pdf: true, output: default.html }
+
+	:task_systems:
+	  - 
+	    :name: none
+	    :regex:
+	      - { pattern: '/Issue:\s*(\d+)/i', label: none }
+	      - { pattern: '/Issue:\s*(none)/i', label: none }
+	      - { pattern: '/(#\d+)/', label: none }
+	      - { pattern: '/us:(\d+)/', label: none }
+	    :delimiter: '/,|\s/'
+	  -
+	    :name: jira
+	    :query_string: "http//your.server.hostname/jira/rest/api/latest/#{task_id}"
+	    :usr: "user"  
+	    :pw: "password"
+	    :regex:
+	    - { pattern: '/PRJ-(\d+)/i', label: jira }      
+	  -
+	    :name: trac
+	    :trac_url: "https://my.trac.site"
+	    :trac_usr: "user"
+	    :trac_pwd: "pass"
+	    :regex:
+	    - { pattern: '/Ticket-(\d+)/i', label: trac }  
 
 ## Special case with none task system
 

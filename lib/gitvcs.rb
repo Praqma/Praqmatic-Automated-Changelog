@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "rugged"
+require_relative "model"
 
 module Vcs
   
@@ -9,7 +10,7 @@ module Vcs
     
     def initialize(settings)
       @settings = settings
-      @repository = Rugged::Repository.new(@settings['repo_location'])    
+      @repository = Rugged::Repository.new(@settings[:repo_location])    
     end
     
     def createWalker
@@ -37,8 +38,6 @@ module Vcs
       headTime = headTime.to_i
       tailTime = tailTime.to_i
   
-      commit_messages = Hash.new
-  
       walker = createWalker
 
       #We need to sort topologically (since commits can be ooo)
@@ -46,13 +45,16 @@ module Vcs
 
       walker.push(headCommit.oid)
       
+      commits = Model::PACCommitCollection.new
+
       walker.each do |commit|
         if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-          commit_messages[commit.oid] = commit.message
+          p_commit = PACCommit.new(commit.oid, commit.message, commit.time)
+          commits.add(p_commit)
         end
       end
        
-      return commit_messages
+      return commits
     end
   
     def get_commit_messages_by_commit_sha(tailCommitSHA, headCommitSHA=nil)
@@ -81,21 +83,21 @@ module Vcs
 
       walker.push(headCommitSHA)
   
-      commit_messages = Hash.new      
+      commits = Model::PACCommitCollection.new
   
       begin
-        walker.each do |commit|
+        walker.each do |commit|          
           if commit.oid == tailCommitSHA
             break
           end
-  
-          commit_messages[commit.oid] = commit.message
+          p_commit = Model::PACCommit.new(commit.oid, commit.message, commit.time)
+          commits.add(p_commit)
         end
       rescue RuntimeError
         puts "Failed to load changeset"
       end
   
-      return commit_messages
+      return commits
     end
     
     def get_commit_messages_by_tag_name(tailTag, headTag=nil)
@@ -104,16 +106,16 @@ module Vcs
       #FIXME: How dow we do this properly? 
       getTaggedCommitTime = lambda do |tagName|
         if tailTag != "LATEST" 
-          tagCommitTime = @repository.refs(/tags\/#{tagName}/)
-                  
-          if tagCommitTime.first.nil?
+          tagCommitTime = @repository.references["refs/tags/#{tagName}"]
+              
+          if tagCommitTime.nil?
             raise ArgumentError, "The tag with the name #{tailTag} not found in repository"
           end
           
-          mycommit = @repository.lookup(tagCommitTime.first.target)
+          mycommit = @repository.lookup(tagCommitTime.target_id)
 
           #If target is another tag, get the time of that
-          if (mycommit.class == Rugged::Tag)
+          if (mycommit.class == Rugged::Tag::Annotation)
             mycommit.target.time
           else
             mycommit.time
@@ -140,10 +142,10 @@ module Vcs
   
       getTagReferenceOid = lambda do |tagName|
         if tailTag != "LATEST"
-          tailTagReference = @repository.refs(/tags\/#{tagName}/)
+          tailTagReference = @repository.references["refs/tags/#{tagName}"]
           
-          raise ArgumentError, "Tag reference '#{tagName}' can not be found" if tailTagReference.empty?
-          tailTagReference.first.target
+          raise ArgumentError, "Tag reference '#{tagName}' can not be found" if tailTagReference.nil?
+          tailTagReference
         else
           commitTimes = []
           release_regex = /tags/
@@ -166,7 +168,7 @@ module Vcs
       end
   
       getCommitOid = lambda do |tagOid|
-        element = @repository.lookup(tagOid)
+        element = @repository.lookup(tagOid.target_id)
   
         if element.respond_to?('target')
           return element.target.oid
@@ -184,7 +186,7 @@ module Vcs
       walker.sorting(Rugged::SORT_TOPO)
   
       if headTag.nil?
-        headCommit = @repository.lookup(@repository.head.target)
+        headCommit = @repository.lookup(@repository.head.target_id)
         headTime = headCommit.time.to_i
         walker.push(headCommit.oid)
       else
@@ -195,7 +197,7 @@ module Vcs
         walker.push(headCommitOid)
       end
   
-      commitMessages = Hash.new
+      commits = Model::PACCommitCollection.new
   
       begin
         walker.each do |commit| 
@@ -203,14 +205,15 @@ module Vcs
           #traverses differs from what is displayed on github. 
 
           if tailCommitOid != commit.oid && headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-            commitMessages[commit.oid] = commit.message        
+            p_commit = Model::PACCommit.new(commit.oid, commit.message, commit.time)
+            commits.add(p_commit)     
           end
         end
       rescue RuntimeError
         puts "Failed to load changeset"
       end
       
-      return commitMessages
+      return commits
     end
   end
 end
