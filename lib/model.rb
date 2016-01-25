@@ -110,15 +110,23 @@ module Model
 
     #Group each task discovered by it's label
     def by_label
-      @tasks.group_by { |task| task.label.to_a }  
+      labelled = Hash.new
+      @tasks.each { |t| 
+        t.label.each { |t_label|
+          unless labelled.include? t_label
+            labelled[t_label] = []
+          end
+          unless t_label.nil?
+            labelled[t_label] << t
+          end
+        }
+      }
+      labelled
     end
 
     def to_liquid 
       liquid_hash = { 'tasks' => @tasks, 'referenced' => referenced_tasks, 'unreferenced' => unreferenced_commits }
-      #TODO: This fails
       liquid_hash.merge! by_label
-      #liquid_hash << by_label
-
       liquid_hash
     end
 
@@ -189,8 +197,8 @@ module Model
     end
 
     #Get default abbreviation from Git
-    def shortsha
-      @sha.slice(0,7)
+    def shortsha(n = 7)
+      @sha.slice(0,n)
     end
 
     #Match tasks agains this commit. Returns an array of matched tasks. Always contains atleast one element. Since the nil task is

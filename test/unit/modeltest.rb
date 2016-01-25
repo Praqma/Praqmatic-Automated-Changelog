@@ -94,9 +94,7 @@ class ModelTest < Test::Unit::TestCase
 		
 		tc_grouped.add(group1)
 		tc_grouped.add(group2)
-
-		puts tc_grouped.by_label
-
+		
 		assert_equal(3, tc_grouped.by_label["STACI"].length)
 		assert_equal(1, tc_grouped.by_label["LUCI"].length)
 
