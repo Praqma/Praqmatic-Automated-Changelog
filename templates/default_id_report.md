@@ -17,5 +17,5 @@
 
 ## Statistics
 - Total numerber of commits: {{pac_c_count}}
-- Refrenced commits: {{pac_c_referenced}}
+- Referenced commits: {{pac_c_referenced}}
 - Health: {{pac_health}}
