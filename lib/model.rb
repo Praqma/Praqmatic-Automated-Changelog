@@ -34,6 +34,7 @@ module Model
       @label
     end
 
+    #Apppend label to the set of existing labels. This prevents duplicate labels.
     def label=(val)
       @label << val
     end
