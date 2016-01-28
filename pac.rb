@@ -70,18 +70,20 @@ begin
   #This is all our current tasks (PACTaskCollection) Each task is uniquely identified by an ID.
   #We need to iterate each task system
   tasks = Core.task_id_list(commit_map)
-  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)
-  #TODO:NOT DONE
+  everything_ok = true
+  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)  
   Core.settings[:task_systems].each do |ts|
-    Core.apply_task_system(ts)
+    everything_ok &= Core.apply_task_system(ts, tasks)
   end
 
   #Write the ID report (Basically just a list of referenced and non-referenced issues)
   #Takes the list of discovered tasks, and only needs the template settings
   generator = Report::Generator.new
-
-  puts Core.settings
   generator.generate(tasks, commit_map, Core.settings[:templates])
+
+  unless everything_ok
+    exit 15
+  end
 
 rescue Docopt::Exit => e
   puts e.message

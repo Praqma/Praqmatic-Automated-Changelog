@@ -101,7 +101,6 @@ class ModelTest < Test::Unit::TestCase
 		group1.each do |g1|
 			assert_equal(2, g1.applies_to.length)
 		end
-
 	end
 
 end

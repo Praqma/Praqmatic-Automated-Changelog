@@ -225,14 +225,7 @@ module Model
           end
         end
       end
-
-      if !self.referenced
-        task = PACTask.new
-        task.add_commit(self)
-        tasks << task
-      end
-
-
+      
       tasks
     end
 

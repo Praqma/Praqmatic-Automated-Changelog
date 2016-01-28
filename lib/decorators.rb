@@ -6,17 +6,36 @@ module JiraTaskDecorator
   require 'uri'
   require 'json'
 
+  attr_accessor :data 
+
   def fetch(query_string, usr, pw) 
     expanded = eval('"'+query_string+'"')
 
     uri = URI(expanded)
     req = Net::HTTP::Get.new(uri)
     req.basic_auth usr, pw
-    res = Net::HTTP.start(uri.hostname, uri.port) { |http|
-      http.request(req)
-    }
+    begin
+      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
+        http.request(req)
+      }
+    rescue Exception
+      raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
+    end 
 
-    @data = JSON.parse(res.body)
+    unless res.is_a? Net::HTTPOK
+      raise Exception, "Failed to fetch task with id #{task_id} on url #{expanded}"
+    end
+
+    begin 
+      @data = parse(res.body)
+    rescue JSONError
+      raise Exception, "Unparsable JSON data fetched from url #{expanded}"
+    end
+
+  end
+
+  def parse(response)
+    JSON.parse(response)
   end
 
   def attributes
@@ -27,7 +46,7 @@ module JiraTaskDecorator
     )
   end
 
-  attr_accessor :data  
+  
 end
 
 module CrucibleTaskDecorator
@@ -54,8 +73,7 @@ module TracTaskDecorator
         @data = { :summary => ticket.summary, :status => ticket.status, :description => ticket.description }
       end
     rescue Trac::TracException => e
-      puts "The ticket with the id #{task_id} not found in Trac"
-      puts e.message
+      raise Exception, "[PAC] The ticket with the id #{task_id} not found in Trac"
     end    
   end
 

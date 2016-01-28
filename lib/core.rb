@@ -14,12 +14,13 @@ module Core extend self
     @@settings = val
   end
   
-  def apply_task_system(task_system)
+  #Requires a configuration section for the task system to be applied
+  def apply_task_system(task_system, tasks)
     if task_system[:name] == 'trac'
-      Task::TracTaskSystem.new(tasks, @settings)
+      Task::TracTaskSystem.new(@@settings).apply(tasks)
     end
     if task_system[:name] == 'jira'
-      Task::JiraTaskSystem.new(tasks, @settings)
+      Task::JiraTaskSystem.new(@@settings).apply(tasks)
     end   
   end
   
@@ -38,7 +39,7 @@ module Core extend self
   end
 
   #This is now core functionality. The task of generating a collection of tasks based on the commits found
-  #This takes in a PACCommitCollection and returns a 
+  #This takes in a PACCommitCollection and returns a PACTaskCollection 
   def task_id_list(commits)
     regex_arr = []
 
@@ -69,7 +70,7 @@ module Core extend self
 
       if !referenced
         task = Model::PACTask.new
-        task.add_commit(self)
+        task.add_commit(c_pac)
         tasks.add(task)
       end      
 

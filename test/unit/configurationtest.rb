@@ -9,7 +9,6 @@ class ConfigurationTest < Test::Unit::TestCase
 		loaded = YAML::load(File.open(settings_file))
 		assert_true(loaded.has_key?(:general))
 		assert_equal(3, loaded[:task_systems].length)
-		assert_equal(3, loaded[:templates].length)
-		puts loaded
+		assert_equal(3, loaded[:templates].length)		
 	end
 end
