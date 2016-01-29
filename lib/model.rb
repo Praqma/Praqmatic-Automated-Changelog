@@ -46,12 +46,13 @@ module Model
     end
 
     def to_liquid
-      { 
+      hash = { 
         'task_id' => @task_id, 
         'commits' => @commit_collection, 
         'attributes' => attributes,
         'label' => label
       }
+      hash
     end
 
     def attributes

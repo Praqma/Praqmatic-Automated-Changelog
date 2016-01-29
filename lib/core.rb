@@ -16,11 +16,12 @@ module Core extend self
   
   #Requires a configuration section for the task system to be applied
   def apply_task_system(task_system, tasks)
-    if task_system[:name] == 'trac'
-      Task::TracTaskSystem.new(@@settings).apply(tasks)
+    puts "[PAC] Applying task system #{task_system[:name]}"
+    if task_system[:name] == 'trac'      
+      Task::TracTaskSystem.new(task_system).apply(tasks)
     end
     if task_system[:name] == 'jira'
-      Task::JiraTaskSystem.new(@@settings).apply(tasks)
+      Task::JiraTaskSystem.new(task_system).apply(tasks)
     end   
   end
   
@@ -57,7 +58,7 @@ module Core extend self
 
         if ts.has_key? :regex 
           tasks_for_commit = c_pac.matchtask(ts[:regex], split_pattern)
-          tasks_for_commit.each do |t|
+          tasks_for_commit.each do |t|            
             t.applies_to = ts[:name]
           end            
           #If a task was found

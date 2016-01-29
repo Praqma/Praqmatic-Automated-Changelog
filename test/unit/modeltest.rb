@@ -66,10 +66,11 @@ class ModelTest < Test::Unit::TestCase
 		#is an implementaion detail.
 		task_c = Model::PACTaskCollection.new
 		task_c.add(task11)						
-		assert_false(task11.attributes.has_key?(:data))
+		assert_false(task11.attributes.has_key?('data'))
 		task11.extend(JiraTaskDecorator)
 		#Notice how that 'task11' now responds to the attributes call with the data field (empty at the moment)
-		assert_true(task11.attributes.has_key?(:data))
+		puts task11.attributes
+		assert_true(task11.attributes.has_key?('data'))
 	end
 
 

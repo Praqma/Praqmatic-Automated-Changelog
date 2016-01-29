@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'pp'
+require_relative 'decorators'
 begin
   require 'pdfkit'
   require 'trac4r'
@@ -46,9 +47,9 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))            
-            t.extend(JiraTaskDecorator).fetch(@settings['query_string'], @settings['usr'], @settings['pw'])
+            t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
           end
-        rescue Exception => err
+        rescue Exception => err          
           puts "[PAC] Jira #{err.message}"
           ok = false
         end

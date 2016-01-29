@@ -10,24 +10,30 @@ module JiraTaskDecorator
 
   def fetch(query_string, usr, pw) 
     expanded = eval('"'+query_string+'"')
-
     uri = URI(expanded)
-    req = Net::HTTP::Get.new(uri)
+    req = Net::HTTP::Get.new(uri)    
     req.basic_auth usr, pw
+    
     begin
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
-        http.request(req)
-      }
+      if expanded.start_with?('https')
+        res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme = 'https') { |http|
+          http.request(req)
+        }
+      else
+        res = Net::HTTP.start(uri.hostname, uri.port) { |http|
+          http.request(req)
+        }        
+      end
     rescue Exception
       raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
     end 
 
     unless res.is_a? Net::HTTPOK
-      raise Exception, "Failed to fetch task with id #{task_id} on url #{expanded}"
+      raise Exception, "Failed to fetch task with id #{task_id} on url #{expanded} return code was #{res.code}"
     end
 
     begin 
-      @data = parse(res.body)
+      @data = parse(res.body) 
     rescue JSONError
       raise Exception, "Unparsable JSON data fetched from url #{expanded}"
     end
@@ -39,9 +45,9 @@ module JiraTaskDecorator
   end
 
   def attributes
-    super.merge!(
+    super.merge!(      
       { 
-        :data => @data
+        'data' => @data
       }
     )
   end
@@ -80,7 +86,7 @@ module TracTaskDecorator
   def attributes
     super.merge!(
       { 
-        :data => @data
+        'data' => @data
       }
     )    
   end
