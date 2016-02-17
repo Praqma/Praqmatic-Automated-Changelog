@@ -1,4 +1,4 @@
-[![Stories in Ready](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=ready&title=Ready)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog)
+[![Stories in Ready](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20-workable&title=Workable)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog)
 # Praqmatic Automated Changelog (PAC)
 
 Tool for creating automated, but pragmatic, changelogs.
