@@ -61,7 +61,7 @@ module Task
   class TracTaskSystem < TaskSystem
     TASK_REGEX = /Ticket\#(?<id>([0-9]+|none))+/i
     def initialize(settings) 
-      TracTaskDecorator.trac_instance = Trac.new @settings[:trac]['trac_url'], @settings[:trac]['trac_usr'], @settings[:trac]['trac_pwd']      
+      TracTaskDecorator.trac_instance = Trac.new @settings[:trac][:trac_url], @settings[:trac][:trac_usr], @settings[:trac][:trac_pwd]      
     end
 
     def apply(tasks)

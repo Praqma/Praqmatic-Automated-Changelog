@@ -31,8 +31,8 @@
     - { pattern: '/Ticket-(\d+)/i', label: trac }  
   
 :vcs:
-  type: git
-  usr:
-  pwd:
-  repo_location: '/path/to/my/repo'
-  release_regex: 'tags'
+  :type: git
+  :usr:
+  :pwd:
+  :repo_location: '/path/to/my/repo'
+  :release_regex: 'tags'
