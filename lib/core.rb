@@ -36,7 +36,7 @@ module Core extend self
   end
   
   def to_time(datestring)
-    DateTime.strptime(datestring, @settings[:general]['date_template']).to_time    
+    DateTime.strptime(datestring, @@settings[:general]['date_template']).to_time    
   end
 
   #This is now core functionality. The task of generating a collection of tasks based on the commits found

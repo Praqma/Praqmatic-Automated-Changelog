@@ -29,7 +29,7 @@ module Vcs
       raise ArgumentError, 'Tail time parameter is nil' if tailTime.nil?
   
       headTarget = @repository.head.target
-      headCommit = @repository.lookup(headTarget)
+      headCommit = @repository.lookup(headTarget.oid)
   
       if headTime.nil?
         headTime = headCommit.time
@@ -49,7 +49,7 @@ module Vcs
 
       walker.each do |commit|
         if headTime >= commit.time.to_i && commit.time.to_i >= tailTime
-          p_commit = PACCommit.new(commit.oid, commit.message, commit.time)
+          p_commit = Model::PACCommit.new(commit.oid, commit.message, commit.time)
           commits.add(p_commit)
         end
       end
