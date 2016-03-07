@@ -9,9 +9,15 @@ module JiraTaskDecorator
   attr_accessor :data 
 
   def fetch(query_string, usr, pw) 
-    expanded = eval('"'+query_string+'"')
-    uri = URI(expanded)
-    req = Net::HTTP::Get.new(uri)    
+    expanded = eval('"'+query_string+'"')    
+	uri = URI.parse(expanded)
+         
+    if expanded =~ URI::regexp
+      req = Net::HTTP::Get.new(uri) 
+    else
+      raise "Invalid URI: #{expanded}"
+    end 
+
     req.basic_auth usr, pw
     
     begin
