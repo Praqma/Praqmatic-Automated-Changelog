@@ -17,11 +17,11 @@
     :delimiter: '/,|\s/'
   -
     :name: jira
-    :query_string: "http//your.server.hostname/jira/rest/api/latest/#{task_id}"
+    :query_string: "http://your.server.hostname/rest/api/latest/issue/#{task_id}"
     :usr: "user"  
     :pw: "password"
     :regex:
-    - { pattern: '/PRJ-(\d+)/i', label: jira }      
+    - { pattern: '/(PRJ-\d+)/i', label: jira }      
   -
     :name: trac
     :trac_url: "https://my.trac.site"
