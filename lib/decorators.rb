@@ -11,7 +11,7 @@ module JiraTaskDecorator
   def fetch(query_string, usr, pw) 
     expanded = eval('"'+query_string+'"')    
 	uri = URI.parse(expanded)
-         
+    
     if expanded =~ URI::regexp
       req = Net::HTTP::Get.new(uri) 
     else
@@ -21,7 +21,7 @@ module JiraTaskDecorator
     req.basic_auth usr, pw
     
     begin
-      if expanded.start_with?('https')
+      if uri.scheme == 'https'
         res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme = 'https') { |http|
           http.request(req)
         }
