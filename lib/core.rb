@@ -58,7 +58,7 @@ module Core extend self
 
         if ts.has_key? :regex 
           tasks_for_commit = c_pac.matchtask(ts[:regex], split_pattern)
-          tasks_for_commit.each do |t|            
+          tasks_for_commit.each do |t|    
             t.applies_to = ts[:name]
           end            
           #If a task was found

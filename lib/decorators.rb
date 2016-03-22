@@ -11,9 +11,9 @@ module JiraTaskDecorator
   def fetch(query_string, usr, pw) 
     expanded = eval('"'+query_string+'"')    
 	uri = URI.parse(expanded)
-    
+     
     if expanded =~ URI::regexp
-      req = Net::HTTP::Get.new(uri) 
+      req = Net::HTTP::Get.new(uri)
     else
       raise "Invalid URI: #{expanded}"
     end 

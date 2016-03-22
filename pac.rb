@@ -45,7 +45,6 @@ begin
     settings_file = input['--settings']
   end
   
-
   loaded = YAML::load(File.open(settings_file))
 
   unless input['--pattern'].nil? 
@@ -80,9 +79,13 @@ begin
   #Takes the list of discovered tasks, and only needs the template settings
   generator = Report::Generator.new
   generator.generate(tasks, commit_map, Core.settings[:templates])
-
   unless everything_ok
-    exit 15
+	if Core.settings[:general][:strict]
+		exit 15
+	else
+	  puts '[PAC] Ignoring encountered errors. Strict mode is disabled.'
+	  exit 0
+	end
   end
 
 rescue Docopt::Exit => e

@@ -1,6 +1,7 @@
 :general:
   date_template: '%Y-%m-%d'
-
+  :strict: false
+ 
 :templates:
   - { location: templates/default_id_report.md, output: ids.md }
   - { location: templates/default.md, output: default.md }
