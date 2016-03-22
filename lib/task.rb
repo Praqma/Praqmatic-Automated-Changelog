@@ -38,22 +38,28 @@ module Task
 
   #This is the Jira task system (EXAMPLE ~ NOT FINISHED)
   class JiraTaskSystem < TaskSystem
-    def initialize(settings)
-      super(settings)   
+    def initialize(settings)	
+      super(settings) 
     end
 
     def apply(tasks)
-      ok = true      
+      ok = true    
+      tasks_with_no_jira_issues = []
+      
       tasks.each do |t|
         begin
-          if(t.applies_to.include?(@settings[:name]))            
+          if(t.applies_to.include?(@settings[:name]))  
             t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
           end
-        rescue Exception => err          
+        rescue Exception => err   
+		  tasks_with_no_jira_issues << t  
           puts "[PAC] Jira #{err.message}"
-          ok = false
+          ok = false	
         end
-      end      
+      end    
+      
+      tasks.tasks -= tasks_with_no_jira_issues
+
       ok
     end 
   end
