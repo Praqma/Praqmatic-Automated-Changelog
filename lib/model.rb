@@ -13,6 +13,10 @@ module Model
     def applies_to
       @applies_to
     end
+    
+    def data
+	  @data
+    end
 
     def applies_to=(val)
       @applies_to << val
@@ -50,7 +54,8 @@ module Model
         'task_id' => @task_id, 
         'commits' => @commit_collection, 
         'attributes' => attributes,
-        'label' => label
+        'label' => label,
+        'data' => data
       }
       hash
     end
@@ -98,7 +103,12 @@ module Model
     end
 
     def unreferenced_commits
-      @tasks.select { |t| t.task_id.nil? }.first.commits
+      output = @tasks.select { |t| t.task_id.nil? }
+      if output.first.nil? 
+		[]
+      else
+		output.first.commits
+      end
     end
 
     def referenced_tasks
