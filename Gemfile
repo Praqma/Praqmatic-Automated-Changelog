@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gem 'mercurial-ruby', :require => false
 gem 'pdfkit'
 gem 'rake'
-gem 'rugged'
+gem 'rugged', '~> 0.24.0'
 gem 'trac4r', :require => false
 gem 'docopt'
 gem 'ruby-fogbugz', :require => false

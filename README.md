@@ -315,8 +315,24 @@ Here is an example
 
 Tests can be easily executed by running `rake test` for unit tests and `rake functional_test` for functional tests. 
 
+## Installation on windows
+
+To run it on windows you need to install ruby installer x86 and devkit x86 [link](http://rubyinstaller.org/downloads/)
+
+To install ruby devkit follow these [instructions](https://github.com/oneclick/rubyinstaller/wiki/Development-Kit)
+
+Rugged requires CMake and pkg-config. 
+
+CMake can be downloaded from [here](http://www.cmake.org/files/v3.2/cmake-3.2.3-win32-x86.zip)
+
+pkg-config has some dependencies. However, there's a [nice package bundled with the dependencies](http://iweb.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/ray_linn/64bit-libraries/pkg-config/pkg-config-0.26.7z).
+
+Start by installing bundler with this command `gem install bundler`. Followed by a `bundle` command inside the project root directory. 
+
 ## Contributors
 * Hugo Leote (hleote@praqma.net)
 * Martin Georgiev (mvgeorgiev@praqma.net)
 * Mads Nielsen (man@praqma.net)
 * Bue Petersen (bue@praqma.net)
+* Andrius Ordojan (and@praqma.net)
+
