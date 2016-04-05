@@ -35,9 +35,13 @@ job('3_release') {
         git('git://github.com/jgritman/aws-sdk-test.git', '2.0')
     }
 
-    steps {
-        shell('git tag -a ${version} -m "${description}"')
-        shell('git push origin ${version}')
+    publishers {
+        git {
+            pushOnlyIfSuccess()
+            tag('origin', '${version}') {
+                message('${description}')
+                create()
+            }
+        }
     }
-
 }
