@@ -1,6 +1,36 @@
-job('1_test') {
+job('1_pretested-integration') {
     scm {
-        git('git://github.com/jgritman/aws-sdk-test.git', '2.0')
+        git {
+            remote {
+                name('origin')
+                url('https://github.com/Praqma/Praqmatic-Automated-Changelog.git')
+            }
+            branch('origin/ready/**')
+
+
+            extensions {
+                wipeOutWorkspace()
+                pruneBranches()
+            }
+        }
+    }
+
+    wrappers {
+        pretestedIntegration("SQUASHED", "2.0", "origin")
+    }
+    publishers {
+        pretestedIntegration()
+    }
+
+    publishers {
+        downstream('2_test', 'SUCCESS')
+    }
+}
+
+
+job('2_test') {
+    scm {
+        git('https://github.com/Praqma/Praqmatic-Automated-Changelog.git', '2.0')
     }
     steps {
         rake() {
@@ -13,9 +43,9 @@ job('1_test') {
     }
 }
 
-job('2_functional_test') {
+job('3_functional_test') {
     scm {
-        git('git://github.com/jgritman/aws-sdk-test.git', '2.0')
+        git('https://github.com/Praqma/Praqmatic-Automated-Changelog.git', '2.0')
     }
     steps {
         rake() {
@@ -25,23 +55,30 @@ job('2_functional_test') {
     }
 }
 
-job('3_release') {
-    parameters {
-        stringParam('version')
-        textParam('description')
-    }
+job('4_release') {
 
     scm {
-        git('git://github.com/jgritman/aws-sdk-test.git', '2.0')
+        git('https://github.com/Praqma/Praqmatic-Automated-Changelog.git', '2.0')
     }
+
 
     publishers {
         git {
             pushOnlyIfSuccess()
-            tag('origin', '${version}') {
-                message('${description}')
+            tag('origin', '$VERSION') {
+                message('')
                 create()
             }
         }
     }
+
+    wrappers {
+        environmentVariables {
+            propertiesFile('./version.properties')
+            env('VERSION', '$ver-$BUILD_NUMBER')
+
+        }
+
+    }
 }
+
