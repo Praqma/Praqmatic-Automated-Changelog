@@ -6,7 +6,7 @@ begin
   require 'trac4r'
   require 'fogbugz'
 rescue LoadError => error
-
+  puts error
 end
 
 class String
@@ -49,10 +49,10 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))  
-            t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
+            t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw], debug: @settings[:debug])
           end
         rescue Exception => err   
-		  tasks_with_no_jira_issues << t  
+		      tasks_with_no_jira_issues << t  
           puts "[PAC] Jira #{err.message}"
           ok = false	
         end
@@ -66,8 +66,9 @@ module Task
 
   class TracTaskSystem < TaskSystem
     TASK_REGEX = /Ticket\#(?<id>([0-9]+|none))+/i
-    def initialize(settings) 
-      TracTaskDecorator.trac_instance = Trac.new @settings[:trac][:trac_url], @settings[:trac][:trac_usr], @settings[:trac][:trac_pwd]      
+    def initialize(settings)
+      super(settings) 
+      TracTaskDecorator.trac_instance = Trac.new settings[:trac_url], settings[:trac_usr], settings[:trac_pwd]      
     end
 
     def apply(tasks)
@@ -75,7 +76,7 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))
-            t.extend(TracTaskDecorator).fetch()
+            t.extend(TracTaskDecorator).fetch(debug: @settings[:debug])
           end
         rescue Exception => err
           puts "[PAC] #{err.message}"

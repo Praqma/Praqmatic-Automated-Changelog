@@ -8,7 +8,7 @@ end
 
 task :functional_test do 
 	Dir.glob('test/functional/*.rb').each do |testfile|
-		ruby "#{testfile}"
+		ruby "#{testfile} --verbose=verbose"
 	end
 end
 
@@ -16,3 +16,5 @@ task :coverage do
   ENV['COVERAGE'] = 'on'
   Rake::Task['test'].execute
 end
+
+

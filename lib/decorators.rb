@@ -8,9 +8,9 @@ module JiraTaskDecorator
 
   attr_accessor :data 
 
-  def fetch(query_string, usr, pw) 
+  def fetch(query_string, usr, pw, debug: false) 
     expanded = eval('"'+query_string+'"')    
-	uri = URI.parse(expanded)
+	  uri = URI.parse(expanded)
      
     if expanded =~ URI::regexp
       req = Net::HTTP::Get.new(uri)
@@ -40,6 +40,8 @@ module JiraTaskDecorator
 
     begin 
       @data = parse(res.body) 
+      puts "[PAC] #{@data}" if debug
+      @data
     rescue JSONError
       raise Exception, "Unparsable JSON data fetched from url #{expanded}"
     end
@@ -57,32 +59,27 @@ module JiraTaskDecorator
       }
     )
   end
-
   
-end
-
-module CrucibleTaskDecorator
-  def attributes
-    super.merge! ({ :review_status => 'APPROVED' })
-  end 
 end
 
 module TracTaskDecorator
   require 'trac4r'
 
-  def trac_instance
+  def self.trac_instance
     @@trac_instance    
   end
 
-  def trac_instance=(trac)
+  def self.trac_instance=(trac)
     @@trac_instance = trac
   end
 
-  def fetch
+  def fetch(debug: false)
     begin
       unless task_id.nil? 
-        ticket = track_instance.tickets.get array[task_id.to_i]
+        ticket = TracTaskDecorator.trac_instance.tickets.get task_id.to_i
         @data = { :summary => ticket.summary, :status => ticket.status, :description => ticket.description }
+        puts "[PAC] #{@data}" if debug
+        @data        
       end
     rescue Trac::TracException => e
       raise Exception, "[PAC] The ticket with the id #{task_id} not found in Trac"
