@@ -39,7 +39,7 @@ DOCOPT
 begin
   require "pp"
   input = Docopt::docopt(doc)
-  settings_file = File.join(File.dirname(__FILE__), 'default_settings.yml')
+  settings_file = File.join(Dir.pwd, 'default_settings.yml')
   
   unless input['--settings'].nil?
     settings_file = input['--settings']

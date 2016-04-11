@@ -179,42 +179,59 @@ Note that when using tags with a pattern that matches multiple tags, the latest 
 
 ## Using the Praqma/docker-pac container
 
-* [Praqma/docker-pac imagefile](https://github.com/Praqma/docker-pac)
-* [praqma/pac image](https://registry.hub.docker.com/u/praqma/pac/)
+The docker container for PAC works by mounting a git repository into the container as a volume, by default the folder `/work` is set as the current 
+working directory inside the container.
 
-The following usage example are actually based on test repository we supply with `idReportTestRepository` in `test/resources/idReportTestRepository.zip` so you can easy try the following yourself.
+So in order to test, and try out the container do the following:
 
-* First create the `testing-PAC` folder somewhere on your local machine and accessible from docker.
-* enable display as described just above
-* clone latest [PAC](https://github.com/Praqma/Praqmatic-Automated-Changelog) (tagged release version) to the `testing-PAC`-folder as `PAC-0.9.0`
-
-Your should now have the following:
+* Unzip the file `test/resources/idReportTestRepository.zip` file from this repository to a folder on your computer
+* Create a file `default_settings.yml` and paste the contents from below into this file. Put the file in the root of the extracted Git repository 
 
 ```
-testing-PAC
-testing-PAC/PAC-0.9.0
+:general:
+  date_template: "%Y-%m-%d"
+  :strict: true
+
+:templates:
+  - { location: /usr/src/app/templates/default_id_report.md, output: ids.md }
+  - { location: /usr/src/app/templates/default.md, output: default.md }
+  - { location: /usr/src/app/templates/default_html.html, pdf: true, output: default.html }
+
+:task_systems:
+  - 
+    :name: none
+    :regex:
+      - { pattern: '/.*Issue:\s*(?<id>[\d+|[,|\s]]+).*?\n/im', label: none }
+      - { pattern: '/.*Issue:\s*?(none).*?\n/im', label: none}
+    :delimiter: '/,|\s/'
+  
+:vcs:
+  :type: git
+  :usr:
+  :pwd:
+  :repo_location: '.'
+  :release_regex: 'tags'
 ```
 
-* unzip the testing repository `test/resources/idReportTestRepository.zip` into `testing-PAC/idReportTestRepository`
-	* `unzip PAC-0.9.0/test/resources/idReportTestRepository.zip`
+Now, when this is done, you should be able to run PAC, the example below is where we extracted the idTestRepository to my home folder:
 
+`docker run --rm -v /home/mads/idReportTestRepository:/data praqma/pac -s f9a66ca6d2e6`
 
-Then you have:
+If PAC is working, you should see the following on system out:
 
+	[PAC] Applying task system none
 
-```
-testing-PAC
-testing-PAC/PAC-0.9.0
-testing-PAC/idReportTestRepository
-```
+and if you do an `ls -al` in your repostitory it should now look like this:
 
-* copy and edit the PAC configuration file to match repostiroy location:
-  * `cp PAC-0.9.0/test/resources/idReportTestRepository_settings.yml idReportTestRepository/`
-  * edit the line `repo_location:` to match `repo_location: "idReportTestRepository"`
-* Then run docker pac container v2 like this from the `testing-PAC` directory:
-  `docker run -v $(pwd):/data -v /tmp/.X11-unix:/tmp/.X11-unix:ro -e DISPLAY=$DISPLAY praqma/pac:v2 ruby PAC-0.9.0/pac.rb -s f9a66ca6d2e6 --settings=idReportTestRepository/idReportTestRepository_settings.yml`
+	-rwxrwxrwx 1 mads mads   759 Apr 12 10:24 default.html
+	-rwxrwxrwx 1 mads mads   356 Apr 12 10:24 default.md
+	-rwxrwxrwx 1 mads mads 21047 Apr 12 10:24 default.pdf
+	-rw-rw-r-- 1 mads mads   608 Apr 12 10:23 default_settings.yml
+	drwxrwxr-x 8 mads mads  4096 Apr 27  2015 .git
+	-rwxrwxrwx 1 mads mads   489 Apr 12 10:24 ids.md
+	-rw-rw-r-- 1 mads mads   340 Apr 27  2015 README.md
 
-_and you will get ids.md (the ID report) as output_ and see that PAC is able to run and use the toolstack supplied.
+That's it. You've now succesfully created a changelog, automagically.
 
 
 ## Prerequisites
@@ -223,7 +240,6 @@ If you are going to be using the tool to generate PDF files which we use kramdow
 `sudo apt-get install libxslt-dev libxml2-dev`
 
 `sudo apt-get install wkhtmltopdf`
-
 
 Also you'll need to install the gems specified in the Gemfile in order to get it working. At the current state Linux support is much better than windows
 

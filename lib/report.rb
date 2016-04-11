@@ -15,12 +15,14 @@ module Report
 	          'pac_health' => commits.health,
 	          'pac_c_unreferenced' => commits.count_without  
 	        } )
+	        File.chmod(0777, file)
 	      end
 
 	      if t['pdf'] == true
 	        output_file_path = t['output'].sub(/\.html$/, '.pdf')
 	        kit = PDFKit.new(File.new(t['output']), :page_size => 'A4')
 	        kit.to_file(output_file_path)
+	        File.chmod(0777, output_file_path)
 	      end
 	    end
 	  end

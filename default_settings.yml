@@ -35,5 +35,5 @@
   :type: git
   :usr:
   :pwd:
-  :repo_location: '/path/to/my/repo'
+  :repo_location: '.'
   :release_regex: 'tags'
