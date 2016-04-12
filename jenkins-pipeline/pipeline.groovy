@@ -18,6 +18,10 @@ job('1_pretested-integration') {
         }
     }
 
+    triggers {
+        githubPush()
+    }
+
     wrappers {
         pretestedIntegration("SQUASHED", "master", "origin")
     }
