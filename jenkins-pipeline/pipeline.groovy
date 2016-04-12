@@ -1,13 +1,32 @@
+REPOSITORY_URL = 'https://github.com/Praqma/Praqmatic-Automated-Changelog.git'
+MAIN_BRANCH = 'master'
+REMOTE_NAME = 'origin'
+JOB_LABELS = 'jenkinsubuntu'
+NUM_OF_BUILDS_TO_KEEP = 100
+
 job('1_pretested-integration') {
     logRotator {
-        numToKeep(25)
+        numToKeep(NUM_OF_BUILDS_TO_KEEP)
+    }
+
+    label(JOB_LABELS)
+
+    properties {
+        ownership {
+            primaryOwnerId('and')
+            coOwnerIds('man')
+        }
+    }
+
+    authorization {
+        permission('hudson.model.Item.Read', 'anonymous')
     }
 
     scm {
         git {
             remote {
-                name('origin')
-                url('https://github.com/Praqma/Praqmatic-Automated-Changelog.git')
+                name(REMOTE_NAME)
+                url(REPOSITORY_URL)
             }
             branch('origin/ready/**')
 
@@ -23,7 +42,8 @@ job('1_pretested-integration') {
     }
 
     wrappers {
-        pretestedIntegration("SQUASHED", "master", "origin")
+        buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})')
+        pretestedIntegration("SQUASHED", MAIN_BRANCH, REMOTE_NAME)
     }
 
     publishers {
@@ -31,84 +51,157 @@ job('1_pretested-integration') {
     }
 
     publishers {
-        downstream('2_test', 'SUCCESS')
-        mailer('and@praqma.net bue@praqma.net', false, false)
+        mailer('and@praqma.net', false, false)
+        downstreamParameterized {
+            trigger('2_test') {
+                parameters {
+                    gitRevision()
+                }
+            }
+        }
     }
 }
 
 
 job('2_test') {
     logRotator {
-        numToKeep(25)
+        numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
 
-    scm {
-        git('https://github.com/Praqma/Praqmatic-Automated-Changelog.git', 'master')
-    }
+    label(JOB_LABELS)
 
-    steps {
-        rake() {
-            task('test')
-            installation('(Default)')
+    properties {
+        ownership {
+            primaryOwnerId('and')
+            coOwnerIds('man')
         }
     }
 
+    authorization {
+        permission('hudson.model.Item.Read', 'anonymous')
+    }
+
+    scm {
+        git {
+            remote {
+                name(REMOTE_NAME)
+                url(REPOSITORY_URL)
+            }
+            branch(MAIN_BRANCH)
+            extensions {}
+        }
+    }
+
+    steps {
+        shell('rake test')
+    }
+
+    wrappers {
+        buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})')
+    }
+
     publishers {
-        downstream('3_functional_test', 'SUCCESS')
-        mailer('and@praqma.net bue@praqma.net', false, false)
+        mailer('and@praqma.net', false, false)
+        downstreamParameterized {
+            trigger('3_functional_test') {
+                parameters {
+                    gitRevision()
+                }
+            }
+        }
     }
 }
 
 job('3_functional_test') {
     logRotator {
-        numToKeep(25)
+        numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
 
-    scm {
-        git('https://github.com/Praqma/Praqmatic-Automated-Changelog.git', 'master')
-    }
+    label(JOB_LABELS)
 
-    steps {
-        rake() {
-            task('functional_test')
-            installation('(Default)')
+    properties {
+        ownership {
+            primaryOwnerId('and')
+            coOwnerIds('man')
         }
     }
 
+    authorization {
+        permission('hudson.model.Item.Read', 'anonymous')
+    }
+
+    scm {
+        git {
+            remote {
+                name(REMOTE_NAME)
+                url(REPOSITORY_URL)
+            }
+            branch(MAIN_BRANCH)
+            extensions {}
+        }
+    }
+
+    steps {
+        shell('rake functional_test')
+    }
+
+    wrappers {
+        buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})')
+    }
+
     publishers {
-        buildPipelineTrigger('4_release')
-        mailer('and@praqma.net bue@praqma.net', false, false)
+        buildPipelineTrigger('4_release') {
+            parameters {
+                gitRevision()
+            }
+        }
+        mailer('and@praqma.net', false, false)
     }
 }
 
 job('4_release') {
+    label(JOB_LABELS)
+
+    properties {
+        ownership {
+            primaryOwnerId('and')
+            coOwnerIds('man')
+        }
+    }
+
+    authorization {
+        permission('hudson.model.Item.Read', 'anonymous')
+    }
+
     scm {
         git {
             remote {
-                name('origin')
-                url('https://github.com/Praqma/Praqmatic-Automated-Changelog.git')
+                name(REMOTE_NAME)
+                url(REPOSITORY_URL)
             }
-            branch('master')
+            branch(MAIN_BRANCH)
             extensions {}
         }
     }
+
+    wrappers {
+        buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})-ver=$VERSION')
+
+        environmentVariables {
+            propertiesFile('./version.sh')
+            env('VERSION', '$ver-$BUILD_NUMBER')
+        }
+    }
+
     publishers {
         git {
             pushOnlyIfSuccess()
-            tag('origin', '$VERSION') {
+            tag(REMOTE_NAME, '$VERSION') {
                 message('')
                 create()
             }
 
-            mailer('and@praqma.net bue@praqma.net', false, false)
-        }
-
-        wrappers {
-            environmentVariables {
-                propertiesFile('./version.properties')
-                env('VERSION', '$ver-$BUILD_NUMBER')
-            }
+            mailer('and@praqma.net', false, false)
         }
     }
 }
-

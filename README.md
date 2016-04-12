@@ -57,7 +57,7 @@ Notice the `pdf: true` attribute on the template. PAC has the ability to transfo
 
 ### Jira specific information
 
-The query string do not handle redirects, so you must prepend the correct protocol in your `query_string` setting. The behaviour of PAC changes if you have specified `https` or `http` always specify the full url, including the correct protocol to use.
+The query string do not handle redirects, so you must prepend the correct protocol in your `query_string` setting. The behavior of PAC changes if you have specified `https` or `http` always specify the full url, including the correct protocol to use.
 
 ## The templating engine
 
@@ -103,7 +103,7 @@ PAC comes with a set of default templates. Take a look at those for inspiration.
 
 ### Jira template extras
 
-Several fields are added when a task is matched for a jira issue if you have a configured issuel link like so: `https://your.first.server.com/rest/api/latest/issue/#{task_id}?fields=issuetype` you get a json response that looks something like this:
+Several fields are added when a task is matched for a jira issue if you have a configured issue link like so: `https://your.first.server.com/rest/api/latest/issue/#{task_id}?fields=issuetype` you get a json response that looks something like this:
 
 	{
 		"expand":"renderedFields,names,schema,transitions,operations,editmeta,changelog,versionedRepresentations",
@@ -122,7 +122,7 @@ Several fields are added when a task is matched for a jira issue if you have a c
 		}
 	}
 
-The fields are then accesed like so:
+The fields are then accessed like so:
 
 * `task.attributes.data.id` The id value of the json above
 * `task.attributes.data.fields.issuetype.[self | id | description | iconUrl | name | subtask]` All values under issuetype
