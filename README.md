@@ -297,7 +297,7 @@ The `Model` module contains all the object models needed. We have the folling, t
 The `PACTaskCollection` has a method to add _n_ tasks to the list. If the task was already added, based on the unique id, then the commits of the two tasks are 
 merged, resulting in 1 task, with the extra commits from the other tasks. This happens if a task is referenced in multiple commits. The _uniqueness_ is implemented in the `PACTaskCollection`. 
 
-In order to ensure that, the _==_ (equals) method on the `PACTask` has been overriden, to only take into account the id of the task when determining equality.
+In order to ensure that, the _==_ (equals) method on the `PACTask` has been overridden, to only take into account the id of the task when determining equality.
 
 The `PACTask` object has a collection of associated commits. It also holds references to the names of which task systems the task applies to. Also labels tied to the commit are also applied to the task, so that the tasks can be sorted by their labels. A `PACTask` can contain multiple labels. 
 
