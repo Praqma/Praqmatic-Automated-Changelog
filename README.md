@@ -251,14 +251,18 @@ _Note there is a docker container available also, which makes the tools and envi
 
 The general program can be described this way
 
-1. The Vcs module obtains a list of commits, given user supplied repository and start/finish. 
-2. The Vcs turns raw commits into PACCommit model objects and returns an array of these in the `PACCommitCollection`
+1. The Vcs module obtains a list of commits object from [Rugged](https://github.com/libgit2/rugged), given user supplied repository and start/finish. 
+2. The Vcs turns the [Rugged](https://github.com/libgit2/rugged) commits into PACCommit model objects and returns an array of these in the `PACCommitCollection`. The commit collection functions just like a regular list in Ruby, you can add stuff to it with the `add` method etc. Refer to the source code for information. 
 3. The Core module then produces a bare bones `PACTaskCollection` with tasks, the tasks only has the id property.
 4. After the bare `PACTaskCollection` has been generated, each task system applies it's decorator(s) to the task adding additonal data.
 5. The `PACTaskCollection` is then passed to the Liquid template engine and the outputs are produced
 
- 
+Since [Liquid](https://shopify.github.io/liquid/) has a very strict object model, and no ruby code is allowed inside templates (you can use simple filters and chain theme together with th | (pipe), we need to transform the data in `PACTaskCollection` so that Liquid understands it. For example, symbols as has keys are not allowed in the template.
+
+You are also required to bind Model objects to Liquid locals to be used in templates see the `Notes on Liquid` section.
+
 ### Object model 
+
 The principal model in PAC consists of the following ruby `Modules` 
 * Core
 * Vcs
@@ -294,12 +298,45 @@ The `Model` module contains all the object models needed. We have the folling, t
 * PACTask
 * PACTaskCollection
 
-The `PACTaskCollection` has a method to add _n_ tasks to the list. If the task was already added, based on the unique id, then the commits of the two tasks are 
-merged, resulting in 1 task, with the extra commits from the other tasks. This happens if a task is referenced in multiple commits. The _uniqueness_ is implemented in the `PACTaskCollection`. 
+`PACCommit` is just a data structure that encapsulates the `Rugged` commit. It has the `referenced` member which is an indication wheather or not this commit had a task reference.
 
-In order to ensure that, the _==_ (equals) method on the `PACTask` has been overridden, to only take into account the id of the task when determining equality.
+```
+class PACCommit
+  def initialize(sha, message = nil, date = nil)
+	@sha = sha
+	@message = message
+	@referenced = false
+	@date = date
+  end
+end
+``` 
+
+The `PACTaskCollection` has a method to add _n_ tasks to the list. If the task was already added, based on the unique id, then the commits of the two tasks are 
+merged, resulting in 1 task, with the extra commits from the other tasks. This happens if a task is referenced in multiple commits. The _uniqueness_ is implemented in the `PACTaskCollection`. The `PACTaskCollection` basically encapsulates a Ruby list, with some additional logic to ensure uniqueness.
+
+```
+class PACTaskCollection
+  def initialize
+    @tasks = []
+  end
+end 
+```
+
+In order to ensure uniqueness, the _==_ (equals) method on the `PACTask` has been overridden, to only take into account the id of the task when determining equality.
 
 The `PACTask` object has a collection of associated commits. It also holds references to the names of which task systems the task applies to. Also labels tied to the commit are also applied to the task, so that the tasks can be sorted by their labels. A `PACTask` can contain multiple labels. 
+
+```
+class PACTask
+  def initialize(task_id = nil)
+    @task_id = task_id      
+    @commit_collection = PACCommitCollection.new 
+    @attributes = { }
+    @applies_to = Set.new      
+    @label = Set.new
+  end
+end
+```
 
 *Module: Report*
 
@@ -313,7 +350,7 @@ The module expects a list of tasks, the id of each task is used to query the tas
 
 ### Notes on Liquid
 
-In order for liquid to produce locals for the template, you need to implement a `to_liquid` method. This method should return a hash whose keys can be used 
+In order for liquid to produce locals for the template, we implemented a `to_liquid` method. This method should return a hash whose keys can be used 
 as parameters in the template.
 
 Here is an example
