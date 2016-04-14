@@ -103,7 +103,11 @@ job('2_functional_test_pac') {
     //Since we do 'docker stuff' using rake...i don't know how tests would react if we start running docker in docker
     //TODO: This should be done differently. Since it requires manual configuration of a slave
     steps {
-        shell('rake functional_test')
+        shell('''
+#!/bin/bash
+. ~/.profile
+rake test
+''')
     }
 
     wrappers {
