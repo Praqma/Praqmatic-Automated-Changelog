@@ -106,7 +106,7 @@ job('2_functional_test_pac') {
         shell('''
 #!/bin/bash
 . ~/.profile
-rake test
+rake functional_test
 ''')
     }
 
