@@ -413,7 +413,10 @@ Choice of containers:
     * leave users in-active
     * perform re-index
 
+## Release process
 
+A release candidate has to be able to pass the [pipeline](http://code.praqma.net/ci/view/Open%20Source/view/Praqmatic-Automated-Changelog/). The release step will be started under manual supervision. The released versions of the software will be tagged. This will allow to download the precise version from GitHub, it will be available under the releases [section](https://github.com/Praqma/Praqmatic-Automated-Changelog/releases). 
+ 
 ## Installation on windows
 
 To run it on windows you need to install ruby installer x86 and devkit x86 [link](http://rubyinstaller.org/downloads/)
