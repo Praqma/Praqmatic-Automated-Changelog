@@ -12,6 +12,11 @@ Currently proof-of-concepts handles
 
 You can output in any format you like using the liquid templating language. We have the option to turn html into pdf with the pdf switch in the template setup.
 
+## What's new in 2.0.X? 
+
+* Added a templating engine to PAC. You can now define your own custom templates for output using liquid.
+* Added support for JIRA task system
+
 ## Settings file example (Jira)
 
 Below is an example of an example that uses Jira.
@@ -231,7 +236,7 @@ and if you do an `ls -al` in your repostitory it should now look like this:
 	-rwxrwxrwx 1 mads mads   489 Apr 12 10:24 ids.md
 	-rw-rw-r-- 1 mads mads   340 Apr 27  2015 README.md
 
-That's it. You've now succesfully created a changelog, automagically.
+That's it. You've now succesfully created a changelog, automagically. As an alterntive you can run the script we provide with PAC (`demo_setup_docker.sh`) this script replays what was explained above. 
 
 ## Prerequisites
 If you are going to be using the tool to generate PDF files which we use kramdown and pdfkit to generate you'll need to run the following command and a linux machine
@@ -346,6 +351,105 @@ The `Report` module has one class. The generator class that produces the output 
 The `Task` module is responsible for applying the appropriate decorators for the task system. It is entirely possible to apply more than one decorator.
 The module expects a list of tasks, the id of each task is used to query the task system and add additional info to the task.
 
+#### Model example
+
+This printout is what the internal data structure of PAC looks like when you run the provided demo script on a very simple repository:
+
+``` 
+#<Model::PACTaskCollection:0x007f7807f07a18
+ @tasks=
+  [#<Model::PACTask:0x007f7807f071a8
+    @applies_to=#<Set: {"none"}>,
+    @attributes={},
+    @commit_collection=
+     #<Model::PACCommitCollection:0x007f7807f07180
+      @commits=
+       [#<Model::PACCommit:0x007f7807f144c0
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Test for multiple\n\nIssue: 1,2\n",
+         @referenced=true,
+         @sha="fb493078d9f42d79ea0e3a56abca7956a0d47123">,
+        #<Model::PACCommit:0x007f7807f14010
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Updated readme file again - third commit\n\nIssue: 1\n",
+         @referenced=true,
+         @sha="cd32697cb7e2d3a7f3b77b5766ec22d31b002367">,
+        #<Model::PACCommit:0x007f7807f07e50
+         @date=2015-04-27 10:37:05 +0000,
+         @message=
+          "Revert \"Updated readme file\"\n\nThis reverts commit 881b321e68481e0ae5cfab316b4b147e101f844a.\nIssue: 1\n",
+         @referenced=true,
+         @sha="a7b63f11d24b6f2fd164d35b904386b234667991">]>,
+    @label=#<Set: {"none"}>,
+    @task_id="1">,
+   #<Model::PACTask:0x007f7807f06fa0
+    @applies_to=#<Set: {"none"}>,
+    @attributes={},
+    @commit_collection=
+     #<Model::PACCommitCollection:0x007f7807f06f78
+      @commits=
+       [#<Model::PACCommit:0x007f7807f144c0
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Test for multiple\n\nIssue: 1,2\n",
+         @referenced=true,
+         @sha="fb493078d9f42d79ea0e3a56abca7956a0d47123">]>,
+    @label=#<Set: {"none"}>,
+    @task_id="2">,
+   #<Model::PACTask:0x007f7807f05e48
+    @applies_to=#<Set: {}>,
+    @attributes={},
+    @commit_collection=
+     #<Model::PACCommitCollection:0x007f7807f05e20
+      @commits=
+       [#<Model::PACCommit:0x007f7807f14330
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Test for empty\n",
+         @referenced=false,
+         @sha="55857d4e9838d1855b10e4c30b43a433e2db47cd">,
+        #<Model::PACCommit:0x007f7807f07b30
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Initial commit - added README\n",
+         @referenced=false,
+         @sha="f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6">]>,
+    @label=#<Set: {}>,
+    @task_id=nil>,
+   #<Model::PACTask:0x007f7807f050d8
+    @applies_to=#<Set: {"none"}>,
+    @attributes={},
+    @commit_collection=
+     #<Model::PACCommitCollection:0x007f7807f050b0
+      @commits=
+       [#<Model::PACCommit:0x007f7807f141a0
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Test for none reference\n\nIssue: none\n",
+         @referenced=true,
+         @sha="a789b472150f462a8ae291577dcf7557b2b4ca55">]>,
+    @label=#<Set: {"none"}>,
+    @task_id="none">,
+   #<Model::PACTask:0x007f7807efe990
+    @applies_to=#<Set: {"none"}>,
+    @attributes={},
+    @commit_collection=
+     #<Model::PACCommitCollection:0x007f7807efe968
+      @commits=
+       [#<Model::PACCommit:0x007f7807f07cc0
+         @date=2015-04-27 10:37:05 +0000,
+         @message="Updated readme file\n\nIssue: 3\n",
+         @referenced=true,
+         @sha="881b321e68481e0ae5cfab316b4b147e101f844a">]>,
+    @label=#<Set: {"none"}>,
+    @task_id="3">]>
+```
+
+A couple of things to note here:
+
+ * `label` on the `PACTask` are the labels assigned via. regular expressions in the config file. It's a `Set` so values are unique, and will be overriden if you provide the same label to two different regular expressions
+ * `referenced` on the `PACCommit` is the indicator that this commit has been referenced somwhere by a task.
+ * `applies_to` on the `PACTask` indicates which task management system the task was found to belong two. It's a `Set` so value are unique.
+ * Note that in all cases, `attributes` is an empty Hash. This variable will be populated by data for all the task systems this `PACTask` applies to. For Jira this is a straight up key/value hash.
+ * `task_id` is the key that is used to look up data in the task management system(s) that populate the `attributes` field on the `PACTask`. Method of lookup varies and is unique for each task system. Trac uses an xmlrpc interface with a `ruby` gem, and `Jirà` is just plain `REST` using ruby standard `HTTP` libraries.
+
+Task systems and the user defined regular expressions are applied sequentially to a task, in the order they are listed in the user supplied configuration file. A regex only has 1 label, but the regex can be copied to apply more than 1 label to the same task.
 
 ### Notes on Liquid
 

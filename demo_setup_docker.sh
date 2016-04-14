@@ -13,7 +13,7 @@ cat << EOF > demorepo/idReportTestRepository/default_settings.yml
   - { location: /usr/src/app/templates/default_html.html, pdf: true, output: default.html }
 
 :task_systems:
-  - 
+  -
     :name: none
     :regex:
       - { pattern: '/.*Issue:\s*(?<id>[\d+|[,|\s]]+).*?\n/im', label: none }
@@ -27,4 +27,5 @@ cat << EOF > demorepo/idReportTestRepository/default_settings.yml
   :repo_location: '.'
   :release_regex: 'tags'
 EOF
+docker build -t praqma/pac:snapshot .
 docker run --rm -v $(pwd)/demorepo/idReportTestRepository:/data praqma/pac:snapshot -s f9a66ca6d2e6

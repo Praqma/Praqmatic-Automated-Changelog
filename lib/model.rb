@@ -3,10 +3,15 @@ module Model
 	#Model object representing a discovered task
   class PACTask
     def initialize(task_id = nil)
+      #Lookup key for task management system
       @task_id = task_id      
+      #Commits tied to this task
       @commit_collection = PACCommitCollection.new 
+      #Data from task management systems(s)
       @attributes = { }
+      #Key that determines which system(s) we need to look in for data
       @applies_to = Set.new      
+      #Assigned label. Used in templates so that you can group your tasks using labels.
       @label = Set.new
     end
 
