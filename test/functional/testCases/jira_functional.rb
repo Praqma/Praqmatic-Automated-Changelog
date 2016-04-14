@@ -2,7 +2,6 @@
 module PAC__TestCases_Jira
   require 'pp'
   require 'fileutils'
-  require 'zip/zip'
   require 'ci/reporter/rake/test_unit_loader.rb'
   require_relative '../../../lib/model'
   require_relative '../../../lib/task'

@@ -101,9 +101,8 @@ job('2_functional_test_pac') {
     }    
 
     //Since we do 'docker stuff' using rake...i don't know how tests would react if we start running docker in docker
-    //We can do bundle install to make sure all dependencies are installed
+    //TODO: This should be done differently. Since it requires manual configuration of a slave
     steps {
-        shell('bundle install')
         shell('rake functional_test')
     }
 
