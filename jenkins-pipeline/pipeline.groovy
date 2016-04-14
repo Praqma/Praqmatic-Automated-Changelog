@@ -4,7 +4,7 @@ REMOTE_NAME = 'origin'
 JOB_LABELS = 'GiJeLiSlave'
 NUM_OF_BUILDS_TO_KEEP = 100
 
-job('1_pretested-integration') {
+job('1_pretested-integration_pac') {
     logRotator {
         numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
@@ -65,7 +65,7 @@ docker run --entrypoint=/bin/sh --rm -v $(pwd):/data praqma/pac:snapshot -c rake
     }
 }
 
-job('2_functional_test') {
+job('2_functional_test_pac') {
     logRotator {
         numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
@@ -117,7 +117,7 @@ job('2_functional_test') {
     }
 }
 
-job('3_release') {
+job('3_release_pac') {
     label(JOB_LABELS)
 
     properties {
