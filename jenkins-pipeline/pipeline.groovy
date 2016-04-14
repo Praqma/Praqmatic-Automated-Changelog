@@ -9,7 +9,7 @@ job('1_pretested-integration') {
         numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
 
-    label(dockerHostLabel)
+    label(JOB_LABELS)
 
     properties {
         ownership {
