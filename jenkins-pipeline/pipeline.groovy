@@ -3,7 +3,7 @@ MAIN_BRANCH = 'master'
 REMOTE_NAME = 'origin'
 JOB_LABELS = 'GiJeLiSlave'
 NUM_OF_BUILDS_TO_KEEP = 100
-def releasePraqmaCredentials = '100247a2-70f4-4a4e-a9f6-266d139da9db'
+GITHUB_PRAQMA_CREDENTIALS = '100247a2-70f4-4a4e-a9f6-266d139da9db'
 
 job('1_pretested-integration_pac') {
     logRotator {
@@ -28,7 +28,7 @@ job('1_pretested-integration_pac') {
             remote {
                 name(REMOTE_NAME)
                 url(REPOSITORY_URL)
-                credentials(releasePraqmaCredentials)
+                credentials(GITHUB_PRAQMA_CREDENTIALS)
             }
             branch('origin/ready/**')
 
@@ -143,7 +143,7 @@ job('3_release_pac') {
             remote {
                 name(REMOTE_NAME)
                 url(REPOSITORY_URL)
-                credentials(releasePraqmaCredentials)
+                credentials(GITHUB_PRAQMA_CREDENTIALS)
             }
             branch(MAIN_BRANCH)
             extensions {}
@@ -151,7 +151,7 @@ job('3_release_pac') {
     }
 
     wrappers {
-        buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})-ver=$VERSION')
+        buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})-ver=${ENV,var="VERSION"}')
 
         environmentVariables {
             propertiesFile('./version.sh')
