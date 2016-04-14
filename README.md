@@ -363,6 +363,11 @@ Here is an example
       }
     end
 
+### Developer notes
+
+You can use the docker container to build and test PAC application, that way you do not need to install ruby on your own local machine if you want to extend it. You can run any arbitrary command using this docker command, this example below executes `rake test` and mounts PAC into the container as a volume. Execute this while while your are in the root of PAC source.
+
+`docker run --entrypoint=/bin/sh --rm -v $(pwd):/data praqma/pac:snapshot -c rake test`  
 
 ### Tests
 

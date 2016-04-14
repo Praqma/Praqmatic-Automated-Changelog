@@ -41,6 +41,12 @@ job('1_pretested-integration') {
         githubPush()
     }
 
+    //First step: Do PAC execute? (No syntax errors?)
+    steps {
+        shell('ruby pac.rb')
+    }
+
+
     wrappers {
         buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})')
         pretestedIntegration("SQUASHED", MAIN_BRANCH, REMOTE_NAME)
