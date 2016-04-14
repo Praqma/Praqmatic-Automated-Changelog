@@ -3,6 +3,7 @@ MAIN_BRANCH = 'master'
 REMOTE_NAME = 'origin'
 JOB_LABELS = 'GiJeLiSlave'
 NUM_OF_BUILDS_TO_KEEP = 100
+def releasePraqmaCredentials = '100247a2-70f4-4a4e-a9f6-266d139da9db'
 
 job('1_pretested-integration_pac') {
     logRotator {
@@ -27,6 +28,7 @@ job('1_pretested-integration_pac') {
             remote {
                 name(REMOTE_NAME)
                 url(REPOSITORY_URL)
+                credentials(releasePraqmaCredentials)
             }
             branch('origin/ready/**')
 
@@ -99,7 +101,9 @@ job('2_functional_test_pac') {
     }    
 
     //Since we do 'docker stuff' using rake...i don't know how tests would react if we start running docker in docker
+    //We can do bundle install to make sure all dependencies are installed
     steps {
+        shell('bundle install')
         shell('rake functional_test')
     }
 
@@ -136,6 +140,7 @@ job('3_release_pac') {
             remote {
                 name(REMOTE_NAME)
                 url(REPOSITORY_URL)
+                credentials(releasePraqmaCredentials)
             }
             branch(MAIN_BRANCH)
             extensions {}
