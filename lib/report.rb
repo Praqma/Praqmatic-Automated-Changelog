@@ -3,7 +3,10 @@ module Report
 	class Generator
 	  #This one has become a tad too specific for git. We get the short shar (first 8 digits). And
 	  #we trim the subject (That is the first element in the list when splitting the message on a newline. 
-	  #Takes a 'PACCommitCollection' as an argument  
+	  #Arguments:
+	  # tasks     - A 'PACTaskCollection' of populated tasks
+	  # commits   - A 'PACCommitCollection' list of commits. used to tally those that were referenced and those that were not
+	  # templates - The list of configured templates to render 
 	  def generate(tasks, commits, templates)
 	    templates.each do |t|        
 	      File.open(t['output'],'w:UTF-8') do |file| 

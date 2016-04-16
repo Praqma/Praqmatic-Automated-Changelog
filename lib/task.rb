@@ -9,12 +9,6 @@ rescue LoadError => error
   puts error
 end
 
-class String
-  def is_number?
-    !!(self =~ /^[-+]?[0-9]+$/)
-  end
-end
-
 module Task  
   #The task system is responsible for writing the changelog. We feed it with a list of commits, and an output directory for the changelogs
   #unless otherwise specified the path will be the current directory.
@@ -36,7 +30,7 @@ module Task
   class NoneTaskSystem < TaskSystem    
   end
 
-  #This is the Jira task system (EXAMPLE ~ NOT FINISHED)
+  #This is the Jira task system
   class JiraTaskSystem < TaskSystem
     def initialize(settings)	
       super(settings) 

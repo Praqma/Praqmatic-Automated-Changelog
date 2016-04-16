@@ -20,7 +20,7 @@ module Model
     end
     
     def data
-	  @data
+	    @data
     end
 
     def applies_to=(val)
