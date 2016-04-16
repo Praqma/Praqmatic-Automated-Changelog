@@ -333,10 +333,15 @@ The `PACTask` object has a collection of associated commits. It also holds refer
 ```
 class PACTask
   def initialize(task_id = nil)
+    #Lookup key for task management system
     @task_id = task_id      
+    #Commits tied to this task
     @commit_collection = PACCommitCollection.new 
+    #Data from task management systems(s)
     @attributes = { }
+    #Key that determines which system(s) we need to look in for data
     @applies_to = Set.new      
+    #Assigned label. Used in templates so that you can group your tasks using labels.
     @label = Set.new
   end
 end
@@ -353,7 +358,50 @@ The module expects a list of tasks, the id of each task is used to query the tas
 
 #### Model example
 
-This printout is what the internal data structure of PAC looks like when you run the provided demo script on a very simple repository:
+The first method we use is the one that traverses your git commit messages, for example, this is the output of the `Core.get_commit_messages_by_commit_sha` method:
+
+``` 
+#<Model::PACCommitCollection:0x007f05540f3df8
+ @commits=
+  [#<Model::PACCommit:0x007f05540f3cb8
+    @date=2015-04-27 10:37:05 +0000,
+    @message="Test for multiple\n\nIssue: 1,2\n",
+    @referenced=false,
+    @sha="fb493078d9f42d79ea0e3a56abca7956a0d47123">,
+   #<Model::PACCommit:0x007f05540f3b28
+    @date=2015-04-27 10:37:05 +0000,
+    @message="Test for empty\n",
+    @referenced=false,
+    @sha="55857d4e9838d1855b10e4c30b43a433e2db47cd">,
+   #<Model::PACCommit:0x007f05540f3948
+    @date=2015-04-27 10:37:05 +0000,
+    @message="Test for none reference\n\nIssue: none\n",
+    @referenced=false,
+    @sha="a789b472150f462a8ae291577dcf7557b2b4ca55">,
+   #<Model::PACCommit:0x007f05540f37b8
+    @date=2015-04-27 10:37:05 +0000,
+    @message="Updated readme file again - third commit\n\nIssue: 1\n",
+    @referenced=false,
+    @sha="cd32697cb7e2d3a7f3b77b5766ec22d31b002367">,
+   #<Model::PACCommit:0x007f05540f3628
+    @date=2015-04-27 10:37:05 +0000,
+    @message=
+     "Revert \"Updated readme file\"\n\nThis reverts commit 881b321e68481e0ae5cfab316b4b147e101f844a.\nIssue: 1\n",
+    @referenced=false,
+    @sha="a7b63f11d24b6f2fd164d35b904386b234667991">,
+   #<Model::PACCommit:0x007f05540f3470
+    @date=2015-04-27 10:37:05 +0000,
+    @message="Updated readme file\n\nIssue: 3\n",
+    @referenced=false,
+    @sha="881b321e68481e0ae5cfab316b4b147e101f844a">,
+   #<Model::PACCommit:0x007f05540f32b8
+    @date=2015-04-27 10:37:05 +0000,
+    @message="Initial commit - added README\n",
+    @referenced=false,
+    @sha="f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6">]>
+```
+
+After this, this collection is passed to the `Core.task_id_list(...)` method and this is how this list look after we've matched commits to tasks each commits gets added to the task(s) it belongs to
 
 ``` 
 #<Model::PACTaskCollection:0x007f7807f07a18
@@ -439,6 +487,15 @@ This printout is what the internal data structure of PAC looks like when you run
          @sha="881b321e68481e0ae5cfab316b4b147e101f844a">]>,
     @label=#<Set: {"none"}>,
     @task_id="3">]>
+```
+
+There are another method, the one which applies task systems to this list, internally the only thing that changes is that the `attributes` field get's populated. How this looks depends on the task system, in the example above we just use the default system, which yields and empty hash. The next step simply takes this gross list and add the attributes that the task system contains.
+
+```
+  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)  
+  Core.settings[:task_systems].each do |ts|
+    everything_ok &= Core.apply_task_system(ts, tasks)
+  end
 ```
 
 A couple of things to note here:
