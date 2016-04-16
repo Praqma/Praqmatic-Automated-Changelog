@@ -27,7 +27,7 @@ module PAC__TestCases_Trac
 
     Test::Unit.at_exit do
       bn = ENV['BUILD_NUMBER'] || '0000'
-      puts %x( ./test/resources/stop_task_system-trac-#{bn} )
+      puts %x( ./test/resources/stop_task_system-trac-#{bn}.sh )
     end
 
     #First functional 
