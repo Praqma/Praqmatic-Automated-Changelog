@@ -60,11 +60,10 @@ docker run --entrypoint=/bin/sh --rm -v $(pwd):/data praqma/pac:snapshot -c rake
 
     publishers {
         pretestedIntegration()
-    }
-
-    publishers {
+        downstream('2_functional_test_pac', 'SUCCESS')
         mailer('and@praqma.net', false, false)
     }
+
 }
 
 job('2_functional_test_pac') {
@@ -95,10 +94,6 @@ job('2_functional_test_pac') {
             extensions {}
         }
     }
-
-    triggers {
-        githubPush()
-    }    
 
     //Since we do 'docker stuff' using rake...i don't know how tests would react if we start running docker in docker
     //TODO: This should be done differently. Since it requires manual configuration of a slave
