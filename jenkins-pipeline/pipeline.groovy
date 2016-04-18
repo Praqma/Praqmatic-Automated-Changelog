@@ -46,12 +46,9 @@ job('1_pretested-integration_pac') {
     //First step: Can we build the docker container, and can we run unit tests?
     //This basically mimics developer behaviour
     steps {
-        shell('''
-docker build -t praqma/pac:snapshot .             
-docker run --entrypoint=/bin/sh --rm -v $(pwd):/data praqma/pac:snapshot -c rake test
-''')
+        shell('''docker build -t praqma/pac:snapshot .
+                 |docker run --entrypoint=/bin/sh --rm -v $(pwd):/data praqma/pac:snapshot -c rake test'''.stripMargin())
     }
-
 
     wrappers {
         buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})')
@@ -98,11 +95,9 @@ job('2_functional_test_pac') {
     //Since we do 'docker stuff' using rake...i don't know how tests would react if we start running docker in docker
     //TODO: This should be done differently. Since it requires manual configuration of a slave
     steps {
-        shell('''
-#!/bin/bash
-. ~/.profile
-rake functional_test
-''')
+        shell('''#!/bin/bash
+                 |. ~/.profile
+                 |rake functional_test'''.stripMargin())
     }
 
     wrappers {
