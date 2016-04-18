@@ -314,7 +314,7 @@ The `Model` module contains all the object models needed. We have the folling, t
 * PACTask
 * PACTaskCollection
 
-`PACCommit` is just a data structure that encapsulates the `Rugged` commit. It has the `referenced` member which is an indication wheather or not this commit had a task reference.
+`PACCommit` is just a data structure that encapsulates the `Rugged` commit. It has the `referenced` member which is an indication whether or not this commit had a task reference.
 
 ```
 class PACCommit
@@ -512,8 +512,8 @@ There are another method, the one which applies task systems to this list, inter
 
 A couple of things to note here:
 
- * `label` on the `PACTask` are the labels assigned via. regular expressions in the config file. It's a `Set` so values are unique, and will be overriden if you provide the same label to two different regular expressions
- * `referenced` on the `PACCommit` is the indicator that this commit has been referenced somwhere by a task.
+ * `label` on the `PACTask` are the labels assigned via. regular expressions in the config file. It's a `Set` so values are unique, and will be overridden if you provide the same label to two different regular expressions
+ * `referenced` on the `PACCommit` is the indicator that this commit has been referenced somewhere by a task.
  * `applies_to` on the `PACTask` indicates which task management system the task was found to belong two. It's a `Set` so value are unique.
  * Note that in all cases, `attributes` is an empty Hash. This variable will be populated by data for all the task systems this `PACTask` applies to. For Jira this is a straight up key/value hash.
  * `task_id` is the key that is used to look up data in the task management system(s) that populate the `attributes` field on the `PACTask`. Method of lookup varies and is unique for each task system. Trac uses an xmlrpc interface with a `ruby` gem, and `Jirà` is just plain `REST` using ruby standard `HTTP` libraries.
