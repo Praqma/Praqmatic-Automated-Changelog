@@ -1,4 +1,8 @@
 # -*- coding: utf-8; -*-
+# The PAC test cases for jira uses the setup described and documented under the 
+# test/resources/jira-env folder of this project. It uses a preconfigured Jira container with pre-made
+# issues. The pre-filled data (json) is included in the folder along with instructions on how to add this data.
+# The functional tests in this module make uses of that.  
 module PAC__TestCases_Jira
   require 'pp'
   require 'fileutils'
@@ -7,26 +11,73 @@ module PAC__TestCases_Jira
   require_relative '../../../lib/task'
 
   Test::Unit.at_start do
-    puts "Start up jira here here"
+    #Execute the startup script for Jira.
+    jira_host_port = ENV['HOST_PORT'] || '28080'
+    puts %x( ./test/resources/start_task_system.sh "jira" #{jira_host_port} )
   end
+
+  Test::Unit.at_exit do
+    bn = ENV['BUILD_NUMBER'] || '0000'
+    puts %x( ./test/resources/stop_task_system-jira-#{bn}.sh )
+  end  
 
   class JiraIntegration < Test::Unit::TestCase
     require 'fileutils'
     require 'open3'
 
-    #Example of how to construct a functional unit tests, with a known running instance of a Jira instance.
+    #Inspect one case throughly. In this case it's the FAS-1 case. See the test/resources/jira-env/FAS-1.json file on how Jira json output looks like.
     def test_jira_case_exists
+      jira_host_port = ENV['HOST_PORT'] || '28080'
       #The only required settings to apply a task system to a named task using jira is the 'issue-link' so hotwire this, in order to get the data
-      #settings = { :name => 'jira', :query_string => 'http://localhost:9090/rest/api/latest/issue/#{task_id}', :usr => 'admin', :pw => 'password' }
-      #collection = Model::PACTaskCollection.new
-      #task = Model::PACTask.new 'AMM-17'
-      #task.applies_to = 'jira'
-      #collection.add(task)
-      #jira = Task::JiraTaskSystem.new(settings).apply(collection)
-      #Assert that no errors returned
-      #assert_true(jira)
-      #Assert that the description field has a value
-      #assert_not_nil(collection['AMM-17'].attributes.data.description)
+
+      #We split the string into the static part here
+      static = "http://localhost:#{jira_host_port}"
+      #The query string is construted this way so that the 'task_id' is only evaluated when jira is 'applied' to the task. Therefore we have
+      #to wrap that part in single plings.
+      settings = { :name => 'jira', :query_string => static+'/rest/api/latest/issue/#{task_id}', :usr => 'admin', :pw => 'admin' }
+      collection = Model::PACTaskCollection.new
+      task = Model::PACTask.new 'FAS-1'
+      task.applies_to = 'jira'
+      collection.add(task)
+
+      #First assert that the inverse is true before starting (the attributes field SHOULD be empty here)
+      assert_true(task.attributes.empty?)
+
+      jira = Task::JiraTaskSystem.new(settings).apply(collection)
+
+      #Assert data was there
+      assert_false(task.attributes.empty?)
+
+      #Verify that the data is correct.
+      description = task.attributes['data']['fields']['description']
+      summary = task.attributes['data']['fields']['summary']
+      assert_equal("Thatcher's government since 1952). Scotland The Scots pine marten.", summary)
+      assert_true(description.include?("After 1860 at Holyrood in the Great Highland English"))
     end       
+
+    #This test just processes a larger collection of issues, and makes sure that data is there. Data is not verified, we're just testing that the
+    #'attributes' of each case has been set.
+    def test_bulk_procesing_case
+      jira_host_port = ENV['HOST_PORT'] || '28080'
+      
+      #We split the string into the static part here
+      static = "http://localhost:#{jira_host_port}"
+
+      #The query string is construted this way so that the 'task_id' is only evaluated when jira is 'applied' to the task. Therefore we have
+      #to wrap that part in single plings.
+      settings = { :name => 'jira', :query_string => static+'/rest/api/latest/issue/#{task_id}', :usr => 'admin', :pw => 'admin' }
+      collection = Model::PACTaskCollection.new
+      (2..30).each do |tid|
+        task = Model::PACTask.new "FAS-#{tid}"
+        task.applies_to = 'jira'
+        collection.add(task)        
+      end
+
+      #Assert that each task has some assigned attributes
+      jira = Task::JiraTaskSystem.new(settings).apply(collection)
+      collection.each do |task|
+        assert_false(task.attributes.empty?)
+      end       
+    end
   end # class
 end # module
