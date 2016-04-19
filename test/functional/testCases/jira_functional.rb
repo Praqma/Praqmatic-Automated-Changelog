@@ -79,5 +79,33 @@ module PAC__TestCases_Jira
         assert_false(task.attributes.empty?)
       end       
     end
+
+    #This tests the case where the developer has put in the wrong task number (one that doesn't exists)
+    #The same response is recorded for ALL return codes that are not 200 OK (unless res.is_a? Net::HTTPOK -This includes 400 Bad Request, 403 Permission denied etc...)
+    #TODO: How do we handle and test http-redirects?
+    def test_http_not_ok
+      jira_host_port = ENV['HOST_PORT'] || '28080'
+      
+      #We split the string into the static part here
+      static = "http://localhost:#{jira_host_port}"
+
+      #The query string is construted this way so that the 'task_id' is only evaluated when jira is 'applied' to the task. Therefore we have
+      #to wrap that part in single plings.
+      settings = { :name => 'jira', :query_string => static+'/rest/api/latest/issue/#{task_id}', :usr => 'admin', :pw => 'admin', :debug => true}
+
+      #Create a non-exiting issue that was referenced
+      collection = Model::PACTaskCollection.new
+      task = Model::PACTask.new 'FAS-90029'
+      task.applies_to = 'jira'
+      collection.add(task)
+
+      #The correct behaviour in this case is that 'jira' becomes false, an error messsage is written to std.out 
+      jira = Task::JiraTaskSystem.new(settings).apply(collection)
+      assert_false(jira)
+
+      #Since the issue could not be found..the list of Jira Tasks should be empty.
+      assert_equal(0, collection.length)
+    end
+
   end # class
 end # module
