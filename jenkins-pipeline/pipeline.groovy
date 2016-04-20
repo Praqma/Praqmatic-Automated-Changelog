@@ -5,7 +5,11 @@ JOB_LABELS = 'GiJeLiSlave'
 NUM_OF_BUILDS_TO_KEEP = 100
 GITHUB_PRAQMA_CREDENTIALS = '100247a2-70f4-4a4e-a9f6-266d139da9db'
 
-job('1_pretested-integration_pac') {
+PRETESTED_INTEGRATION_JOB_NAME = '1_pretested-integration_pac'
+FUNCTIONAL_TEST_JOB_NAME = '2_functional_test_pac'
+RELEASE_JOB_NAME = '3_release_pac'
+
+job(PRETESTED_INTEGRATION_JOB_NAME) {
     logRotator {
         numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
@@ -63,7 +67,7 @@ job('1_pretested-integration_pac') {
 
 }
 
-job('2_functional_test_pac') {
+job(FUNCTIONAL_TEST_JOB_NAME) {
     logRotator {
         numToKeep(NUM_OF_BUILDS_TO_KEEP)
     }
@@ -105,7 +109,7 @@ job('2_functional_test_pac') {
     }
 
     publishers {
-        buildPipelineTrigger('3_release_pac') {
+        buildPipelineTrigger(RELEASE_JOB_NAME) {
             parameters {
                 gitRevision()
             }
@@ -114,7 +118,7 @@ job('2_functional_test_pac') {
     }
 }
 
-job('3_release_pac') {
+job(RELEASE_JOB_NAME) {
     label(JOB_LABELS)
 
     properties {
