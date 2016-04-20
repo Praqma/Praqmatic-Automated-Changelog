@@ -105,7 +105,7 @@ job('2_functional_test_pac') {
     }
 
     publishers {
-        buildPipelineTrigger('3_release') {
+        buildPipelineTrigger('3_release_pac') {
             parameters {
                 gitRevision()
             }
