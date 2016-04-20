@@ -12,6 +12,18 @@ task :functional_test do
 	end
 end
 
+task :functional_trac do 
+	Dir.glob('test/functional/*trac*.rb').each do |testfile|
+		ruby "#{testfile} --verbose=verbose"
+	end	
+end
+
+task :functional_jira do 
+	Dir.glob('test/functional/*jira*.rb').each do |testfile|
+		ruby "#{testfile} --verbose=verbose"
+	end	
+end
+
 task :coverage do
   ENV['COVERAGE'] = 'on'
   Rake::Task['test'].execute

@@ -48,6 +48,10 @@ module Model
       @label << val
     end
 
+    def clear_labels
+      @label.clear
+    end
+
     #We need to override the equals method. A task is uniquely identified by it's identifier (id). This is usually what
     #is used to fetch additonal information from the task management system
     def ==(other) 

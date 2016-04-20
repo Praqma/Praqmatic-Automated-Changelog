@@ -48,12 +48,11 @@ module Task
         rescue Exception => err   
 		      tasks_with_no_jira_issues << t  
           puts "[PAC] Jira #{err.message}"
-          ok = false	
+          ok = false
+          t.clear_labels
+          t.label = 'unknown'	
         end
-      end    
-      
-      tasks.tasks -= tasks_with_no_jira_issues
-
+      end        
       ok
     end 
   end
@@ -74,6 +73,8 @@ module Task
           end
         rescue Exception => err
           puts "[PAC] #{err.message}"
+          t.clear_labels
+          t.label = 'unknown'
           ok = false
         end
       end
