@@ -30,6 +30,27 @@ module PAC__TestCases_Trac
       puts %x( ./test/resources/stop_task_system-trac-#{bn}.sh )
     end
 
+    def test_http_not_ok
+      trac_host_port = ENV['HOST_PORT'] || '28080'
+      #The only required settings to apply a task system to a named task using jira is the 'issue-link' so hotwire this, in order to get the data
+      #settings[:trac_url], settings[:trac_usr], settings[:trac_pwd]
+      settings = { :trac_url => "http://localhost:#{trac_host_port}/trac", :trac_usr => 'admin', :trac_pwd => 'UqmvS76r7D', :name => 'trac' }
+      system = Task::TracTaskSystem.new(settings)    
+      collection = Model::PACTaskCollection.new      
+      task = Model::PACTask.new 666.to_s
+      task.applies_to = 'trac'
+      task.label = 'found'
+      collection.add(task)
+
+      trac = system.apply(collection)
+      #Assert that errors errors returned
+      assert_false(trac)
+      #We assign the label 'unknown' to tasks that failed to fetch metadata'
+      assert_true(task.label.include?('unknown'))
+      #Also assert that the label 'found' has been cleared
+      assert_false(task.label.include?('found'))
+    end
+
     #First functional 
     def test_trac_case_exists
       trac_host_port = ENV['HOST_PORT'] || '28080'

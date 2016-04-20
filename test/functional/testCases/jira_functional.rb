@@ -97,14 +97,17 @@ module PAC__TestCases_Jira
       collection = Model::PACTaskCollection.new
       task = Model::PACTask.new 'FAS-90029'
       task.applies_to = 'jira'
+      task.label = 'found'
       collection.add(task)
 
       #The correct behaviour in this case is that 'jira' becomes false, an error messsage is written to std.out 
       jira = Task::JiraTaskSystem.new(settings).apply(collection)
       assert_false(jira)
 
-      #Since the issue could not be found..the list of Jira Tasks should be empty.
-      assert_equal(0, collection.length)
+      #We assign the label 'unknown' to tasks that failed to fetch metadata. (The commit is STILL referenced because it matched our regex)
+      assert_true(task.label.include?('unknown'))
+      #Also assert that the label 'found' has been cleared
+      assert_false(task.label.include?('found'))
     end
 
   end # class
