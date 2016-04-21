@@ -9,7 +9,7 @@ PRETESTED_INTEGRATION_JOB_NAME = '1_pretested-integration_pac'
 FUNCTIONAL_TEST_JOB_NAME = '2_functional_test_pac'
 RELEASE_JOB_NAME = '3_release_pac'
 
-DOCKER_REPO_NAME = 'praqma/pactmp'
+DOCKER_REPO_NAME = 'praqma/pac'
 
 job(PRETESTED_INTEGRATION_JOB_NAME) {
     logRotator {
