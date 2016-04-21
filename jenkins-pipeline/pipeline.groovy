@@ -9,6 +9,8 @@ PRETESTED_INTEGRATION_JOB_NAME = '1_pretested-integration_pac'
 FUNCTIONAL_TEST_JOB_NAME = '2_functional_test_pac'
 RELEASE_JOB_NAME = '3_release_pac'
 
+DOCKER_REPO_NAME = 'praqma/pactmp'
+
 job(PRETESTED_INTEGRATION_JOB_NAME) {
     logRotator {
         numToKeep(NUM_OF_BUILDS_TO_KEEP)
@@ -96,8 +98,7 @@ job(FUNCTIONAL_TEST_JOB_NAME) {
         }
     }
 
-    //Since we do 'docker stuff' using rake...i don't know how tests would react if we start running docker in docker
-    //TODO: This should be done differently. Since it requires manual configuration of a slave
+    //This is a workaround until we get docker inside docker to run our functional test
     steps {
         shell('''#!/bin/bash
                  |. ~/.profile
@@ -152,6 +153,18 @@ job(RELEASE_JOB_NAME) {
             env('VERSION', '$ver-$BUILD_NUMBER')
         }
     }
+
+    steps {
+      dockerBuildAndPublish {
+        repositoryName(DOCKER_REPO_NAME)
+        tag('${VERSION}')
+        registryCredentials('docker-hub-crendential')
+        dockerHostURI('unix:///var/run/docker.sock')
+        forcePull(false)
+        createFingerprints(false)
+        skipDecorate()
+      }
+    }    
 
     publishers {
         git {
