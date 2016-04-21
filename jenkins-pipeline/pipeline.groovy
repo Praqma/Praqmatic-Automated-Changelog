@@ -148,7 +148,7 @@ job(RELEASE_JOB_NAME) {
         buildName('${BUILD_NUMBER}#${GIT_REVISION,length=8}(${GIT_BRANCH})-ver=${ENV,var="VERSION"}')
 
         environmentVariables {
-            propertiesFile('./version.sh')
+            propertiesFile('./version.properties')
             env('VERSION', '$ver-$BUILD_NUMBER')
         }
     }
