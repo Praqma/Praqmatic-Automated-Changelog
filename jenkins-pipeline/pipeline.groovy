@@ -36,11 +36,10 @@ job(PRETESTED_INTEGRATION_JOB_NAME) {
                 url(REPOSITORY_URL)
                 credentials(GITHUB_PRAQMA_CREDENTIALS)
             }
-            branch('origin/ready/**')
+            branch("$REMOTE_NAME/ready/**")
 
             extensions {
                 wipeOutWorkspace()
-                pruneBranches()
             }
         }
     }
@@ -63,7 +62,7 @@ job(PRETESTED_INTEGRATION_JOB_NAME) {
 
     publishers {
         pretestedIntegration()
-        downstream('2_functional_test_pac', 'SUCCESS')
+        downstream(FUNCTIONAL_TEST_JOB_NAME, 'SUCCESS')
         mailer('and@praqma.net', false, false)
     }
 
