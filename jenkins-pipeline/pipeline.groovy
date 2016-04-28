@@ -154,6 +154,22 @@ job(RELEASE_JOB_NAME) {
     }
 
     steps {
+      systemGroovyCommand('''
+import hudson.model.*
+
+def env = build.getEnvironment()
+def gitCommit = env['GIT_COMMIT']
+def shortGitCommit = gitCommit[0..6]
+
+def pa = new ParametersAction([
+  new StringParameterValue("SHORT_GIT_COMMIT", shortGitCommit)
+])
+
+build.addAction(pa)
+      ''')
+      
+      shell('echo "$VERSION ($SHORT_GIT_COMMIT)" > version.stamp')
+
       dockerBuildAndPublish {
         repositoryName(DOCKER_REPO_NAME)
         tag('${VERSION}')
