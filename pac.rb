@@ -6,8 +6,6 @@ require_relative 'lib/core'
 require_relative 'lib/report'
 
 doc = <<DOCOPT
-Pragmatic changelog 
-
 Usage:
   #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]     
   #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]
@@ -33,11 +31,22 @@ Options:
     
   --pattern=<rel_pattern>
   
-    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.        
+    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP         
 DOCOPT
 
 begin
   require "pp"
+
+  #Versioning strategy see the file docs/versioning.md
+  def version
+    if File.exist?(File.dirname(__FILE__)+'/version.stamp')
+      version = File.read(File.dirname(__FILE__)+'/version.stamp')
+    else
+      version = "Unknown version"
+    end
+    version
+  end
+
   input = Docopt::docopt(doc)
   settings_file = File.join(Dir.pwd, 'default_settings.yml')
   
@@ -89,5 +98,7 @@ begin
   end
 
 rescue Docopt::Exit => e
+  puts "Praqmatic Automated Changelog (PAC)"
+  puts "#{version}\n"
   puts e.message
 end
