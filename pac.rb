@@ -38,9 +38,12 @@ begin
   require "pp"
 
   #Versioning strategy see the file docs/versioning.md
+  #We need to read where the symlink points to because the docker container links pac to /usr/bin
   def version
-    if File.exist?(File.dirname(__FILE__)+'/version.stamp')
-      version = File.read(File.dirname(__FILE__)+'/version.stamp')
+    path = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
+    dir = File.dirname(path)
+    if File.exist?(dir+'/version.stamp')
+      version = File.read(dir+'/version.stamp')
     else
       version = "Unknown version"
     end
