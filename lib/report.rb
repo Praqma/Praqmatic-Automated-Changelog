@@ -6,18 +6,17 @@ module Report
 	  #Arguments:
 	  # tasks     - A 'PACTaskCollection' of populated tasks
 	  # commits   - A 'PACCommitCollection' list of commits. used to tally those that were referenced and those that were not
-	  # templates - The list of configured templates to render 
-	  def generate(tasks, commits, templates)
-	    templates.each do |t|        
+	  # config 		- The configuration used 
+	  def generate(tasks, commits, config)
+	    config[:templates].each do |t|        
 	      File.open(t['output'],'w:UTF-8') do |file| 
 	        file << Liquid::Template.parse(File.read(t['location'])).render( { 
 	          'tasks' => tasks, 	     
-	          'title' => 'PAC id report',
 	          'pac_c_count' => commits.count,
 	          'pac_c_referenced' => commits.count_with,
 	          'pac_health' => commits.health,
 	          'pac_c_unreferenced' => commits.count_without  
-	        } )
+	        }.merge!(define_properties(config)) )
 	        File.chmod(0777, file)
 	      end
 
@@ -29,5 +28,15 @@ module Report
 	      end
 	    end
 	  end
+
+	  #Merges the properties, defaults title to 'PAC Changelog'
+	  #At this point config[:properties] is either nil, or properly configured and defined.
+	  def define_properties(config)
+	  	std = { 'properties' => { 'title' => 'PAC Changelog' } }
+	  	unless config[:properties].nil?
+	  		std['properties'].merge!(config[:properties])
+	  	end
+	  	std
+	  end 
 	end
 end

@@ -7,9 +7,9 @@ require_relative 'lib/report'
 
 doc = <<DOCOPT
 Usage:
-  #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]     
-  #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]
-  #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]  
+  #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]      
+  #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
+  #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]  
   #{__FILE__} -h|--help
 
 Options:
@@ -30,8 +30,13 @@ Options:
     Path to the settings file used. If nothing is specified default_settings.yml is used
     
   --pattern=<rel_pattern>
-  
-    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP         
+
+    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.
+
+  --properties=<properties>
+
+    Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.*.
+    JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
 DOCOPT
 
 begin
@@ -51,16 +56,11 @@ begin
   end
 
   input = Docopt::docopt(doc)
-  settings_file = File.join(Dir.pwd, 'default_settings.yml')
-  
-  unless input['--settings'].nil?
-    settings_file = input['--settings']
-  end
-  
-  loaded = YAML::load(File.open(settings_file))
-
-  unless input['--pattern'].nil? 
-    loaded[:vcs][:release_regex] = input['--pattern']
+  begin
+    loaded = Core.generate_settings(input)
+  rescue Exception => e
+    puts "[PAC] Invalid command line options specified. Message was #{e.message}"
+    exit 7
   end
   
   #Load the settings
@@ -90,7 +90,7 @@ begin
   #Write the ID report (Basically just a list of referenced and non-referenced issues)
   #Takes the list of discovered tasks, and only needs the template settings
   generator = Report::Generator.new
-  generator.generate(tasks, commit_map, Core.settings[:templates])
+  generator.generate(tasks, commit_map, Core.settings)
   unless everything_ok
   	if Core.settings[:general][:strict]
   		exit 15
