@@ -44,6 +44,11 @@ After running the demo, look for the reports in `demorepo/idReportTestRepository
 
 This demo generates some reports through a custom template which uses data from SCM commits of a small test repository and a spun-up JIRA instance.
 
+**Try a manual demo using the pac-manuscript repository**
+
+The [pac-manuscript](https://github.com/praqma-test/pac-manuscript) repository is a short demonstration of how PAC works with Jira, where each step of gradually introduces more of the PAC configuration and features.
+The readme in the repository explain how to use it, but the pac-maunscript repository is a imaginary example on a source code repository matching some Jira issues where the series of commits are introducing new PAC features.
+
 ## Getting started
 
 You'll need to have some commits that reference tasks in one way or another, otherwise your changelog will look rather dull.
