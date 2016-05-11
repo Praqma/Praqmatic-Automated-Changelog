@@ -1,11 +1,11 @@
-## Migrating from 1.x to 2.x
+# Migrating from 1.x to 2.x
 
 With the introduction of PAC 2.0, the settings file formatting has changed.
 The change isn't backwards compatible, so you will need to edit your settings file when upgrading from 1.x.
 
 In the following example, we upgrade a simple 1.x settings file:
 
-#### Old format
+## Old format
 
 ```YAML
 :general:
@@ -27,7 +27,8 @@ In the following example, we upgrade a simple 1.x settings file:
   pwd:
   repo_location: "."
 ```
-#### New format
+
+## New format
 
 ```YAML
 :general:
@@ -43,7 +44,6 @@ In the following example, we upgrade a simple 1.x settings file:
     :name: none
     :regex:
       - { pattern: '/(JENKINS-[0-9]+)', label: none }
-    :delimiter: '/,|\s/'
 
 :vcs:
   :type: git
@@ -52,7 +52,7 @@ In the following example, we upgrade a simple 1.x settings file:
 
 ## Migration steps
 
-The following points cover all the settings file sections and the changes required to upgrade them.
+The changed needed to are explained in details below.
 
 ### :general:
 

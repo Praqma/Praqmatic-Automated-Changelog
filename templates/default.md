@@ -1,4 +1,4 @@
-#{{title}}
+# PAC Changelog
 {% for task in tasks.referenced %}
 ## {{task.task_id}}
 {% for commit in task.commits %}

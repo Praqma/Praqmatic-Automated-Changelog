@@ -48,7 +48,7 @@ job(PRETESTED_INTEGRATION_JOB_NAME) {
         githubPush()
     }
 
-    //First step: Can we build the docker container, and can we run unit tests?
+    //First step: Can we build the docker image, and can we run unit tests?
     //This basically mimics developer behaviour
     steps {
         shell('''docker build -t praqma/pac:snapshot .

@@ -1,6 +1,8 @@
-# Praqmatic Automated Changelog (PAC)
+# Blue print for Praqmatic Automated Changelog (PAC)
 
 _A short description of an automated changelog system and some initial design considerations_.
+
+Original idea from 2013/2014.
 
 # Motivation
 
