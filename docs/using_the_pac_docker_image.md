@@ -11,9 +11,9 @@ We supply a PAC docker image, [`praqma/pac`](https://hub.docker.com/r/praqma/pac
 praqmatic automated changelog 
 
 Usage:
-  /usr/bin/pac (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]     
-  /usr/bin/pac (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]
-  /usr/bin/pac (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>]
+  /usr/bin/pac (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
+  /usr/bin/pac (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
+  /usr/bin/pac (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
   /usr/bin/pac -h|--help
 
 Options:
@@ -36,6 +36,11 @@ Options:
   --pattern=<rel_pattern>
   
     Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.
+
+  --properties=<properties>
+
+    Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.*.
+    JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'
 ```
 
 ## Usage

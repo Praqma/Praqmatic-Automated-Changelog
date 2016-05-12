@@ -9,6 +9,10 @@ Configuration file is YAML, so the : (colons), - (dash) and indentation matters.
 	  date_template: '%Y-%m-%d'
 	  :strict: false
 
+	:properties:
+		title: 'Changelog name'
+		product: 'Awesome product'
+
 	:templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
 	  - { location: templates/default.md, output: default.md }
@@ -59,6 +63,15 @@ _Defaults to `'%Y-%m-%d'`_
 **`strict`** If set to true PAC returns a non-zero exit code when a referenced task cannot be looked up your task system. 
 
 _Defaults to `false`_.   
+
+## Properties (_optional section_)
+
+This section specifies properties that you want to use in your template. You can specify any arbitrary number of properties in this section. In the example shown above, the following variables can be referenced in Liquid: 
+
+- `{{properties.title}}`
+- `{{properties.product}}`
+
+These values can be overridden at runtime by adding the `--properties` option when running PAC. Run PAC with the `-h` switch for an explanation on how to set a correct value for the `--properties` option.
 
 ## Templates
 
@@ -115,4 +128,3 @@ Used for configuring the VCS to use. You can chose either Git or Mercurial (hg).
 
 * **`type`** The VCS to use, we currently support `git` or `hg`
 * **`repo_location`** The location of the repository to use. _Defaults to `.`_ for current working directory as PAC assumes to be called from within the repository for which to create a changelog.
-

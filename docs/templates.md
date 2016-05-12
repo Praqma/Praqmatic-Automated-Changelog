@@ -63,6 +63,14 @@ PAC always make the following variable available to use in a template.
 
 You can find more examples on PAC templates in the `templates` folder.
 
+## Extra PAC variables
+
+If you have defined the `:properties:` section in your configuration file or are running PAC with the `--properties` switch. You will also have the following variables available in your templates:
+
+- `properties.*` The `*` should be substituted with the name of your variable.
+
+This can be useful if you want to inject and use environment variables in your template, or you have a common set of changelog templates that rely on some form of dymanic content based on your build environment.  
+
 
 ## Using debug to inspect raw task system data
 

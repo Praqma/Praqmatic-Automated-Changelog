@@ -35,7 +35,9 @@ Options:
 
   --properties=<properties>
 
-    Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.*.
+    Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.* in 
+    your Liquid templates. Referenced like so '{{properties.[your-variable]}}' in your templates.
+
     JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
 DOCOPT
 
@@ -56,10 +58,19 @@ begin
   end
 
   input = Docopt::docopt(doc)
+
+  #This should print out any and all errors related to creating settings for PAC. This captures
+  #JSON parser errors.
   begin
-    loaded = Core.generate_settings(input)
+    configuration = Core.read_settings_file(input)
+    loaded = Core.generate_settings(input, configuration)
+  rescue JSON::ParserError => pe
+    puts "[PAC] Error paring JSON from --properties switch"
+    puts "[PAC] Exception caught while parsing command line options: #{pe}"
+    exit 6
   rescue Exception => e
-    puts "[PAC] Invalid command line options specified. Message was #{e.message}"
+    puts "[PAC] Unspecified error caught while creating configuration"
+    puts "[PAC] Exception caught while creating configuration: #{e}"
     exit 7
   end
   
@@ -89,8 +100,8 @@ begin
 
   #Write the ID report (Basically just a list of referenced and non-referenced issues)
   #Takes the list of discovered tasks, and only needs the template settings
-  generator = Report::Generator.new
-  generator.generate(tasks, commit_map, Core.settings)
+  generator = Report::Generator.new(tasks, commit_map)
+  generator.generate(Core.settings)
   unless everything_ok
   	if Core.settings[:general][:strict]
   		exit 15
