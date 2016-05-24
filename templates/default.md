@@ -1,6 +1,9 @@
 #{{title}}
 {% for task in tasks.referenced %}
-## {{task.task_id}}
+## {{task.task_id}}: [{{task.attributes.data.html_url}}]({{task.attributes.data.title}})
+State: _{{task.attributes.data.state}}_
+Milestone: _{{task.attributes.data.milestone}}_
+
 {% for commit in task.commits %}
 - {{commit.shortsha}}: {{commit.header}}
 {% endfor %}

@@ -18,7 +18,7 @@ module JiraTaskDecorator
       raise "Invalid URI: #{expanded}"
     end 
 
-    req.basic_auth usr, pw
+    #req.basic_auth usr, pw
     
     begin
       if uri.scheme == 'https'
@@ -30,7 +30,8 @@ module JiraTaskDecorator
           http.request(req)
         }        
       end
-    rescue Exception
+    rescue Exception => e  
+      puts e.message 
       raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
     end 
 
