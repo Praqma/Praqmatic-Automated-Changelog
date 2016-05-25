@@ -19,29 +19,21 @@ class ConfigurationTest < Test::Unit::TestCase
 	def test_properties_parsing_ok
 		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
 		arguments = { '--settings' => "#{settings_file}", '--properties' => '{"title" : "PAC Changelog Name Override" }' }
-		settings_parsed = Core.generate_settings(arguments)
+		file_parsed = Core.read_settings_file(arguments)
+		settings_parsed = Core.generate_settings(arguments, file_parsed)
 		assert_equal('PAC Changelog Name Override', settings_parsed[:properties]['title'])		
-		defined = Report::Generator.new.define_properties(settings_parsed)
+		defined = Report::Generator.new.to_liquid_properties(settings_parsed)
 		assert_equal('PAC Changelog Name Override', defined['properties']['title'] )
 		assert_equal('PAC Changelog Name Override', settings_parsed[:properties]['title'])
 	end
-
-	#The everything ok scenario where properties is not specified. Assert that the default 'title' is present 
-	def test_properties_parse_omitted
-		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
-		arguments = { '--settings' => "#{settings_file}" }	
-		settings_parsed = Core.generate_settings(arguments)
-		defined = Report::Generator.new.define_properties(settings_parsed)
-		assert_equal('PAC Changelog', defined['properties']['title'] )
-		assert_nil(settings_parsed[:properties])
-	end
-
+	
 	#The sceenario where the JSON is invalid and cannot be parsed. Assert that an exception is thrown
 	def test_properties_incorrect_json
 		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
 		arguments = { '--settings' => "#{settings_file}", '--properties' => "{ title'PAC Chang} " }
+		file_parsed = Core.read_settings_file(arguments)		
 		assert_raise do |err|
-			settings_parsed = Core.generate_settings(arguments)
+			settings_parsed = Core.generate_settings(arguments, file_parsed)
 		end
 	end
 end

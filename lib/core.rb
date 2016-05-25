@@ -14,26 +14,36 @@ module Core extend self
     @@settings = val
   end
 
-  #Creates the final settings based on additonal command line arguments
-  #Parameters
-  # input - The command line arguments parsed by docopt. Essentially a ruby hash
-  #Exceptions
-  # All exections are throw as is. Handled in pac.rb.
-  def generate_settings(input)
+  #Reads the command line options. And based on this it will return the 
+  #path of the settings file to use.
+  def read_settings_file(input)
     settings_file = File.join(Dir.pwd, 'default_settings.yml')
     unless input['--settings'].nil?
       settings_file = input['--settings']
     end
-    
-    loaded = YAML::load(File.open(settings_file))
+    File.read(settings_file)
+  end
 
-    unless input['--pattern'].nil? 
+  #Creates the final settings based on additonal command line arguments
+  #Parameters
+  # cmdline       - The command line arguments parsed by docopt. Essentially a ruby hash
+  # configuration - The contents of the settings file
+  #Exceptions
+  # All exections are throw as is. Handled in pac.rb.
+  def generate_settings(cmdline, configuration)
+    loaded = YAML::load(configuration)
+
+    if loaded[:properties].nil?
+      loaded[:properties] = {}
+    end
+
+    unless cmdline['--pattern'].nil? 
       loaded[:vcs][:release_regex] = input['--pattern']
     end
 
-    unless input['--properties'].nil? 
-      json_value = JSON.parse(input['--properties'])
-      loaded[:properties] = json_value
+    unless cmdline['--properties'].nil? 
+      json_value = JSON.parse(cmdline['--properties'])
+      loaded[:properties] = loaded[:properties].merge(json_value)
     end
     loaded    
   end

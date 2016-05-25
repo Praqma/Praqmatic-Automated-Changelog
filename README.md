@@ -1,599 +1,207 @@
-[![Stories in Ready](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20-workable&title=Workable)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog)
+Issue tracking: 
+[![Groomed](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20workable&title=Groomed)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog) 
+[![Up Next](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20up%20Next&title=UpNext)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog) 
+[![Work In Progress](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20in%20progress&title=InProgress)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog)
+[![Issues](https://img.shields.io/github/issues/Praqma/Praqmatic-Automated-Changelog.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
+
+
 # Praqmatic Automated Changelog (PAC)
 
 Tool for creating automated, but pragmatic, changelogs.
 
-Compared to other ways of extracting changes, typically from the SCM commit messages, this is based around getting information from another source by looking up references to such in the SCM commit message.
+PAC collects task references from SCM commit messages and creates changelog reports with additional information extracted from other systems, like your task management system.
+Compared to other changelog solutions, PAC is very flexible and customizable. The design allows you to solve the problems of having an unchangeable SCM commit history with incorrect task references.
 
-Currently proof-of-concepts handles
+![The workflow behind PAC for creating changelogs](/docs/process.png)
 
-* git dvcs
-* hg dvcs
+## Features
 
-You can output in any format you like using the liquid templating language. We have the option to turn html into pdf with the pdf switch in the template setup.
+* Customizable change reports based on **Liquid templates**
+* Collects task references in SCM commits from **Git** or **Mercurial (hg)**
+* Extracts data from tasks systems like **Trac** and **JIRA** for the collected tasks
+* For task systems returning json data, all data can be used in the templates 
+* Supports **MarkDown**, **HTML** and **PDF** as report formats
+* Supports extracting data from multiple referenced tasks systems at once
+* Supports creating changelog without data from external systems, basing it only on SCM commits
+* Collects statistic on commits with and without task references
 
-## What's new in 2.0.X? 
+PAC has a flexible internal design, making it easy to extend with support for additional report formats, task management systems and so on.
 
-* Added a templating engine to PAC. You can now define your own custom templates for output using liquid.
-* Added support for JIRA task system
+## Demo
 
-## Settings file example (Jira)
+Take PAC for a quick spin with our demo scripts (requires Linux Bash, zip and docker).
 
-Below is an example of an example that uses Jira.
+**Generate changelogs using only SCM commits**
+
+    ./demo_setup_docker.sh
+
+This demo generates some reports based only on SCM commits of a small test repository.
+After running the demo, look for the reports in `demorepo/idReportTestRepository/default.[pdf|html|md|` and `demorepo/idReportTestRepository/ids.md`
+
+**Generates changelogs using data from JIRA**
+
+    ./demo_setup_docker_jira.sh
+
+This demo generates some reports through a custom template which uses data from SCM commits of a small test repository and a spun-up JIRA instance.
+
+**Try a manual demo using the pac-manuscript repository**
+
+The [pac-manuscript](https://github.com/praqma-test/pac-manuscript) repository is a short demonstration of how PAC works with Jira, where each step of gradually introduces more of the PAC configuration and features.
+The readme in the repository explain how to use it, but the pac-maunscript repository is a imaginary example on a source code repository matching some Jira issues where the series of commits are introducing new PAC features.
+
+## Getting started
+
+You'll need to have some commits that reference tasks in one way or another, otherwise your changelog will look rather dull.
+It could be Jira issues: "_Closing PAC-1337 change help text_" or "_PAC-1042: Fixed bug in date resolver_".
+
+To start generating changelogs you'll need to:
+
+ 1. Either install PAC locally or use our provided Docker image
+ 2. Write a PAC configuration file for your project [see the simple configuration file below](#simple-configuration-file)
+ 3. Write a template for your change report [see the simple template below](#simple-template)
+
+### Simple configuration file
+
+This is an example of a simple configuration file. It collects task references from commits using the configured regex and create a changelog based on the configured template.
+This simple example do not extract data from task systems.
 
 	:general:
-	  date_template: '%Y-%m-%d'
+	  date_template: "%Y-%m-%d"
 
 	:templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
-	  - { location: templates/default.md, output: default.md }
-	  - { location: templates/default_html.html, pdf: true, output: default.html }
 
 	:task_systems:
-	  - 
-	    :name: none	    
-	    :regex:
-	      - { pattern: '/Issue:\s*(\d+)/i', label: none }
-	      - { pattern: '/Issue:\s*(none)/i', label: none }
-	      - { pattern: '/(#\d+)/', label: none }
-	      - { pattern: '/us:(\d+)/', label: none }
-	    :delimiter: '/,|\s/'
 	  -
-	    :name: jira
-	    :debug: false
-	    :query_string: "http//your.server.hostname/jira/rest/api/latest/#{task_id}"
-	    :usr: "user"  
-	    :pw: "password"
+	    :name: none
 	    :regex:
-	    - { pattern: '/PRJ-(\d+)/i', label: jira }      
-	  -
-	    :name: trac
-	    :trac_url: "https://my.trac.site"
-	    :trac_usr: "user"
-	    :trac_pwd: "pass"
-	    :regex:
-	    - { pattern: '/Ticket-(\d+)/i', label: trac }  	   
+	      - { pattern: '/PAC\-(\d+)', label: none }
 
-## Noteworthy information
+	:vcs:
+	  :type: git
+	  :repo_location: '.'
 
-The settings file has the list of regular expression, each pattern has one `label` property. When a regular expression is matched, the label from the matched commit is applied to the task the commit belongs to. Each task can contain multiple labels, a good example would be to scan for commits with a task reference that has the words "Wont fix" and apply the label `wont_fix` to those matched commits.
+More about configuration in [Configuration](docs/configuration.md).
 
-If the matched id, fails to collect metadata from the task system, maybe because of temorary server failure and network issues, the task will have it's labels cleared and replaced with the `unknown` label. This allows you to exclude issues where the issue id was written correctly, but maybe referenced a wrong issue that does not exist yet. The commit will still count as referenced in this case.
+Help writing regexp using Ruby IRB see this litle howto: [Howto write regexp using IRB](docs/howto_write_regexp_using_irb.md)
 
-If `strict` is enabled, and the above occurs, PAC will exit with a nonzero exit code.
+### Simple template
 
-Notice the `pdf: true` attribute on the template. PAC has the ability to transform the html output generated by the template to a .pdf file. This requires special configuration for the docker machine and is generally not recommended, we've seen issues with unicode characters. 
-
-The `debug` flag specified under the task system can be used to print the returned output from the task management system to console. For JIRA this would be the returned `json` from the API calls, this should yield data to the console in the form of this:
-
-```
-[PAC] <...>
-```
-
-As an example, here is how it looks with `Trac` and a sample ticket
-
-```
-[PAC] {:summary=>"Third ticket", :status=>"new", :description=>"Third ticket description"}
-```
-
-### Jira specific information
-
-The query string do not handle redirects, so you must prepend the correct protocol in your `query_string` setting. The behavior of PAC changes if you have specified `https` or `http` always specify the full url, including the correct protocol to use.
-
-## The templating engine
-
-PAC now comes with a templating engine. We have a set of standard variables which can be used in the template. The location of the templates and their outputs can be configured by modifying the `:templates:` section of the settings file.
-
-Below is an example of the standard markdown template
+This example template simply lists the discovered issues as headers in a Markdown file. 
 
 	# {{title}}
-	{% for task in tasks.referenced %}
-	## {{task.task_id}}
-	{% for commit in task.commits %}
-	- {{commit.shortsha}}: {{commit.header}}
-	{% endfor %}
-	{% endfor %}
-	## Unspecified
-	{% for commit in tasks.unreferenced %}
-	- {{commit.shortsha}}: {{commit.header}} 
-	{% endfor %}
-
-	## Nones
 	{% for task in tasks.none %}
-	- {{task.task_id}}
+	## {{task.task_id}}
 	{% endfor %}
 
-	## Statistics
-	- Total numerber of commits: {{pac_c_count}}
-	- Referenced commits: {{pac_c_referenced}}
-	- Health: {{pac_health}}
+More about templates in [Templates](docs/templates.md).
 
-We expose the following attributes
 
-* `title` The title of the report
-* `tasks.referenced` All tasks which have been matched 
-* `tasks.[label]` All tasks with the assigned label. In the example above case all tasks with label 'none' will be iterated
-* `tasks.task.[commits | task_id]` A task has a list of commits. And an id.
-* `tasks.unreferenced` The list of commits that has NOT been referenced with a task
-* `commit.[header | shortsha]` A Commit has a header (The text until the first linebreak) and a SHA
-* `pac_c_count` Number of commits in total
-* `pac_c_referenced` Number of referenced commits
-* `pac_health` The 'health' of the changelog. Returns the percentage of referenced commits 
+## Usage
 
-PAC comes with a set of default templates. Take a look at those for inspiration. The templating system allows you to build a simple .txt file if that is your wish.
-
-### Jira template extras
-
-Several fields are added when a task is matched for a jira issue if you have a configured issue link like so: `https://your.first.server.com/rest/api/latest/issue/#{task_id}?fields=issuetype` you get a json response that looks something like this:
-
-	{
-		"expand":"renderedFields,names,schema,transitions,operations,editmeta,changelog,versionedRepresentations",
-		"id":"10000",
-		"self":"https://your.first.server.com/rest/api/latest/issue/10000",
-		"key":"PP-1",
-		"fields":{
-			"issuetype": {
-				"self":"https://your.first.server.com/rest/api/2/issuetype/10001",
-				"id":"10001",
-				"description":"gh.issue.story.desc",
-				"iconUrl":"https://your.first.server.com/images/icons/issuetypes/story.svg",
-				"name":"Story",
-				"subtask":false
-			}
-		}
-	}
-
-The fields are then accessed like so:
-
-* `task.attributes.data.id` The id value of the json above
-* `task.attributes.data.fields.issuetype.[self | id | description | iconUrl | name | subtask]` All values under issuetype
-
-Basically you can 'dot' your way through the values and include the values you want from jira. What data you have available depends on your query string 
-in the configuration file.  
-
-## Testing your regex with the IRB
-
-When you construct your regexp, the IRB is helpful. To start out with you can comment out all task systems except for the `none` system to verify that
-you capture the correct task id's. Use the interactive ruby interpreter to test your regular expressions.
-
-Example one, checking the above example regexp works as we expect
-
-	2.2.1 :001 > commit_message ="Commit message header
-	2.2.1 :002"> 
-	2.2.1 :003"> More lines in commit message
-	2.2.1 :004"> Issue: 12"
-	 => "Commit message header\n\nMore lines in commit message\nIssue: 12"
- 	2.2.1 :015 > regex = /Issue:\s+(\d+)/im
- 	=> /Issue:\s+(\d+)/mi 
-	2.2.1 :016 > commit_message.scan(regex)
- 	=> [["12"]] 
-
-The script uses the scan method to scan the commit mesage, so for each result the script looks in the first capture group, in this case
-PAC would have picked up an issue with the id "12". The scan method can return multiple matches on the same text so make sure your capture first capture group
-contains the id you want.
-
-## Usage examples
-
-_Note there is a docker container available also, which makes the tools and environment setup easier: [Praqma/docker-pac](https://github.com/Praqma/docker-pac)_
+Basic usage examples for the PAC Ruby script:
 
 Show help
 
     ./pac.rb -h
     
-Get commits using tags. tail tag provided
+Get commits using tags from "Release-1.0" tag to "HEAD":
 
-    ./pac.rb -t Release-1.0 --settings=./pacfogbugz_pac_settings.yml
+    ./pac.rb -t Release-1.0 --settings=./default_settings.yml
 
-Get commits using tags, head and tail tags provided
-
-    ./pac.rb -t Release-1.0 Release-2.0 --settings=./pacfogbugz_pac_settings.yml
+    ./pac.rb -t Release-1.0 Release-2.0 --settings=./default_settings.yml
 
 Get commits using time
 
-    ./pac.rb -d 2013-10-01 --settings=./pacfogbugz_pac_settings.yml 
-    
-Get all commits since latest point release. Given a specified pattern. Default is 'tags'
+    ./pac.rb -d 2013-10-01 --settings=./default_settings.yml     
 
-	./pac.rb -t LATEST --settings=./pacfogbugz_pac_settings.yml --pattern='tags/Release-1.*'
+The above getting started is only a simple example, so to utilize all the features in PAC you can dive into the following sections.
 
-Note that when using tags with a pattern that matches multiple tags, the latest is always used. The comparison is always compared to HEAD.
+We recommend using the PAC docker image, as described below in [Running PAC](#running-pac). The basic usage examples then becomes like described in [Usage](docs/using_the_pac_docker_image.md#usage) in [Using the PAC Docker image](docs/using_the_pac_docker_image.md).
 
-## Using the Praqma/docker-pac container
+### Configuring PAC
 
-The docker container for PAC works by mounting a git repository into the container as a volume, by default the folder `/work` is set as the current 
-working directory inside the container.
+All available configurations option for PAC is described in the [Configuration](docs/configuration.md) section.
 
-So in order to test, and try out the container do the following:
+### Writing templates
 
-* Unzip the file `test/resources/idReportTestRepository.zip` file from this repository to a folder on your computer
-* Create a file `default_settings.yml` and paste the contents from below into this file. Put the file in the root of the extracted Git repository 
+Information on how to write templates for the changelog and use the extracted data can be found in the [Templates](docs/templates.md) section.
 
-```
-:general:
-  date_template: "%Y-%m-%d"
-  :strict: true
+### Take PAC for a spin
 
-:templates:
-  - { location: /usr/src/app/templates/default_id_report.md, output: ids.md }
-  - { location: /usr/src/app/templates/default.md, output: default.md }
-  - { location: /usr/src/app/templates/default_html.html, pdf: true, output: default.html }
+You can try PAC using our PAC Docker container and a zipped github repository we use for testing. See [Try PAC with a test repo and PAC docker image](docs/try_pac_with_test_repo_and_docker.md)
 
-:task_systems:
-  - 
-    :name: none
-    :regex:
-      - { pattern: '/.*Issue:\s*(?<id>[\d+|[,|\s]]+).*?\n/im', label: none }
-      - { pattern: '/.*Issue:\s*?(none).*?\n/im', label: none}
-    :delimiter: '/,|\s/'
-  
-:vcs:
-  :type: git
-  :usr:
-  :pwd:
-  :repo_location: '.'
-  :release_regex: 'tags'
-```
+### Running PAC
 
-Now, when this is done, you should be able to run PAC, the example below is where we extracted the idTestRepository to my home folder:
+We recommend to use our supplied [`praqma/pac`](https://hub.docker.com/r/praqma/pac/) Docker image so you avoid configuring a Ruby environmnet yourself.
 
-`docker run --rm -v /home/mads/idReportTestRepository:/data praqma/pac -s f9a66ca6d2e6`
+* See [Using the PAC docker image](docs/using_the_pac_docker_image.md).
 
-If PAC is working, you should see the following on system out:
+If you like to configure your own Ruby environment and run PAC as simple Ruby script (`pac.rb`) follow instruction below for Linux (Ubuntu) or Windows.
 
-	[PAC] Applying task system none
+* PAC requires Ruby version 2 or later. Currently tested with version 2.3.0 of Ruby.
 
-and if you do an `ls -al` in your repostitory it should now look like this:
 
-	-rwxrwxrwx 1 mads mads   759 Apr 12 10:24 default.html
-	-rwxrwxrwx 1 mads mads   356 Apr 12 10:24 default.md
-	-rwxrwxrwx 1 mads mads 21047 Apr 12 10:24 default.pdf
-	-rw-rw-r-- 1 mads mads   608 Apr 12 10:23 default_settings.yml
-	drwxrwxr-x 8 mads mads  4096 Apr 27  2015 .git
-	-rwxrwxrwx 1 mads mads   489 Apr 12 10:24 ids.md
-	-rw-rw-r-- 1 mads mads   340 Apr 27  2015 README.md
+### Run PAC on Linux (Ubuntu)
 
-That's it. You've now succesfully created a changelog, automagically. As an alterntive you can run the script we provide with PAC (`demo_setup_docker.sh`) this script replays what was explained above. 
+Configure your Linux Ruby environment to run PAC and get PAC from sources:
 
-## Prerequisites
-If you are going to be using the tool to generate PDF files which we use kramdown and pdfkit to generate you'll need to run the following command and a linux machine
+Prerequisites:
 
-`sudo apt-get install libxslt-dev libxml2-dev`
+ * Ruby version 2 (you can see specific version in the [PAC docker image file](Dockerfile))
+ * The `bundler` Ruby Gem
+ * Native libraries - for Ubuntu they are: `sudo apt-get install cmake libxslt-dev libxml2-dev wkhtmltopdf`    
 
-`sudo apt-get install wkhtmltopdf`
+Then get and use PAC:
+              
+1. Clone the pac repository to your local machine: `git clone https://github.com/Praqma/Praqmatic-Automated-Changelog.git pac`
+2. Optionally check-out the `latest` tag or a specific release tag if you don't want bleeding edge.
+3. Change directory to `pac` (the git clone) and run the command `bundle install` to install all the used Ruby Gems.
+4. Optionally add a symlink to `pac.rb` in your path, for example: `ln -s [your install directory]/pac.rb /usr/bin/pac` 
 
-Also you'll need to install the gems specified in the Gemfile in order to get it working. At the current state Linux support is much better than windows
+That's it. Test your installation by executing pac: `pac`. If you get a help screen the installation was successful.
 
-_Note there is a docker container available also, which makes the tools and environment setup easier: [Praqma/docker-pac](https://github.com/Praqma/docker-pac)_
+### Run PAC on Windows
 
-## Developer info
+Detailed instructions can be found in [Installing PAC on Windows](docs/windows_instructions.md).
 
-### Program flow
 
-The general program can be described this way
+## Support and maintenance
 
-1. The Vcs module obtains a list of commits object from [Rugged](https://github.com/libgit2/rugged), given user supplied repository and start/finish. 
-2. The Vcs turns the [Rugged](https://github.com/libgit2/rugged) commits into PACCommit model objects and returns an array of these in the `PACCommitCollection`. The commit collection functions just like a regular list in Ruby, you can add stuff to it with the `add` method etc. Refer to the source code for information. 
-3. The Core module then produces a bare bones `PACTaskCollection` with tasks, the tasks only has the id property.
-4. After the bare `PACTaskCollection` has been generated, each task system applies it's decorator(s) to the task adding additonal data.
-5. The `PACTaskCollection` is then passed to the Liquid template engine and the outputs are produced
+* PAC is maintained in the scope of [JOSRA](http://www.josra.org/).
+* Issue and work tracking is done using [Github issues](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
+* Support requests and questions can be sent to support@praqma.net
+* Our roadmap is available on [Trello](https://trello.com/b/0yJy3IlO/pac-praqmatic-automated-changelog)
 
-Since [Liquid](https://shopify.github.io/liquid/) has a very strict object model, and no ruby code is allowed inside templates (you can use simple filters and chain theme together with th | (pipe), we need to transform the data in `PACTaskCollection` so that Liquid understands it. For example, symbols as has keys are not allowed in the template.
+## Changelog
 
-You are also required to bind Model objects to Liquid locals to be used in templates see the `Notes on Liquid` section.
+### 2.x versions
 
-### Object model 
+**Incompatible with versions 1.x and earlier - see the [migration guide](docs/Migrating_1.X.X_to_2.X.X.md) for more information.**
 
-The principal model in PAC consists of the following ruby `Modules` 
-* Core
-* Vcs
-  * GitVcs
-  * MercurialVcs
-* Model
-  * PACTask
-  * PACTaskCollection
-  * PACCommit
-  * PACCommitCollection
-* Report
-  * Generator
-* Task
-  * JiraTaskSystem
-  * TracTaskSystem
-
-*Module: Core*
-
-The responsibility of `Core` is to combine the data found in the `Vcs` module and using this information together with the information from the `Task` module
-to produce a gross list of tasks discovered. 
-
-The `Core` module is used in the _Main_ method of the pac.rb script.   
-
-*Module: Vcs*
-
-The `Vcs` module handles the interaction with the chosen VCS (Usually Git). Given a set of parameters it will return a list of commits in the form of `PACCommitCollection` model object.
-
-*Module: Model*
-
-The `Model` module contains all the object models needed. We have the folling, the names make it clear what their responsibilities are
-* PACCommit
-* PACCommitCollection
-* PACTask
-* PACTaskCollection
-
-`PACCommit` is just a data structure that encapsulates the `Rugged` commit. It has the `referenced` member which is an indication whether or not this commit had a task reference.
-
-```
-class PACCommit
-  def initialize(sha, message = nil, date = nil)
-	@sha = sha
-	@message = message
-	@referenced = false
-	@date = date
-  end
-end
-``` 
-
-The `PACTaskCollection` has a method to add _n_ tasks to the list. If the task was already added, based on the unique id, then the commits of the two tasks are 
-merged, resulting in 1 task, with the extra commits from the other tasks. This happens if a task is referenced in multiple commits. The _uniqueness_ is implemented in the `PACTaskCollection`. The `PACTaskCollection` basically encapsulates a Ruby list, with some additional logic to ensure uniqueness.
-
-```
-class PACTaskCollection
-  def initialize
-    @tasks = []
-  end
-end 
-```
-
-In order to ensure uniqueness, the _==_ (equals) method on the `PACTask` has been overridden, to only take into account the id of the task when determining equality.
-
-The `PACTask` object has a collection of associated commits. It also holds references to the names of which task systems the task applies to. Also labels tied to the commit are also applied to the task, so that the tasks can be sorted by their labels. A `PACTask` can contain multiple labels. 
-
-```
-class PACTask
-  def initialize(task_id = nil)
-    #Lookup key for task management system
-    @task_id = task_id      
-    #Commits tied to this task
-    @commit_collection = PACCommitCollection.new 
-    #Data from task management systems(s)
-    @attributes = { }
-    #Key that determines which system(s) we need to look in for data
-    @applies_to = Set.new      
-    #Assigned label. Used in templates so that you can group your tasks using labels.
-    @label = Set.new
-  end
-end
-```
-
-*Module: Report*
-
-The `Report` module has one class. The generator class that produces the output files. This generator needs to know a complete lists of tasks, the commits involved and a list of user defined templates to generate the report from. Currently we only have Jekyll generation capabilities.  
-
-*Module: Task*
-
-The `Task` module is responsible for applying the appropriate decorators for the task system. It is entirely possible to apply more than one decorator.
-The module expects a list of tasks, the id of each task is used to query the task system and add additional info to the task.
-
-#### Model example
-
-The first method we use is the one that traverses your git commit messages, for example, this is the output of the `Core.get_commit_messages_by_commit_sha` method:
-
-``` 
-#<Model::PACCommitCollection:0x007f05540f3df8
- @commits=
-  [#<Model::PACCommit:0x007f05540f3cb8
-    @date=2015-04-27 10:37:05 +0000,
-    @message="Test for multiple\n\nIssue: 1,2\n",
-    @referenced=false,
-    @sha="fb493078d9f42d79ea0e3a56abca7956a0d47123">,
-   #<Model::PACCommit:0x007f05540f3b28
-    @date=2015-04-27 10:37:05 +0000,
-    @message="Test for empty\n",
-    @referenced=false,
-    @sha="55857d4e9838d1855b10e4c30b43a433e2db47cd">,
-   #<Model::PACCommit:0x007f05540f3948
-    @date=2015-04-27 10:37:05 +0000,
-    @message="Test for none reference\n\nIssue: none\n",
-    @referenced=false,
-    @sha="a789b472150f462a8ae291577dcf7557b2b4ca55">,
-   #<Model::PACCommit:0x007f05540f37b8
-    @date=2015-04-27 10:37:05 +0000,
-    @message="Updated readme file again - third commit\n\nIssue: 1\n",
-    @referenced=false,
-    @sha="cd32697cb7e2d3a7f3b77b5766ec22d31b002367">,
-   #<Model::PACCommit:0x007f05540f3628
-    @date=2015-04-27 10:37:05 +0000,
-    @message=
-     "Revert \"Updated readme file\"\n\nThis reverts commit 881b321e68481e0ae5cfab316b4b147e101f844a.\nIssue: 1\n",
-    @referenced=false,
-    @sha="a7b63f11d24b6f2fd164d35b904386b234667991">,
-   #<Model::PACCommit:0x007f05540f3470
-    @date=2015-04-27 10:37:05 +0000,
-    @message="Updated readme file\n\nIssue: 3\n",
-    @referenced=false,
-    @sha="881b321e68481e0ae5cfab316b4b147e101f844a">,
-   #<Model::PACCommit:0x007f05540f32b8
-    @date=2015-04-27 10:37:05 +0000,
-    @message="Initial commit - added README\n",
-    @referenced=false,
-    @sha="f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6">]>
-```
-
-After this, this collection is passed to the `Core.task_id_list(...)` method and this is how this list look after we've matched commits to tasks each commits gets added to the task(s) it belongs to
-
-``` 
-#<Model::PACTaskCollection:0x007f7807f07a18
- @tasks=
-  [#<Model::PACTask:0x007f7807f071a8
-    @applies_to=#<Set: {"none"}>,
-    @attributes={},
-    @commit_collection=
-     #<Model::PACCommitCollection:0x007f7807f07180
-      @commits=
-       [#<Model::PACCommit:0x007f7807f144c0
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Test for multiple\n\nIssue: 1,2\n",
-         @referenced=true,
-         @sha="fb493078d9f42d79ea0e3a56abca7956a0d47123">,
-        #<Model::PACCommit:0x007f7807f14010
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Updated readme file again - third commit\n\nIssue: 1\n",
-         @referenced=true,
-         @sha="cd32697cb7e2d3a7f3b77b5766ec22d31b002367">,
-        #<Model::PACCommit:0x007f7807f07e50
-         @date=2015-04-27 10:37:05 +0000,
-         @message=
-          "Revert \"Updated readme file\"\n\nThis reverts commit 881b321e68481e0ae5cfab316b4b147e101f844a.\nIssue: 1\n",
-         @referenced=true,
-         @sha="a7b63f11d24b6f2fd164d35b904386b234667991">]>,
-    @label=#<Set: {"none"}>,
-    @task_id="1">,
-   #<Model::PACTask:0x007f7807f06fa0
-    @applies_to=#<Set: {"none"}>,
-    @attributes={},
-    @commit_collection=
-     #<Model::PACCommitCollection:0x007f7807f06f78
-      @commits=
-       [#<Model::PACCommit:0x007f7807f144c0
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Test for multiple\n\nIssue: 1,2\n",
-         @referenced=true,
-         @sha="fb493078d9f42d79ea0e3a56abca7956a0d47123">]>,
-    @label=#<Set: {"none"}>,
-    @task_id="2">,
-   #<Model::PACTask:0x007f7807f05e48
-    @applies_to=#<Set: {}>,
-    @attributes={},
-    @commit_collection=
-     #<Model::PACCommitCollection:0x007f7807f05e20
-      @commits=
-       [#<Model::PACCommit:0x007f7807f14330
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Test for empty\n",
-         @referenced=false,
-         @sha="55857d4e9838d1855b10e4c30b43a433e2db47cd">,
-        #<Model::PACCommit:0x007f7807f07b30
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Initial commit - added README\n",
-         @referenced=false,
-         @sha="f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6">]>,
-    @label=#<Set: {}>,
-    @task_id=nil>,
-   #<Model::PACTask:0x007f7807f050d8
-    @applies_to=#<Set: {"none"}>,
-    @attributes={},
-    @commit_collection=
-     #<Model::PACCommitCollection:0x007f7807f050b0
-      @commits=
-       [#<Model::PACCommit:0x007f7807f141a0
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Test for none reference\n\nIssue: none\n",
-         @referenced=true,
-         @sha="a789b472150f462a8ae291577dcf7557b2b4ca55">]>,
-    @label=#<Set: {"none"}>,
-    @task_id="none">,
-   #<Model::PACTask:0x007f7807efe990
-    @applies_to=#<Set: {"none"}>,
-    @attributes={},
-    @commit_collection=
-     #<Model::PACCommitCollection:0x007f7807efe968
-      @commits=
-       [#<Model::PACCommit:0x007f7807f07cc0
-         @date=2015-04-27 10:37:05 +0000,
-         @message="Updated readme file\n\nIssue: 3\n",
-         @referenced=true,
-         @sha="881b321e68481e0ae5cfab316b4b147e101f844a">]>,
-    @label=#<Set: {"none"}>,
-    @task_id="3">]>
-```
-
-There are another method, the one which applies task systems to this list, internally the only thing that changes is that the `attributes` field get's populated. How this looks depends on the task system, in the example above we just use the default system, which yields and empty hash. The next step simply takes this gross list and add the attributes that the task system contains.
-
-```
-  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)  
-  Core.settings[:task_systems].each do |ts|
-    everything_ok &= Core.apply_task_system(ts, tasks)
-  end
-```
-
-A couple of things to note here:
-
- * `label` on the `PACTask` are the labels assigned via. regular expressions in the config file. It's a `Set` so values are unique, and will be overridden if you provide the same label to two different regular expressions
- * `referenced` on the `PACCommit` is the indicator that this commit has been referenced somewhere by a task.
- * `applies_to` on the `PACTask` indicates which task management system the task was found to belong two. It's a `Set` so value are unique.
- * Note that in all cases, `attributes` is an empty Hash. This variable will be populated by data for all the task systems this `PACTask` applies to. For Jira this is a straight up key/value hash.
- * `task_id` is the key that is used to look up data in the task management system(s) that populate the `attributes` field on the `PACTask`. Method of lookup varies and is unique for each task system. Trac uses an xmlrpc interface with a `ruby` gem, and `Jirà` is just plain `REST` using ruby standard `HTTP` libraries.
-
-Task systems and the user defined regular expressions are applied sequentially to a task, in the order they are listed in the user supplied configuration file. A regex only has 1 label, but the regex can be copied to apply more than 1 label to the same task.
-
-### Notes on Liquid
-
-In order for liquid to produce locals for the template, we implemented a `to_liquid` method. This method should return a hash whose keys can be used 
-as parameters in the template.
-
-Here is an example
-
-    def to_liquid
-      { 
-        'task_id' => @task_id, 
-        'commits' => @commit_collection, 
-        'attributes' => attributes,
-        'label' => label
-      }
-    end
-
-## Developer notes
-
-You can use the docker container to build and test PAC application, that way you do not need to install ruby on your own local machine if you want to extend it. You can run any arbitrary command using this docker command, this example below executes `rake test` and mounts PAC into the container as a volume. Execute this while while your are in the root of PAC source.
-
-`docker run --entrypoint=/bin/sh --rm -v $(pwd):/data praqma/pac:snapshot -c rake test`  
-
-### Tests
-
-Tests can be easily executed by running `rake test` for unit tests and `rake functional_test` for functional tests.
-
-#### Integration tests for supported tasks systems
-
- * spin up a container with the task system
- * configure it
- * poor known test data into the system
- * run all relevant tests on the systems (assuming they do not change data)
- * shut down and clean-up containers
-
-Possibly container, configuration and test data could be combined into a new container to save spin-up time. 
-
-Note also that tests relies on know test data, e.g. task references etc. thus they are off-course part of this repository.
-
-Choice of containers:
-
-* **Jira**: The [`blacklabelops/jira`](https://hub.docker.com/r/blacklabelops/jira/) container seems very popular and easy to use, thus this is chosen as base container for Jira. . Compared to our own (Praqma) [staci project](https://github.com/Praqma/staci) that start a complete Atlassian suite, this simple jira container seems easier to start with.
-* **Trac**: The [`jmmills/trac`](https://hub.docker.com/r/jmmills/trac/) container was chosen because it had the most pulls of the trac images on the hub, and was the only container that came with the xmlrpc for trac plugin as part of the package.   
-
-
-The funcional test suites start the needed container with the `test/resources/start_task_system.sh` and the autogenerated `test/resources/stop_task_system.sh`
-
-
-
-## Release process
-
-A release candidate has to be able to pass the [pipeline](http://code.praqma.net/ci/view/Open%20Source/view/Praqmatic-Automated-Changelog/). The release step will be started under manual supervision. The released versions of the software will be tagged. This will allow to download the precise version from GitHub, it will be available under the releases [section](https://github.com/Praqma/Praqmatic-Automated-Changelog/releases). 
- 
-## Installation on windows
-
-To run it on windows you need to install ruby installer x86 and devkit x86 [link](http://rubyinstaller.org/downloads/)
-
-To install ruby devkit follow these [instructions](https://github.com/oneclick/rubyinstaller/wiki/Development-Kit)
-
-Rugged requires CMake and pkg-config. 
-
-CMake can be downloaded from [here](http://www.cmake.org/files/v3.2/cmake-3.2.3-win32-x86.zip)
-
-pkg-config has some dependencies. However, there's a [nice package bundled with the dependencies](http://iweb.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/ray_linn/64bit-libraries/pkg-config/pkg-config-0.26.7z).
-
-Start by installing bundler with this command `gem install bundler`. Followed by a `bundle` command inside the project root directory. 
-
-## Contributors
-* Hugo Leote (hleote@praqma.net)
-* Martin Georgiev (mvgeorgiev@praqma.net)
+* Support for report templates
+* Support for JIRA
+
+### 1.x versions
+
+* Support for 'none' report - changelog without task system interaction
+
+### 0.x versions
+
+_Initial release and proof-of-concept_
+
+* Trac support
+* Markdown, HTML, PDF
+
+
+## Developer information
+
+For details on design and development see [Developer information](docs/developer_info.md)
+
+### Contributors
+
 * Mads Nielsen (man@praqma.net)
 * Bue Petersen (bue@praqma.net)
 * Andrius Ordojan (and@praqma.net)
+* Thierry Lacour (thi@praqma.net)
 

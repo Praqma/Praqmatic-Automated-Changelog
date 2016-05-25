@@ -1,5 +1,5 @@
-# {{title}}
-{% for task in tasks.real %}
+# PAC Changelog
+{% for task in tasks.referenced %}
 ## {{task.task_id}}
 {% for commit in task.commits %}
 - {{commit.shortsha}}: {{commit.header}}
