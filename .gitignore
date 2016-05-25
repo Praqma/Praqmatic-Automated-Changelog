@@ -6,6 +6,7 @@ changelog.html
 pac
 coverage
 test/reports
-test/resources/stop_task_system*default.md
+test/resources/stop_task_system*
+default.md
 default.html
 default.pdf
