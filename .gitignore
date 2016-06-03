@@ -7,3 +7,8 @@ pac
 coverage
 test/reports
 test/resources/stop_task_system*
+default.html
+default.md
+default_ids.md
+default.pdf
+

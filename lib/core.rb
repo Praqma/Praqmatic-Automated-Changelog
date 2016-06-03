@@ -3,6 +3,7 @@ require 'yaml'
 require_relative "./task.rb"
 require_relative "./gitvcs"
 require_relative "./mercurialvcs"
+require_relative "./logging"
 
 module Core extend self
 
@@ -45,12 +46,13 @@ module Core extend self
       json_value = JSON.parse(cmdline['--properties'])
       loaded[:properties] = loaded[:properties].merge(json_value)
     end
+    loaded[:verbosity] = Logging.calc_verbosity(cmdline)
     loaded    
   end
   
   #Requires a configuration section for the task system to be applied
   def apply_task_system(task_system, tasks)
-    puts "[PAC] Applying task system #{task_system[:name]}"
+    Logging.verboseprint(1, "[PAC] Applying task system #{task_system[:name]}")
     if task_system[:name] == 'trac'      
       Task::TracTaskSystem.new(task_system).apply(tasks)
     end
@@ -113,5 +115,4 @@ module Core extend self
 
     tasks      
   end
-
 end

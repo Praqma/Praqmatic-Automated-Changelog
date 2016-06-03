@@ -70,6 +70,16 @@ to produce a gross list of tasks discovered.
 
 The `Core` module is used in the _Main_ method of the pac.rb script.   
 
+*Module: Logging*
+
+Logging contains some helper functions for printing output in accordance with
+the user selected verbosity level. 
+The important part is the `Logging.verboseprint(int, args*) function.
+Use this anywhere you want to output to console. It will print the provided 
+message (args*) if, and only if, the user has specified a verbosity equal to or above the number specified. 
+
+Example: `Logging.verboseprint(1, "Debug message")` will be printet only if pac was called with at least `-v`.
+
 *Module: Vcs*
 
 The `Vcs` module handles the interaction with the chosen VCS (Usually Git). Given a set of parameters it will return a list of commits in the form of `PACCommitCollection` model object.

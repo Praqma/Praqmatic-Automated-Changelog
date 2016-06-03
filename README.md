@@ -117,6 +117,8 @@ Get commits using time
 
 The above getting started is only a simple example, so to utilize all the features in PAC you can dive into the following sections.
 
+*Verbosity:*  As most unix tools, pac supports `-v` and `-q` to indicate that it should be more or less verbose in its output. Both switches can be provided multiple times (e.g. `-vv`) for increased effect. One can be used to cancel out the other, which can be useful for instance for reverting behaviour added in a bash alias.
+
 We recommend using the PAC docker image, as described below in [Running PAC](#running-pac). The basic usage examples then becomes like described in [Usage](docs/using_the_pac_docker_image.md#usage) in [Using the PAC Docker image](docs/using_the_pac_docker_image.md).
 
 ### Configuring PAC

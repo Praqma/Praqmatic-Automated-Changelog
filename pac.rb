@@ -7,9 +7,9 @@ require_relative 'lib/report'
 
 doc = <<DOCOPT
 Usage:
-  #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]      
-  #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
-  #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]  
+  #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
+  #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
+  #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
   #{__FILE__} -h|--help
 
 Options:
@@ -39,6 +39,14 @@ Options:
     your Liquid templates. Referenced like so '{{properties.[your-variable]}}' in your templates.
 
     JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
+
+  -v
+
+  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
+
+  -q
+
+  Less verbose output. Can be repeated for more silence or to cancel out -v
 DOCOPT
 
 begin
@@ -64,6 +72,8 @@ begin
   begin
     configuration = Core.read_settings_file(input)
     loaded = Core.generate_settings(input, configuration)
+    #Load the settings
+    Core.settings = loaded 
   rescue JSON::ParserError => pe
     puts "[PAC] Error paring JSON from --properties switch"
     puts "[PAC] Exception caught while parsing command line options: #{pe}"
@@ -74,9 +84,6 @@ begin
     exit 7
   end
   
-  #Load the settings
-  Core.settings = loaded 
-
   if (input['--sha'] || input['-s'])
     commit_map = Core.vcs.get_commit_messages_by_commit_sha(input['<to>'], input['<from>'])
   elsif (input['--date'] || input['-d'])
@@ -106,7 +113,7 @@ begin
   	if Core.settings[:general][:strict]
   		exit 15
   	else
-  	  puts '[PAC] Ignoring encountered errors. Strict mode is disabled.'
+  	  Logging.verboseprint(1, '[PAC] Ignoring encountered errors. Strict mode is disabled.')
   	  exit 0
   	end
   end
@@ -115,4 +122,5 @@ rescue Docopt::Exit => e
   puts "Praqmatic Automated Changelog (PAC)"
   puts "#{version}\n"
   puts e.message
+  puts
 end
