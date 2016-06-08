@@ -50,7 +50,7 @@ PAC always make the following variable available to use in a template.
 
 * `tasks.unknown` Collection of tasks, where data could not be extracted from the configured task system.
 * `tasks.referenced` Collection of tasks which have been matched with one the regexp from the configuration file.
-* `tasks.label` Collection of tasks with the assigned label `label`. In the example above used in the "Nones" section. Read more about labels in the [Labels](labels_configuration.md) section.
+* `tasks.label` Collection of tasks with the assigned label `label`. In the example above used in the "Nones" section. Read more about labels in the [Labels](label_configuration.md) section.
 * `tasks.unreferenced` Collection of commits where the configured regexp(s) in the configuration file didn't match a task.
 
 * `pac_c_count` Total number of commits PAC considered.
