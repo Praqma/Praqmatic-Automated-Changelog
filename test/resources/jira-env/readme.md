@@ -143,17 +143,17 @@ $ rm -rf docker-postgresql
 
 Then we have the following images:
 
-$ docker images | grep praqma/pac_test
-praqma/pac_test_postgres-for-jira                            20161504-143355         8cee8ed7f576        About a minute ago   231.4 MB
-praqma/pac_test_jira                                         20161504-142659         6a21c7bcd50a        3 minutes ago        547.2 MB
+	$ docker images | grep praqma/pac_test
+	praqma/pac_test_postgres-for-jira                            20161504-143355         8cee8ed7f576        About a minute ago   231.4 MB
+	praqma/pac_test_jira                                         20161504-142659         6a21c7bcd50a        3 minutes ago        547.2 MB
 
 
 ## Step 2 - Running our pac_test Jira container to do initial Jira setup
 
 Now we have the two images that persist data inside the container, so they can now be configured:
 
-docker run --name pac_test_postgres-for-jira-temp -d -e 'DB_USER=jiradb' -e 'DB_PASS=jellyfish' -e 'DB_NAME=jiradb' praqma/pac_test_postgres-for-jira:20161504-143355
-docker run -d --name pac_test_jira-temp -e "JIRA_DATABASE_URL=postgresql://jiradb@postgres/jiradb" -e "JIRA_DB_PASSWORD=jellyfish" --link pac_test_postgres-for-jira-temp:postgres -p 28080:8080 praqma/pac_test_jira:20161504-142659
+	docker run --name pac_test_postgres-for-jira-temp -d -e 'DB_USER=jiradb' -e 'DB_PASS=jellyfish' -e 'DB_NAME=jiradb' praqma/pac_test_postgres-for-jira:20161504-143355
+	docker run -d --name pac_test_jira-temp -e "JIRA_DATABASE_URL=postgresql://jiradb@postgres/jiradb" -e "JIRA_DB_PASSWORD=jellyfish" --link pac_test_postgres-for-jira-temp:postgres -p 28080:8080 praqma/pac_test_jira:20161504-142659
 
 ### Jira initial Setup Wizard choices
 
@@ -214,16 +214,16 @@ Using http://jumble.expium.com/ we generated some Jira test data as a json file.
 
 Check the following images to see how test data was generated or read the json file:
 
-* [test/resources/jira-env/Selection_050.png](test/resources/jira-env/Selection_050.png)
-* [test/resources/jira-env/Selection_052.png](test/resources/jira-env/Selection_052.png)
-* [test/resources/jira-env/Selection_053.png](test/resources/jira-env/Selection_053.png)
+* [test/resources/jira-env/Selection_050.png](Selection_050.png)
+* [test/resources/jira-env/Selection_052.png](Selection_052.png)
+* [test/resources/jira-env/Selection_053.png](Selection_053.png)
 
 Import them into the running Jira instance:
 
 
-    * Jira Administration -> System -> External System Import -> JSON and chose file `test/resources/jira-env/0578a7b0-fd81-11e5-a150-91d01466654e.json`
-    * leave users in-active
-    * perform re-index
+* Jira Administration -> System -> External System Import -> JSON and chose file `test/resources/jira-env/0578a7b0-fd81-11e5-a150-91d01466654e.json`
+* leave users in-active
+* perform re-index
 
 Check `test/resources/jira-env/0578a7b0-fd81-11e5-a150-91d01466654e-data-import.log` for import details results.
 
@@ -242,3 +242,11 @@ $ docker push praqma/pac_test_jira:v1
 $ docker push praqma/pac_test_postgres-for-jira:v1
 ```
 
+## Step X - refreshed license
+
+Followed all the above steps 1-4 again to renew a 3 month trial license and published a new binary image on the hub.
+
+* a new license was used
+* same docker images used
+* same test data imported again, didn't update logfile output
+* version "v2" of the images are out on the hub now (actually only needed to update the database though)
