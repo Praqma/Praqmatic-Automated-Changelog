@@ -19,7 +19,7 @@ module Task
     end
 
     def apply(tasks)
-
+        true
     end
 
     def html_escape_non_ascii(text)
@@ -43,11 +43,12 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))  
-            t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw], debug: @settings[:debug])
+            t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
           end
         rescue Exception => err   
 		      tasks_with_no_jira_issues << t  
-          puts "[PAC] Jira #{err.message}"
+          Logging.verboseprint(0, "[PAC] Jira #{err.message}")
+          Logging.verboseprint(1, err.backtrace)
           ok = false
           t.clear_labels
           t.label = 'unknown'	
@@ -80,6 +81,32 @@ module Task
       end
       ok      
     end
+  end
+
+  class FogBugzTaskSystem < TaskSystem
+    def initialize(settings)
+      super(settings) 
+    end
+
+    def apply(tasks)
+      ok = true    
+      tasks_with_no_jira_issues = []
+      
+      tasks.each do |t|
+        begin
+          if(t.applies_to.include?(@settings[:name]))  
+            t.extend(FogbugzTaskDecorator).fetch(@settings[:query_string], debug: @settings[:debug])
+          end
+        rescue Exception => err   
+          tasks_with_no_jira_issues << t  
+          puts "[PAC] FogBugz #{err.message}"
+          ok = false
+          t.clear_labels
+          t.label = 'unknown' 
+        end
+      end        
+      ok
+    end     
   end
 
 end

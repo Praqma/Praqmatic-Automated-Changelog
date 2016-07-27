@@ -24,6 +24,10 @@ task :functional_jira do
 	end	
 end
 
+task :changelog do
+	`docker run --rm -v $(pwd):/data -v /home/praqma/tools:/tools praqma/pac:2.1.0-beta --from-latest-tag 2.0.1 --settings=/tools/config/settings_github_pac.yml -vvv` 
+end
+
 task :coverage do
   ENV['COVERAGE'] = 'on'
   Rake::Task['test'].execute

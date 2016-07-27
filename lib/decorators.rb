@@ -5,31 +5,16 @@ module JiraTaskDecorator
   require 'net/http' 
   require 'uri'
   require 'json'
+  require_relative 'logging' 
 
   attr_accessor :data 
 
-  def fetch(query_string, usr, pw, debug: false) 
+  def fetch(query_string, usr, pw) 
     expanded = eval('"'+query_string+'"')    
 	  uri = URI.parse(expanded)
-     
-    if expanded =~ URI::regexp
-      req = Net::HTTP::Get.new(uri)
-    else
-      raise "Invalid URI: #{expanded}"
-    end 
-
-    req.basic_auth usr, pw
     
     begin
-      if uri.scheme == 'https'
-        res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme = 'https') { |http|
-          http.request(req)
-        }
-      else
-        res = Net::HTTP.start(uri.hostname, uri.port) { |http|
-          http.request(req)
-        }        
-      end
+      res = DecoratorUtils.query(uri, usr, pw)
     rescue Exception
       raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
     end 
@@ -38,9 +23,10 @@ module JiraTaskDecorator
       raise Exception, "Failed to fetch task with id #{task_id} on url #{expanded} return code was #{res.code}"
     end
 
-    begin 
+    begin
+      Logging.verboseprint(3, "[PAC] Got the following data from #{expanded}: #{res.body}") 
       @data = parse(res.body) 
-      puts "[PAC] #{@data}" if debug
+      Logging.verboseprint(1, "[PAC] Fetched the following from Jira: #{@data}")
       @data
     rescue JSONError
       raise Exception, "Unparsable JSON data fetched from url #{expanded}"
@@ -78,7 +64,7 @@ module TracTaskDecorator
       unless task_id.nil? 
         ticket = TracTaskDecorator.trac_instance.tickets.get task_id.to_i
         @data = { :summary => ticket.summary, :status => ticket.status, :description => ticket.description }
-        puts "[PAC] #{@data}" if debug
+        Logging.verboseprint(1, "[PAC] Fetched the following from Trac: #{@data}")
         @data        
       end
     rescue Trac::TracException => e
@@ -95,4 +81,44 @@ module TracTaskDecorator
   end
 
   attr_accessor :data  
+end
+
+module FogbugzTaskDecorator
+
+  require 'xmlsimple'
+
+  def fetch(query_string)
+    expanded = eval('"'+query_string+'"')    
+    uri = URI.parse(expanded)    
+    res = DecoratorUtils.query(uri)
+    Logging.verboseprint(3, "[PAC] Got the following data from #{expanded}: #{res.body}")
+    @data = XmlSimple.xml_in res.body
+    Logging.verboseprint(1, "[PAC] Fetched the following from FogBugz: #{@data}")
+    @data    
+  end
+
+  def attributes
+    super.merge!({ 'data' => @data })
+  end
+end
+
+module DecoratorUtils extend self  
+
+  def query(uri, usr = nil, pw = nil)
+    req = Net::HTTP::Get.new(uri)
+    unless usr.nil?
+      req.basic_auth usr, pw
+    end
+
+    if uri.scheme == 'https'
+      res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme = 'https') { |http|
+        http.request(req)
+      }
+    else
+      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
+        http.request(req)
+      }        
+    end    
+  end
+
 end

@@ -58,6 +58,9 @@ module Core extend self
     end
     if task_system[:name] == 'jira'
       Task::JiraTaskSystem.new(task_system).apply(tasks)
+    end
+    if task_system[:name] == 'fogbugz'
+      Task::FogBugzTaskSystem.new(task_system).apply(tasks)
     end   
   end
   

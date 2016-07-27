@@ -13,3 +13,4 @@ gem 'simplecov-rcov', :require => false
 gem 'ci_reporter_test_unit'
 gem 'zip'
 gem 'liquid'
+gem 'xml-simple', '~> 1.1', '>= 1.1.5'

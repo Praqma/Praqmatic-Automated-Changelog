@@ -10,6 +10,9 @@ Usage:
   #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
   #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
   #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
+  #{__FILE__} --from <oldest-ref> [(--to <newest-ref> | --to-date <newest-date>)] [--settings=<settings_file>] [--properties=<properties>] [-v...] [-q...] 
+  #{__FILE__} --from-date <from_date> [(--to <newest-ref> | --to-date <newest-date>)] [--settings=<settings_file>] [--properties=<properties>] [-v...] [-q...] 
+  #{__FILE__} --from-latest-tag <approximation> [(--to <newest-ref> | --to-date <newest-date>)] [--settings=<settings_file>] [--properties=<properties>] [-v...] [-q...]  
   #{__FILE__} -h|--help
 
 Options:
@@ -23,15 +26,17 @@ Options:
      
   -s --sha
               
-    Use SHAs to select the changesets.      
+    Use SHAs to select the changesets. [DEPRECATED]
+    Deprecated since 2.1.0. Use --from instead.      
   
   --settings=<settings_file> 
   
     Path to the settings file used. If nothing is specified default_settings.yml is used
     
-  --pattern=<rel_pattern>
+  --pattern=<rel_pattern> [DEPRECATED]
 
     Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.
+    Deprecated since 2.1.0 --from-latest-tag <approximation> instead.
 
   --properties=<properties>
 
@@ -83,9 +88,15 @@ begin
     puts "[PAC] Exception caught while creating configuration: #{e}"
     exit 7
   end
-  
-  if (input['--sha'] || input['-s'])
-    commit_map = Core.vcs.get_commit_messages_by_commit_sha(input['<to>'], input['<from>'])
+
+  if (input['--from']) 
+    commit_map = Core.vcs.get_delta(input['<oldest-ref>'], input['<newest-ref>'])
+  elsif (input['--from-latest-tag'])
+    found_tag = Core.vcs.get_latest_tag(input['<approximation>'])
+    commit_map = Core.vcs.get_delta(found_tag, input['<newest-ref>'])
+  elsif (input['--sha'] || input['-s'])
+    Logging.verboseprint(0, "[PAC] Warning: Using deprecated method call. Use --from instead")
+    commit_map = Core.vcs.get_delta(input['<to>'], input['<from>'])
   elsif (input['--date'] || input['-d'])
     toTime = Core.to_time(input['<to>'])
     unless input['<from>'].nil?
@@ -93,7 +104,8 @@ begin
     end
     commit_map = Core.vcs.get_commit_messages_by_commit_times(toTime, fromTime)     
   else
-    commit_map = Core.vcs.get_commit_messages_by_tag_name(input['<to>'], input['<from>'])    
+    Logging.verboseprint(0, "[PAC] Warning: Using deprecated method call. Use --from instead. This method accepts both tags and git shas")
+    commit_map = Core.vcs.get_delta(input['<to>'], input['<from>'])    
   end
 
   #This is all our current tasks (PACTaskCollection) Each task is uniquely identified by an ID.
