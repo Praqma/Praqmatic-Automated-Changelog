@@ -59,7 +59,7 @@ module TracTaskDecorator
     @@trac_instance = trac
   end
 
-  def fetch(debug: false)
+  def fetch
     begin
       unless task_id.nil? 
         ticket = TracTaskDecorator.trac_instance.tickets.get task_id.to_i
@@ -107,6 +107,7 @@ module DecoratorUtils extend self
   def query(uri, usr = nil, pw = nil)
     req = Net::HTTP::Get.new(uri)
     unless usr.nil?
+      Logging.verboseprint(3, "[PAC] Using basic authentication")
       req.basic_auth usr, pw
     end
 

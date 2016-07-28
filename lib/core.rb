@@ -42,6 +42,21 @@ module Core extend self
       loaded[:vcs][:release_regex] = input['--pattern']
     end
 
+    #User name override
+    if cmdline['-c']
+      (0..cmdline['-c']-1).each do |it|
+        u = cmdline['<user>'][it]
+        p = cmdline['<password>'][it]
+        t = cmdline['<target>'][it]
+        loaded[:task_systems].each do |ts|
+          if ts[:name] == t
+            ts[:usr] = u
+            ts[:pw] = p
+          end
+        end
+      end
+    end
+    
     unless cmdline['--properties'].nil? 
       json_value = JSON.parse(cmdline['--properties'])
       loaded[:properties] = loaded[:properties].merge(json_value)
@@ -52,16 +67,18 @@ module Core extend self
   
   #Requires a configuration section for the task system to be applied
   def apply_task_system(task_system, tasks)
+    val = true
     Logging.verboseprint(1, "[PAC] Applying task system #{task_system[:name]}")
     if task_system[:name] == 'trac'      
-      Task::TracTaskSystem.new(task_system).apply(tasks)
+      val = Task::TracTaskSystem.new(task_system).apply(tasks)
     end
     if task_system[:name] == 'jira'
-      Task::JiraTaskSystem.new(task_system).apply(tasks)
-    end
+      val = Task::JiraTaskSystem.new(task_system).apply(tasks)
+    end    
     if task_system[:name] == 'fogbugz'
-      Task::FogBugzTaskSystem.new(task_system).apply(tasks)
-    end   
+      val = Task::FogBugzTaskSystem.new(task_system).apply(tasks)
+    end
+    val
   end
   
   def vcs

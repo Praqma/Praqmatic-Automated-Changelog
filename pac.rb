@@ -7,51 +7,39 @@ require_relative 'lib/report'
 
 doc = <<DOCOPT
 Usage:
-  #{__FILE__} (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
-  #{__FILE__} (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
-  #{__FILE__} (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>] [-v...] [-q...]
-  #{__FILE__} --from <oldest-ref> [(--to <newest-ref> | --to-date <newest-date>)] [--settings=<settings_file>] [--properties=<properties>] [-v...] [-q...] 
-  #{__FILE__} --from-date <from_date> [(--to <newest-ref> | --to-date <newest-date>)] [--settings=<settings_file>] [--properties=<properties>] [-v...] [-q...] 
-  #{__FILE__} --from-latest-tag <approximation> [(--to <newest-ref> | --to-date <newest-date>)] [--settings=<settings_file>] [--properties=<properties>] [-v...] [-q...]  
+  #{__FILE__} (-d | --date) <to> [<from>] [options] [-v...] [-q...]
+  #{__FILE__} (-s | --sha) <to> [<from>] [options] [-v...] [-q...]
+  #{__FILE__} (-t | --tag) <to> [<from>] [options] [-v...] [-q...]
+  #{__FILE__} from <oldest-ref> [(--to <newest-ref> | --to-date <newest-date>)] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+  #{__FILE__} from-date <from_date> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
+  #{__FILE__} from-latest-tag <approximation> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
   #{__FILE__} -h|--help
 
 Options:
-  -h --help
-             
-    Show this screen.
+  -h --help  Show this screen.
+
+  --from <oldest-ref>  Specify where to stop searching for commit. For git this takes anything that rev-parse accepts. Such as HEAD~3 / Git sha or tag name.
+
+  --from-date <from-date>  Use dates to select the changesets.
+
+  --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.  
     
-  -d --date
-             
-    Use dates to select the changesets.
-     
-  -s --sha
+  -d --date  Use dates to select the changesets.  
+
+  -s --sha  Deprecated since 2.1.0. Use --from instead.
               
-    Use SHAs to select the changesets. [DEPRECATED]
-    Deprecated since 2.1.0. Use --from instead.      
-  
-  --settings=<settings_file> 
-  
-    Path to the settings file used. If nothing is specified default_settings.yml is used
-    
-  --pattern=<rel_pattern> [DEPRECATED]
+  --settings=<path>  Path to the settings file used. If nothing is specified default_settings.yml is used      
 
-    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.
-    Deprecated since 2.1.0 --from-latest-tag <approximation> instead.
-
-  --properties=<properties>
+  --properties=<properties>  
 
     Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.* in 
     your Liquid templates. Referenced like so '{{properties.[your-variable]}}' in your templates.
 
     JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
 
-  -v
+  -v  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
 
-  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
-
-  -q
-
-  Less verbose output. Can be repeated for more silence or to cancel out -v
+  -q  Less verbose output. Can be repeated for more silence or to cancel out -v
 DOCOPT
 
 begin
@@ -89,9 +77,9 @@ begin
     exit 7
   end
 
-  if (input['--from']) 
+  if (input['from']) 
     commit_map = Core.vcs.get_delta(input['<oldest-ref>'], input['<newest-ref>'])
-  elsif (input['--from-latest-tag'])
+  elsif (input['from-latest-tag'])
     found_tag = Core.vcs.get_latest_tag(input['<approximation>'])
     commit_map = Core.vcs.get_delta(found_tag, input['<newest-ref>'])
   elsif (input['--sha'] || input['-s'])
@@ -114,7 +102,8 @@ begin
   everything_ok = true
   #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)  
   Core.settings[:task_systems].each do |ts|
-    everything_ok &= Core.apply_task_system(ts, tasks)
+    res = Core.apply_task_system(ts, tasks)
+    everything_ok &= res 
   end
 
   #Write the ID report (Basically just a list of referenced and non-referenced issues)

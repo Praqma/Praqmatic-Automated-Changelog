@@ -1,0 +1,19 @@
+:general:
+  date_template: '%Y-%m-%d'
+  :strict: false
+ 
+:templates:
+  - { location: /data/templates/examples/github.html, pdf: true, output: default-generated.html }
+
+:task_systems:
+  -
+    :name: jira
+    :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+    :usr:
+    :pw: 
+    :regex:
+    - { pattern: '/#(\d+)/i', label: github }      
+  
+:vcs:
+  :type: git
+  :repo_location: '.'

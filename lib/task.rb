@@ -44,7 +44,10 @@ module Task
         begin
           if(t.applies_to.include?(@settings[:name]))  
             t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
+            Logging.verboseprint(1, "[PAC] Applied task system Jira to #{t.task_id}")
           end
+        #This handles the case where we matched the regex. But the user might have a typo in the issue id. 
+        #This means the issue cannot be looked up.
         rescue Exception => err   
 		      tasks_with_no_jira_issues << t  
           Logging.verboseprint(0, "[PAC] Jira #{err.message}")
@@ -70,7 +73,8 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))
-            t.extend(TracTaskDecorator).fetch(debug: @settings[:debug])
+            t.extend(TracTaskDecorator).fetch
+            Logging.verboseprint(1, "[PAC] Applied task system Trac to #{t.task_id}")
           end
         rescue Exception => err
           puts "[PAC] #{err.message}"
@@ -95,11 +99,13 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))  
-            t.extend(FogbugzTaskDecorator).fetch(@settings[:query_string], debug: @settings[:debug])
+            t.extend(FogbugzTaskDecorator).fetch(@settings[:query_string])
+            Logging.verboseprint(1, "[PAC] Applied task system FogBugz to #{t.task_id}")
           end
-        rescue Exception => err   
+        rescue Exception => err  
           tasks_with_no_jira_issues << t  
-          puts "[PAC] FogBugz #{err.message}"
+          Logging.verboseprint(0, "[PAC] FogBugz #{err.message}")
+          Logging.verboseprint(1, "[PAC] Traceback #{err.backtrace}")
           ok = false
           t.clear_labels
           t.label = 'unknown' 
