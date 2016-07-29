@@ -1,13 +1,14 @@
 REPOSITORY_URL = 'https://github.com/Praqma/Praqmatic-Automated-Changelog.git'
 MAIN_BRANCH = 'master'
 REMOTE_NAME = 'origin'
-JOB_LABELS = 'GiJeLiSlave'
+JOB_LABELS = 'dockerhost1'
 NUM_OF_BUILDS_TO_KEEP = 100
 GITHUB_PRAQMA_CREDENTIALS = '100247a2-70f4-4a4e-a9f6-266d139da9db'
 
 PRETESTED_INTEGRATION_JOB_NAME = '1_pretested-integration_pac'
-FUNCTIONAL_TEST_JOB_NAME = '2_functional_test_pac'
-RELEASE_JOB_NAME = '3_release_pac'
+GENERATE_CHANGE_LOG_JOB_NAME = '2_generate_changelog_pac'
+FUNCTIONAL_TEST_JOB_NAME = '3_functional_test_pac'
+RELEASE_JOB_NAME = '4_release_pac'
 
 DOCKER_REPO_NAME = 'praqma/pac'
 
@@ -62,6 +63,36 @@ job(PRETESTED_INTEGRATION_JOB_NAME) {
 
     publishers {
         pretestedIntegration()
+        downstream(GENERATE_CHANGE_LOG_JOB_NAME, 'SUCCESS')
+        mailer('and@praqma.net', false, false)
+    }
+
+}
+
+job(GENERATE_CHANGE_LOG_JOB_NAME) {
+
+    label(JOB_LABELS)
+
+    scm {
+        git {
+            remote {
+                name(REMOTE_NAME)
+                url(REPOSITORY_URL)
+            }
+            branch(MAIN_BRANCH)
+            extensions {}
+        }
+    }
+
+    //First step: Can we build the docker image, and can we run unit tests?
+    //This basically mimics developer behaviour
+    steps {
+        shell('''
+            docker run --rm -v $(pwd):/data -v /home/praqma/tools:/tools praqma/pac:2.1.0-beta from-latest-tag 2.0.1 --settings=/data/pac_settings.yml -c $pac_user $pac_password jira -vvv
+            ''')
+    }
+
+    publishers {
         downstream(FUNCTIONAL_TEST_JOB_NAME, 'SUCCESS')
         mailer('and@praqma.net', false, false)
     }

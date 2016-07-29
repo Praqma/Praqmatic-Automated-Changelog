@@ -6,6 +6,20 @@ RUN apt-get update && \
     apt-get install -y libxml2-dev && \
     rm -rf /var/lib/apt/lists/* 
 
+RUN apt-get update && \
+    apt-get install -y locales && \
+    rm -rf /var/lib/apt/lists/*
+
+#Set the locale
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=en_US.UTF-8
+
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8  
+
 #This istalls a patched version of wkhtmltopdf that allows it to run headless without configuration
 RUN mkdir -p /var/lib/wkhtml
 WORKDIR /var/lib/wkhtml
@@ -13,6 +27,8 @@ RUN wget http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-
 		tar -xvf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \
 		rm wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \ 
 		ln -sf /var/lib/wkhtml/wkhtmltox/bin/wkhtmltopdf /usr/bin/wkhtmltopdf
+
+
 
 RUN bundle config --global frozen 1
 

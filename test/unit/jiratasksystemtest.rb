@@ -4,6 +4,11 @@ require_relative "../../lib/task.rb"
 require_relative "../../lib/decorators.rb"
 
 class JiraTaskSystemTest < Test::Unit::TestCase
+
+  Test::Unit.at_start do
+  	Core.settings = { :verbosity => 1}
+  end
+
 	#This tests that when you query a an adress that does not exist, we exhibit appropriate behaviour and handle it gracefully. This is a test for a domain that 
 	#actually exits, the server will then throw a 404 not found.  
 	def test_jira_rainy_day_scenario_host_exits_page_not_found

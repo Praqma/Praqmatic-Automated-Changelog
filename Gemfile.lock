@@ -93,6 +93,7 @@ GEM
       rainbow
       rainbow (>= 1.0.4)
       sdoc
+    xml-simple (1.1.5)
     zip (2.0.2)
 
 PLATFORMS
@@ -111,4 +112,5 @@ DEPENDENCIES
   simplecov
   simplecov-rcov
   trac4r
+  xml-simple (~> 1.1, >= 1.1.5)
   zip

@@ -18,6 +18,10 @@
 			ul {
 				list-style: none;
 			}
+
+			a {
+				text-decoration: none;
+			}
 		</style>
 		<title>PAC Changelog</title>
 	</head>
@@ -25,7 +29,7 @@
 		<h1>PAC Changelog</h1>
 		<h3>Referenced tasks</h3>
 		{% for task in tasks.referenced %}
-			<h5>{{task.task_id}}</h5>
+			<h5><a href="{{task.attributes.data.html_url}}">{{task.task_id}}</a> ({{task.attributes.data.state}})</h5>
 			<ul>
 			{% for commit in task.commits %}
 				<li> {{commit.shortsha}}:{{commit.header}}</li>

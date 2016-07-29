@@ -25,7 +25,10 @@
 		<h1>PAC Changelog</h1>
 		<h3>Referenced tasks</h3>
 		{% for task in tasks.referenced %}
-			<h5>{{task.task_id}}</h5>
+			<h5>Case {{task.task_id}} ({{task.attributes.data.cases[0].case[0].sStatus[0]}})</h5>
+			<p>
+				{{task.attributes.data.cases[0].case[0].sTitle[0]}} 
+			</p>
 			<ul>
 			{% for commit in task.commits %}
 				<li> {{commit.shortsha}}:{{commit.header}}</li>
@@ -40,3 +43,5 @@
 		</ul>
 	</body>
 </html>
+
+{{task.attributes.data.cases[0].case[0].sTitle[0]}} ({{task.attributes.data.cases[0].case[0].sStatus[0]}})
