@@ -1,8 +1,4 @@
 # -*- coding: utf-8; -*-
-# Test cases related to the target
-#
-# Copyright 2013 YXLON International A/S
-#
 module PAC__TestCases_IdReport
   require 'pp'
   require 'fileutils'

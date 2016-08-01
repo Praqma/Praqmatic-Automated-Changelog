@@ -1,3 +1,4 @@
+#encoding: utf-8
 module PAC__TestCases_GetCommitMessageOnCorrectBranch
   require 'pp'
   require 'fileutils'

@@ -24,8 +24,11 @@ task :functional_jira do
 	end	
 end
 
-task :changelog do
-	`docker run --rm -v $(pwd):/data -v /home/praqma/tools:/tools praqma/pac:2.1.0-beta --from-latest-tag 2.0.1 --settings=/tools/config/settings_github_pac.yml -vvv` 
+task :functional_vcs do 
+	Dir.glob('test/functional/*vcs*.rb').each do |testfile|
+		puts testfile
+		ruby "#{testfile} --verbose=verbose"
+	end		
 end
 
 task :coverage do
