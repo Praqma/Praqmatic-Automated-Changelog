@@ -10,9 +10,9 @@ Usage:
   #{__FILE__} (-d | --date) <to> [<from>] [options] [-v...] [-q...]
   #{__FILE__} (-s | --sha) <to> [<from>] [options] [-v...] [-q...]
   #{__FILE__} (-t | --tag) <to> [<from>] [options] [-v...] [-q...]
-  #{__FILE__} from <oldest-ref> [(--to <newest-ref> | --to-date <newest-date>)] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+  #{__FILE__} from <oldest-ref> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
   #{__FILE__} from-date <from_date> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
-  #{__FILE__} from-latest-tag <approximation> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
+  #{__FILE__} from-latest-tag [<approximation>] [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
   #{__FILE__} -h|--help
 
 Options:
@@ -68,20 +68,35 @@ begin
     #Load the settings
     Core.settings = loaded 
   rescue JSON::ParserError => pe
-    puts "[PAC] Error paring JSON from --properties switch"
-    puts "[PAC] Exception caught while parsing command line options: #{pe}"
+    Logging.verboseprint(0, "[PAC] Error paring JSON from --properties switch")
+    Logging.verboseprint(0, "[PAC] Exception caught while parsing command line options: #{pe}")
     exit 6
   rescue Exception => e
-    puts "[PAC] Unspecified error caught while creating configuration"
-    puts "[PAC] Exception caught while creating configuration: #{e}"
+    Logging.verboseprint(0, "[PAC] Unspecified error caught while creating configuration")
+    Logging.verboseprint(0, "[PAC] Exception caught while creating configuration: #{e}")
     exit 7
   end
 
-  if (input['from']) 
-    commit_map = Core.vcs.get_delta(input['<oldest-ref>'], input['<newest-ref>'])
+  if (input['from'])
+    if input['<newest-date>']
+      Logging.verboseprint(0,"[PAC] Fiding commits until date #{input['<newest-date>']}")
+      to_commit = Core.vcs.get_first_commit_after(Core.to_time(input['<newest-date>']))
+      Logging.verboseprint(0, "[PAC] Finding commits up and until commit: #{to_commit}")
+      commit_map =   Core.vcs.get_delta(input['<oldest-ref>'], to_commit)
+    else
+      commit_map = Core.vcs.get_delta(input['<oldest-ref>'], input['<newest-ref>'])
+    end   
   elsif (input['from-latest-tag'])
     found_tag = Core.vcs.get_latest_tag(input['<approximation>'])
     commit_map = Core.vcs.get_delta(found_tag, input['<newest-ref>'])
+  elsif input['from-date']
+    if input['--to-date']
+      Logging.verboseprint(0, "[PAC] Using dates. Finding commits between #{input['<newest-date>']} and #{<from-date>}")
+    elsif input['--to']
+      Logging.verboseprint(0, "[PAC] Using dates. Finding commits between commit #{input['newest-ref']} and #{<from-date>}")      
+    else
+      Logging.verboseprint(0, "[PAC] Using dates. Finding commits from tip of repository until #{<from-date>}")
+    end
   elsif (input['--sha'] || input['-s'])
     Logging.verboseprint(0, "[PAC] Warning: Using deprecated method call. Use --from instead")
     commit_map = Core.vcs.get_delta(input['<to>'], input['<from>'])

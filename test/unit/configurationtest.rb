@@ -26,7 +26,7 @@ class ConfigurationTest < Test::Unit::TestCase
 		assert_equal('PAC Changelog Name Override', defined['properties']['title'] )
 		assert_equal('PAC Changelog Name Override', settings_parsed[:properties]['title'])
 	end
-	
+
 	#The sceenario where the JSON is invalid and cannot be parsed. Assert that an exception is thrown
 	def test_properties_incorrect_json
 		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
@@ -36,4 +36,23 @@ class ConfigurationTest < Test::Unit::TestCase
 			settings_parsed = Core.generate_settings(arguments, file_parsed)
 		end
 	end
+	
+	#Credentials test (test the -c option. for username and password overrides)
+	def test_configure_credentials
+		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
+		#Notice the wierd way docopt handles it. The -c flag is a repeat flag, each option is then grouped positionally. So for each 'c' specified 
+		#c is incremented, and the index of the then the value specified.
+		arguments = { '--settings' => "#{settings_file}", '--properties' => '{"title" : "PAC Changelog Name Override" }', '-c' => 2, 
+			'<user>' => ["newuser", "tracuser"], 
+			'<password>' => ["newpassword", "tracpassword"], 
+			'<target>' => ["jira", "trac"] } 
+
+		file_parsed = Core.read_settings_file(arguments)
+		settings_parsed = Core.generate_settings(arguments, file_parsed)		
+		assert_equal('newuser', settings_parsed[:task_systems][1][:usr])
+		assert_equal('newpassword', settings_parsed[:task_systems][1][:pw])
+
+		assert_equal('tracuser', settings_parsed[:task_systems][2][:usr])
+		assert_equal('tracpassword', settings_parsed[:task_systems][2][:pw])
+	end	
 end

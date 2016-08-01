@@ -25,6 +25,32 @@ module Vcs
     def walker=(v)
       @walker = v
     end
+
+    #This is the one that is used as in the most common configuration where only 1 parameter is specified
+    #HEAD to date
+    def get_first_commit_after(date)
+      headcommit = repository.lookup(repository.head.target.oid)
+      walker = createWalker
+      walker.push(headcommit)
+      date_i = date.to_i
+      walker.each do |commit|
+        if date_i >= commit.time.to_i
+          return commit.oid
+        end
+      end    
+    end
+
+    def get_first_commit_before(date)
+      headcommit = repository.lookup(repository.head.target.oid)
+      walker = createWalker
+      date_i = date.to_i
+      walker.push(headcommit)
+      walker.each do |commit|
+        if date_i <= commit.time.to_i
+          return commit.oid
+        end
+      end      
+    end
     
     def get_commit_messages_by_commit_times(tailTime, headTime=nil)
       raise ArgumentError, 'Tail time parameter is nil' if tailTime.nil?
@@ -103,6 +129,7 @@ module Vcs
 
       walker.each do |commit|
         p_commit = Model::PACCommit.new(commit.oid, commit.message, commit.time)
+        Logging.verboseprint(3, "[PAC] Added commit #{commit.oid}")
         commits.add(p_commit)        
       end
       commits
