@@ -9,7 +9,7 @@ class FogBugzTaskSystemTest < Test::Unit::TestCase
   	Core.settings = { :verbosity => 1}
   end
 
-  #Just testing that we fail to apply and 
+  #Just testing that we fail to apply the task system when there is no task system 
 	def test_fogbugz_configuration_should_fail
 		settings = { :name => 'fogbugz', :query_string => 'http://www.praqma.com/#{task_id}', :usr => 'usr_fb', :pw => 'pw_fb' }
 		collection = Model::PACTaskCollection.new

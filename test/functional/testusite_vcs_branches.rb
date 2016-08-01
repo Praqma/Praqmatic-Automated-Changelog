@@ -4,5 +4,6 @@ module PAC__TestSuites
     # TestCase classes that contain the methods I want to use in the test suite
     require_relative 'testCases/vcs_functional_walker.rb'
     require_relative 'testCases/vcs_functional_topology.rb'
+    require_relative 'testCases/vcs_functional_tags.rb'
     include PAC__TestCases_GetCommitMessageOnCorrectBranch
 end
