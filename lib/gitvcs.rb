@@ -59,11 +59,18 @@ module Vcs
     end
 
     #Method that returns the newest commit a tag points to
+    #If no argument given. We'll just use the latest of any tag
     def get_latest_tag(approximation) 
       tag_collection = Rugged::TagCollection.new(repository)
       candidates = []
-      tag_collection.each(approximation+'*') do |tag|
-        candidates << tag
+      unless approximation.nil?
+        tag_collection.each(approximation+'*') do |tag|
+          candidates << tag
+        end
+      else
+        tag_collection.each do |tag|
+          candidates << tag
+        end        
       end
 
       if candidates.empty? 
