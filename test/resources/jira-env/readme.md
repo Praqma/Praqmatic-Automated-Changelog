@@ -174,15 +174,14 @@ Server ID: BHQ7-UI8N-8RZM-SBGR
 
 License (from Bue Petersen Atlassian account - Jira Software Server) generated for above server ID:
 
-AAABcQ0ODAoPeNp9UU1Pg0AUvPMrNvGiBwhUkabJJrawKqalFaoH42WLr7qGLuvbpdp/LwWMVVuP7
-2Pmzcw7ukRBhgqJ5xM3GJz5A/+UhNGc9Fzv3HpGAPlSKgXojEUOUgN7EkaUkrJkztJZGmfMSqrVA
-nC6vNOAmtqe9SqQO3+6swrzF64h4gbolt52z2zPtzri+UZBwldAw+lkwtIwHo6/RuxDCdzs4PwtL
-iyl4blhEy4KuqjgQiF/W3FHgrEywDVgHNHR9W1g38X9xO6nDxM7G12lrTyF5VOVG2db2LpcmneO4
-NR8Yg3UYAXt2mHXe7LZZ6FWJw1ILvMDNv5R8yfC7k7taxxHGUvscRC4get6Vl3QH41/aDPD0QDSJ
-S80WFN85lJo3vgbVUBmUA81SCtEaLq/H1a0Ku7rrS2m9yMKqN2iQqG7FCPQOQrVsN/E6ZBknQxy3
-D7p5HFA2JoXVXOr1X3oDfsC3j2+i/vmbOtP9Xf+UTAsAhQiVpWhYUrRD5cMHYKvMVkgmuZSDgIUZ
-VqzgfBKknpDuyvLtwdkElKr06c=X02i2
-
+AAABcw0ODAoPeNp9UctOwkAU3c9XTOJGF21aLA9JJhHaiakpD1vQjZuhXGAMTOudKcrfWyhGkEdyN
+/d17jnn3rzBlHaKOXUd6jTbda/tetQPRrTmuA0yRwC1yPIc0I5kCkoDn0ojM8V4f8TjYRwmnPSL1
+QRwMBtrQM0sl3xIFPZJdVhguhAaAmGAbeEtp2W5DtkDjzY59MUKmD/o9Xjsh53ot8W/c4mbg72HM
+oifKSNSw3tCLtmkgMccxedK2AoMSQDXgGHAut1OZNXHrYb14tZ868kd1it6OWbTIjX2NrF0NjNfA
+sEu8eQamMECqrHLqs94c05CyU4ZUEKlF2RcYXNi4f5OqSsKg4T3rah17zUdzyNlwo4KV2ATI9AAs
+plYaiADnAsltdjp6xZAh1A2NSjiI+yq/x+2rFi8llPbndqRFVCqxRyl3rsYgE5R5jv05zDu0GRPg
+95WT7p7b1O+Fstid6vifekN5ww+PH6494dZ5T/Dhv3GMCwCFDl7I2JI6FigoFW+GG4Y6fQgvMFDA
+hRREkr0RnrzDQp4FOnQfyMCsbNn7g==X02i6
 
 **Set up administrator account:**
 
@@ -250,3 +249,6 @@ Followed all the above steps 1-4 again to renew a 3 month trial license and publ
 * same docker images used
 * same test data imported again, didn't update logfile output
 * version "v2" of the images are out on the hub now (actually only needed to update the database though)
+* update the test scripts
+
+Updated again pr. 2016-08-10

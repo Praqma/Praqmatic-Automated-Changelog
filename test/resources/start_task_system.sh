@@ -60,8 +60,8 @@ then
 	DB=pac_test_postgres-for-jira-$BN
 	JIRA=pac_test_jira-$BN
 	# Using jira images maintained by the guy called blacklabelops - they seem to fit our purpose.
-	docker run --name $DB -d -e 'DB_USER=jiradb' -e 'DB_PASS=jellyfish' -e 'DB_NAME=jiradb' praqma/pac_test_postgres-for-jira:v2
-	docker run -d --name $JIRA -e "JIRA_DATABASE_URL=postgresql://jiradb@postgres/jiradb" -e "JIRA_DB_PASSWORD=jellyfish" --link $DB:postgres -p $HOSTPORT:8080 praqma/pac_test_jira:v2
+	docker run --name $DB -d -e 'DB_USER=jiradb' -e 'DB_PASS=jellyfish' -e 'DB_NAME=jiradb' praqma/pac_test_postgres-for-jira:v3
+	docker run -d --name $JIRA -e "JIRA_DATABASE_URL=postgresql://jiradb@postgres/jiradb" -e "JIRA_DB_PASSWORD=jellyfish" --link $DB:postgres -p $HOSTPORT:8080 praqma/pac_test_jira:v3
 	docker ps -a | grep pac_test
   write_stop_script $JIRA
   write_stop_script $DB
