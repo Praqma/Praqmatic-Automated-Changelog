@@ -8,7 +8,11 @@ require_relative "./logging"
 module Core extend self
 
   def settings
-    @@settings
+    if defined?(@@settings).nil?
+      {}
+    else
+      @@settings
+    end    
   end
 
   def settings=(val)

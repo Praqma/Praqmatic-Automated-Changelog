@@ -67,4 +67,20 @@ class VerbosityTest < Test::Unit::TestCase
 		assert_equal("yes", Logging.v(2, "yes"))
 	end
 
+	def test_no_exception
+		assert_nil(Logging.v(0, "no"))
+		assert_nil(Logging.v(-3, "no"))
+		assert_nil(Logging.v(-1, "no"))
+	end
+
+	def test_set_settings_still_logging
+		assert_nil(Logging.v(0, "no"))
+		Core.settings = { :verbosity => 2}
+		assert_nil(Logging.v(3, "no"))
+		assert_equal("yes", Logging.v(-3, "yes"))
+		assert_equal("yes", Logging.v(0, "yes"))
+		assert_equal("yes", Logging.v(1, "yes"))
+		assert_equal("yes", Logging.v(2, "yes"))		
+	end
+
 end
