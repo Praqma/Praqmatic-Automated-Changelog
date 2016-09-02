@@ -91,11 +91,11 @@ begin
     commit_map = Core.vcs.get_delta(found_tag, input['<newest-ref>'])
   elsif input['from-date']
     if input['--to-date']
-      Logging.verboseprint(0, "[PAC] Using dates. Finding commits between #{input['<newest-date>']} and #{<from-date>}")
+      Logging.verboseprint(0, "[PAC] Using dates. Finding commits between #{input['<newest-date>']} and #{input['<from-date>']}")
     elsif input['--to']
-      Logging.verboseprint(0, "[PAC] Using dates. Finding commits between commit #{input['newest-ref']} and #{<from-date>}")      
+      Logging.verboseprint(0, "[PAC] Using dates. Finding commits between commit #{input['newest-ref']} and #{input['<from-date>']}")      
     else
-      Logging.verboseprint(0, "[PAC] Using dates. Finding commits from tip of repository until #{<from-date>}")
+      Logging.verboseprint(0, "[PAC] Using dates. Finding commits from tip of repository until #{input['<from-date>']}")
     end
   elsif (input['--sha'] || input['-s'])
     Logging.verboseprint(0, "[PAC] Warning: Using deprecated method call. Use --from instead")
