@@ -84,7 +84,10 @@ job(GENERATE_CHANGE_LOG_JOB_NAME) {
             extensions {}
         }
     }
-    //We inject the globally defined passwords. Requirement: there must be a pac_token password defined in your global configuration
+
+    //We inject the globally defined passwords. 
+    //The shell step require a password. We inject this password from our global configuration in a variable 'secret_password_pac'. This can be configured if you wish to
+    //use a different method to provide the password. The password for this is our GitHub read-access token. 
     wrappers {
         injectPasswords {
             injectGlobalPasswords()
@@ -92,7 +95,7 @@ job(GENERATE_CHANGE_LOG_JOB_NAME) {
     }
 
     steps {
-        shell('docker run --rm -v $(pwd):/data praqma/pac:snapshot from-latest-tag "*" --settings=/data/pac_settings.yml -c $AUTOMATION_USER $pac_token jira')
+        shell('docker run --rm -v $(pwd):/data praqma/pac:snapshot from-latest-tag "*" --settings=/data/pac_settings.yml -c $AUTOMATION_USER $secret_password_pac jira')
     }
 
     publishers {
