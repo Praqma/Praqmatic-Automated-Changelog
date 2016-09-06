@@ -85,22 +85,15 @@ module Vcs
     end
 
     #Method that returns the newest commit a tag points to
-    #If no argument given. We'll just use the latest of any tag
-    def get_latest_tag(approximation) 
+    def get_latest_tag(treeish) 
       tag_collection = Rugged::TagCollection.new(repository)
       candidates = []
-      unless approximation.nil?
-        tag_collection.each(approximation+'*') do |tag|
-          candidates << tag
-        end
-      else
-        tag_collection.each do |tag|
-          candidates << tag
-        end        
+      tag_collection.each(treeish) do |tag|
+        candidates << tag
       end
 
       if candidates.empty? 
-        raise "[PAC] No matching tags found with approximation #{approximation }"
+        raise "[PAC] No matching tags found with approximation #{treeish}"
       end
 
       candidates.sort! {|a,b| a.target.time <=> b.target.time }
