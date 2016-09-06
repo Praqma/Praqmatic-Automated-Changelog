@@ -109,11 +109,19 @@ Get commits using tags from "Release-1.0" tag to "HEAD":
 
     ./pac.rb -t Release-1.0 --settings=./default_settings.yml
 
-    ./pac.rb -t Release-1.0 Release-2.0 --settings=./default_settings.yml
+    ./pac.rb from-latest-tag "Release-1.0" --settings=./default_settings.yml
+
+Geg commits using tags from "Release-1.0" to "Release-2.0"
+
+    ./pac.rb -t Release-1.0 Release-2.0 --settings=./default_settings.yml 
+
+    ./pac.rb from-latest-tag Release-1.0 --to Release-2.0 --settings=./default_settings.yml
 
 Get commits using time
 
-    ./pac.rb -d 2013-10-01 --settings=./default_settings.yml     
+    ./pac.rb -d 2013-10-01 --settings=./default_settings.yml
+
+    ./pac.rb from-date 2013-10-01 --settings=./default_settings.yml      
 
 The above getting started is only a simple example, so to utilize all the features in PAC you can dive into the following sections.
 
