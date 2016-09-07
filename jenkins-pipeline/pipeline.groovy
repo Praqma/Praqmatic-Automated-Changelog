@@ -97,7 +97,7 @@ job(GENERATE_CHANGE_LOG_JOB_NAME) {
     }
 
     steps {
-        shell('docker run --rm -v $(pwd):/data praqma/pac:snapshot from-latest-tag "*" --settings=/data/pac_settings.yml -c $AUTOMATION_USER $secret_password_pac jira')
+        shell('docker run --rm -v $(pwd):/data praqma/pac:snapshot from-latest-tag "*" --settings=/data/pac_settings.yml -c '+AUTOMATION_USER+' $secret_password_pac jira')
     }
 
     publishers {
