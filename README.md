@@ -117,6 +117,10 @@ Get commits using tags from "Release-1.0" to "Release-2.0"
 
     ./pac.rb from-latest-tag Release-1.0 --to Release-2.0 --settings=./default_settings.yml
 
+Get commits using latest tag of any name: 
+
+	./pac.rb from-latest-tag "*" --settings=./default_settings.yml
+
 Get commits using time
 
     ./pac.rb -d 2013-10-01 --settings=./default_settings.yml
