@@ -11,36 +11,43 @@ We supply a PAC docker image, [`praqma/pac`](https://hub.docker.com/r/praqma/pac
 praqmatic automated changelog 
 
 Usage:
-  /usr/bin/pac (-d | --date) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
-  /usr/bin/pac (-s | --sha) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
-  /usr/bin/pac (-t | --tag) <to> [<from>] [--settings=<settings_file>] [--pattern=<rel_pattern>] [--properties=<properties>]
-  /usr/bin/pac -h|--help
+  ./pac.rb (-d | --date) <to> [<from>] [options] [-v...] [-q...]
+  ./pac.rb (-s | --sha) <to> [<from>] [options] [-v...] [-q...]
+  ./pac.rb (-t | --tag) <to> [<from>] [options] [-v...] [-q...]
+  ./pac.rb from <oldest-ref> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+  ./pac.rb from-date <from_date> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
+  ./pac.rb from-latest-tag <approximation> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
+  ./pac.rb -h|--help
+
 
 Options:
-  -h --help
-             
-    Show this screen.
+  -h --help  Show this screen.
+
+  --from <oldest-ref>  Specify where to stop searching for commit. For git this takes anything that rev-parse accepts. Such as HEAD~3 / Git sha or tag name.
+
+  --from-date <from-date>  Use dates to select the changesets.
+
+  --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.  
     
-  -d --date
-             
-    Use dates to select the changesets.
-     
-  -s --sha
+  -d --date  Use dates to select the changesets.  
+
+  -s --sha  Deprecated since 2.1.0. Use --from instead.
               
-    Use SHAs to select the changesets.      
-  
-  --settings=<settings_file> 
-  
-    Path to the settings file used. If nothing is specified default_settings.yml is used
-    
-  --pattern=<rel_pattern>
-  
-    Format that describes how your release tags look. This is used together with -t LATEST. We always check agains HEAD/TIP.
+  --settings=<path>  Path to the settings file used. If nothing is specified default_settings.yml is used      
 
-  --properties=<properties>
+  --properties=<properties>  
 
-    Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.*.
-    JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'
+    Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.* in 
+    your Liquid templates. Referenced like so '{{properties.[your-variable]}}' in your templates.
+
+    JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
+
+  -v  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
+
+  -q  Less verbose output. Can be repeated for more silence or to cancel out -v
+
+  -c  Override username and password. Example: `-c my_user my_password jira`. This will set username and password for task system jira.
+
 ```
 
 ## Usage

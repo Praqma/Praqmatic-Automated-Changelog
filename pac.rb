@@ -40,6 +40,8 @@ Options:
   -v  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
 
   -q  Less verbose output. Can be repeated for more silence or to cancel out -v
+
+  -c  Override username and password. Example: `-c my_user my_password jira`. This will set username and password for task system jira.
 DOCOPT
 
 begin
