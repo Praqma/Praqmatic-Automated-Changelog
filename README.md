@@ -111,7 +111,7 @@ Get commits using tags from "Release-1.0" tag to "HEAD":
 
     ./pac.rb from-latest-tag "Release-1.0" --settings=./default_settings.yml
 
-Geg commits using tags from "Release-1.0" to "Release-2.0"
+Get commits using tags from "Release-1.0" to "Release-2.0"
 
     ./pac.rb -t Release-1.0 Release-2.0 --settings=./default_settings.yml 
 
