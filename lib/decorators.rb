@@ -9,29 +9,38 @@ module JiraTaskDecorator
 
   attr_accessor :data 
 
-  def fetch(query_string, usr, pw) 
-    expanded = eval('"'+query_string+'"')    
-	  uri = URI.parse(expanded)
-    
-    begin
-      res = DecoratorUtils.query(uri, usr, pw)
-    rescue Exception
-      raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
-    end 
+  def fetch(steps)
+    @data = {}
+    steps.each do | step |
+      query_string = step[:query]
+      expanded = eval('"'+query_string+'"')    
+      uri = URI.parse(expanded)
+      
+      begin
+        res = DecoratorUtils.query(uri, step[:usr], step[:pw])
+      rescue Exception
+        raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
+      end 
 
-    unless res.is_a? Net::HTTPOK
-      raise Exception, "Failed to fetch task with id #{task_id} on url #{expanded} return code was #{res.code}"
+      unless res.is_a? Net::HTTPOK
+        raise Exception, "Failed to fetch task with id #{task_id} on url #{expanded} return code was #{res.code}"
+      end
+
+      begin
+        Logging.verboseprint(3, "[PAC] Got the following data from #{expanded}: #{res.body}") 
+        namespace = step[:namespace]
+        result = parse(res.body) 
+        if namespace
+          @data[namespace] = result
+        else
+          @data = @data.merge!(result)
+        end
+        Logging.verboseprint(1, "[PAC] Fetched the following from Jira: #{@data}")
+      rescue JSONError
+        raise Exception, "Unparsable JSON data fetched from url #{expanded}"
+      end
     end
-
-    begin
-      Logging.verboseprint(3, "[PAC] Got the following data from #{expanded}: #{res.body}") 
-      @data = parse(res.body) 
-      Logging.verboseprint(1, "[PAC] Fetched the following from Jira: #{@data}")
-      @data
-    rescue JSONError
-      raise Exception, "Unparsable JSON data fetched from url #{expanded}"
-    end
-
+    @data
   end
 
   def parse(response)

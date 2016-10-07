@@ -29,7 +29,7 @@
 		<h1>PAC Changelog</h1>
 		<h3>Referenced tasks</h3>
 		{% for task in tasks.referenced %}
-			<h5><a href="{{task.attributes.data.html_url}}">{{task.task_id}}</a> ({{task.attributes.data.state}})</h5>
+			<h5><a href="{{task.attributes.data.github.html_url}}">{{task.task_id}}</a> ({{task.attributes.data.github.state}})</h5>
 			<ul>
 			{% for commit in task.commits %}
 				<li> {{commit.shortsha}}:{{commit.header}}</li>

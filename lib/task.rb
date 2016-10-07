@@ -43,7 +43,8 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))  
-            t.extend(JiraTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
+            #puts(@settings[:steps])
+            t.extend(JiraTaskDecorator).fetch(@settings[:steps])
             Logging.verboseprint(1, "[PAC] Applied task system Jira to #{t.task_id}")
           end
         #This handles the case where we matched the regex. But the user might have a typo in the issue id. 
