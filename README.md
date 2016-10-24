@@ -27,6 +27,8 @@ Compared to other changelog solutions, PAC is very flexible and customizable. Th
 
 PAC has a flexible internal design, making it easy to extend with support for additional report formats, task management systems and so on.
 
+See our [roadmap](/roadmap.md) for future plans.
+
 ## Demo
 
 Take PAC for a quick spin with our demo scripts (requires Linux Bash, zip and docker).
@@ -210,7 +212,9 @@ _Initial release and proof-of-concept_
 
 ## Developer information
 
-For details on design and development see [Developer information](docs/developer_info.md)
+For details on design and development info see [Developer information](docs/developer_info.md)
+
+See also [contributing file](/CONTRIBUTING.md).
 
 ### Contributors
 
