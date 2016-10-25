@@ -23,6 +23,7 @@ Compared to other changelog solutions, PAC is very flexible and customizable. Th
 * Supports **MarkDown**, **HTML** and **PDF** as report formats
 * Supports extracting data from multiple referenced tasks systems at once
 * Supports creating changelog without data from external systems, basing it only on SCM commits
+* Easily create reports for several different audiences using data from several sources
 * Collects statistic on commits with and without task references
 
 PAC has a flexible internal design, making it easy to extend with support for additional report formats, task management systems and so on.
@@ -186,8 +187,8 @@ Detailed instructions can be found in [Installing PAC on Windows](docs/windows_i
 
 * PAC is maintained in the scope of [JOSRA](http://www.josra.org/).
 * Issue and work tracking is done using [Github issues](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
-* Support requests and questions can be sent to support@praqma.net
-* Our roadmap is available on [Trello](https://trello.com/b/0yJy3IlO/pac-praqmatic-automated-changelog)
+* Support requests and questions can be created as Github issue or send us an mail on support@praqma.net
+* Our roadmap is availbe in [roadmap](/roadmap.md)
 
 ## Changelog
 
@@ -222,4 +223,3 @@ See also [contributing file](/CONTRIBUTING.md).
 * Bue Petersen (bue@praqma.net)
 * Andrius Ordojan (and@praqma.net)
 * Thierry Lacour (thi@praqma.net)
-

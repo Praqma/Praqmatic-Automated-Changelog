@@ -1,8 +1,17 @@
 # Roadmap
 
-All changes are to comform and support the following visions for PAC.
+All changes are to comform and support the following visions for PAC described in the section below.
 
-The backlog contains issues we to some extend see as within our roadmap, thus the [backlog](https://github.com/Praqma/Praqmatic-Automated-Changelog/milestone/3) contributes with more details to the roadmap.
+The [original blue print](/docs/BluePrint.md) behind a pragmatic automated changelog also still serves as guidelines, especially statememts like these:
+
+> An important aspect of a changelog is that it should be targeted to a specific groups of readers. It could be project managers or it could be end-user and customers. This might requires two very different worded documents, though they are in the end based on the exact same information from the changelog.
+
+_so we are able to collect information from several systems, one for developers and maybe one with end user docs_.
+
+> In a continuous delivery world we are always ready to release, and as a release also include a changelog, or a release note, and other kind of documentation, these documents must also always be available continuously. .. we recognize that the good release note requires some manual work ... 
+
+_so doing it continuously for every commit make missing work visible._
+
 
 
 ## Features and usage
