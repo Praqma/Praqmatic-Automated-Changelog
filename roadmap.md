@@ -14,7 +14,9 @@ _so doing it continuously for every commit make missing work visible._
 
 
 
-## Features and usage
+## Future epics
+
+There is already ongoing work, or plans for the features and usage within the following areas. You will find other work accepted on our [github issues backlog](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues?q=is%3Aopen+is%3Aissue+milestone%3Abacklog) as well, but these are our major areas of focus.
 
 
 * **Multiple query support**: Changes are being discussed and planned, to allow to describe multiple queries when collecting information. Queries will be able to use the information collected from SCM, or from other queries.
@@ -22,6 +24,7 @@ _so doing it continuously for every commit make missing work visible._
 * **Continues support for both running as a script or in a container**: Focus is still to support using PAC as a script going forward, so it can run a script from the repository. Support for distributing it as container or other packages also continues.
 * **Cross-platform - more windows friendly-ness**: All changes have to be platform agnostic or work cross-platform. We should not only abstract by using containers, but must also support that PAC continues to work as a script in the runtime environment meaning any 3rd party dependencies like libraries used must be available (easily!) on major platforms (Windows, MAC, Linux)
 
+_A general rule of thumb is we don't accept changes that break the above plans, or make the impossible or very difficult to implement._
 
 ## Architecture
 
@@ -67,3 +70,16 @@ We will be doing fully automated and reproducible tests in the project, prioriti
 * build up a regression test suite, possible re-use of above tests, to ensure primary use-cases are always working
 
 See also [developer information about tests](/docs/developer_info.md#tests)
+
+
+## Use the roadmap
+
+The roadmap should be live and changeable, but should set some future goals on a very high level. Though the roadmap have some visions, they might be up for discussion.
+
+The roadmap should in the daily work be seen as:
+
+* a guideline and check list for what changes we accept and what work can be put on our backlog
+* information to any developer, that implementations and design decision should honor our future vision - or at least not make it harder to achive
+
+
+_And example on the last one, is that we can not ever include any more non-cross-platform libraries, because we epic about being cross-platform in the future_.
