@@ -83,4 +83,9 @@ class VerbosityTest < Test::Unit::TestCase
 		assert_equal("yes", Logging.v(2, "yes"))		
 	end
 
+	def test_failed_init_default_verbosity 
+		Core.settings = { :verbosity => nil }
+		assert_equal("yes", Logging.v(0, "yes"))
+	end
+
 end
