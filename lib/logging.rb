@@ -19,7 +19,7 @@ module Logging extend self
   end
 
   def v(fromlevel, str)
-    if !Core.settings[:verbosity].nil? && Core.settings[:verbosity] >= fromlevel
+    if Core.settings[:verbosity].nil? && fromlevel <= 0 || !Core.settings[:verbosity].nil? && Core.settings[:verbosity] >= fromlevel
       str
     end
   end

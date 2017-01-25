@@ -67,10 +67,11 @@ class VerbosityTest < Test::Unit::TestCase
 		assert_equal("yes", Logging.v(2, "yes"))
 	end
 
+	#This is necessary. We need to log if someone misconfigures their logger
 	def test_no_exception
-		assert_nil(Logging.v(0, "no"))
-		assert_nil(Logging.v(-3, "no"))
-		assert_nil(Logging.v(-1, "no"))
+		assert_not_nil(Logging.v(0, "yes"))
+		assert_not_nil(Logging.v(-3, "yes"))
+		assert_nil(Logging.v(1, "no"))
 	end
 
 	def test_set_settings_still_logging
