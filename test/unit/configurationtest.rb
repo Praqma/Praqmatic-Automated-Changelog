@@ -54,5 +54,16 @@ class ConfigurationTest < Test::Unit::TestCase
 
 		assert_equal('tracuser', settings_parsed[:task_systems][2][:usr])
 		assert_equal('tracpassword', settings_parsed[:task_systems][2][:pw])
+	end
+
+	def test_raise_exception_on_missing_settings_file 
+		config = { '--settings' => 'not-there.yml' }
+		assert_raise RuntimeError do 
+			Core.read_settings_file(config)
+		end
+		#Assert the inverse as well
+		config['--settings'] = 'pac_settings.yml'
+		Core.read_settings_file(config)
 	end	
+
 end

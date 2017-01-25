@@ -26,6 +26,11 @@ module Core extend self
     unless input['--settings'].nil?
       settings_file = input['--settings']
     end
+
+    unless File.exists?(settings_file) 
+      raise "Settings file '#{settings_file}' does not exist"
+    end
+
     File.read(settings_file)
   end
 
