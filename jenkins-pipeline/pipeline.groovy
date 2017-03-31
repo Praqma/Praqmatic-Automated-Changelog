@@ -225,6 +225,7 @@ build.addAction(pa)
         registryCredentials('docker-hub-crendential')
         dockerHostURI('unix:///var/run/docker.sock')
         forcePull(false)
+	forceTag(false)
         createFingerprints(false)
         skipDecorate()
       }
