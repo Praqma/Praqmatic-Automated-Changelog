@@ -47,12 +47,14 @@ GEM
     liquid (3.0.6)
     mercurial-ruby (0.7.12)
       open4 (~> 1.3.0)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.1.0)
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.7.1)
+      mini_portile2 (~> 2.1.0)
+    nokogiri (1.7.1-x64-mingw32)
+      mini_portile2 (~> 2.1.0)
     oauth2 (1.1.0)
       faraday (>= 0.8, < 0.10)
       jwt (~> 1.0, < 1.5.2)
@@ -98,6 +100,7 @@ GEM
 
 PLATFORMS
   ruby
+  x64-mingw32
 
 DEPENDENCIES
   ci_reporter_test_unit
@@ -114,3 +117,6 @@ DEPENDENCIES
   trac4r
   xml-simple (~> 1.1, >= 1.1.5)
   zip
+
+BUNDLED WITH
+   1.14.6
