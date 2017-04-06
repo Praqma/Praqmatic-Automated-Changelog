@@ -35,7 +35,7 @@ git tag -a v0.1 -m "version 0.1"
 git commit --allow-empty -m "CS-1"
 ```
 
-Run `ruby pac.rb -t "v0.1"` using the tag specified above. 
+Run `ruby pac.rb from "v0.1"` using the tag specified above. 
 
 Inspect the generated `default.md` file and check that it picked up the commit similar to this:
 

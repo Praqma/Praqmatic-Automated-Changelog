@@ -73,7 +73,6 @@ This is an example of a simple configuration file. It collects task references f
 This simple example do not extract data from task systems.
 
 	:general:
-	  date_template: "%Y-%m-%d"
 
 	:templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
@@ -114,25 +113,19 @@ Show help
     
 Get commits using tags from "Release-1.0" tag to "HEAD":
 
-    ./pac.rb -t Release-1.0 --settings=./default_settings.yml
+    ./pac.rb from Release-1.0 --settings=./default_settings.yml
 
     ./pac.rb from-latest-tag "Release-1.0" --settings=./default_settings.yml
 
 Get commits using tags from "Release-1.0" to "Release-2.0"
 
-    ./pac.rb -t Release-1.0 Release-2.0 --settings=./default_settings.yml 
+    ./pac.rb from Release-1.0 --to Release-2.0 --settings=./default_settings.yml 
 
     ./pac.rb from-latest-tag Release-1.0 --to Release-2.0 --settings=./default_settings.yml
 
 Get commits using latest tag of any name: 
 
 	./pac.rb from-latest-tag "*" --settings=./default_settings.yml
-
-Get commits using time
-
-    ./pac.rb -d 2013-10-01 --settings=./default_settings.yml
-
-    ./pac.rb from-date 2013-10-01 --settings=./default_settings.yml      
 
 The above getting started is only a simple example, so to utilize all the features in PAC you can dive into the following sections.
 
@@ -195,6 +188,11 @@ Detailed instructions can be found in [Installing PAC on Windows](docs/windows_i
 * Our roadmap is availbe in [roadmap](/roadmap.md)
 
 ## Changelog
+
+### 3.x versions
+
+* Removed all `date` related parameters
+* Removed deprecated `--sha` parameter (has been replaced with `from`)
 
 ### 2.x versions
 

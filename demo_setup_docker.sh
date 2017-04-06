@@ -4,7 +4,6 @@ mkdir demorepo
 unzip test/resources/idReportTestRepository.zip -d demorepo/
 cat << EOF > demorepo/idReportTestRepository/default_settings.yml 
 :general:
-  date_template: "%Y-%m-%d"
   :strict: true
 
 :templates:
@@ -28,4 +27,4 @@ cat << EOF > demorepo/idReportTestRepository/default_settings.yml
   :release_regex: 'tags'
 EOF
 docker build -t praqma/pac:snapshot .
-docker run --rm -v $(pwd)/demorepo/idReportTestRepository:/data praqma/pac:snapshot -s f9a66ca6d2e6
+docker run --rm -v $(pwd)/demorepo/idReportTestRepository:/data praqma/pac:snapshot from f9a66ca6d2e6

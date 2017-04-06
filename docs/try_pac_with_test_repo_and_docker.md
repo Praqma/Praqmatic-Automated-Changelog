@@ -12,7 +12,6 @@ Unzip one of the git repositories we use for testing - it can be used to generat
 
 ```
 :general:
-  date_template: "%Y-%m-%d"
   :strict: true
 
 :templates:
@@ -35,7 +34,7 @@ Unzip one of the git repositories we use for testing - it can be used to generat
 
 Now, when this is done, you should be able to run PAC, the example below is where we extracted the idTestRepository to my home folder:
 
-`docker run --rm -v /home/youruser/idReportTestRepository:/data praqma/pac -s f9a66ca6d2e6`
+`docker run --rm -v /home/youruser/idReportTestRepository:/data praqma/pac from f9a66ca6d2e6`
 
 If PAC is working, you should see the following on system out:
 

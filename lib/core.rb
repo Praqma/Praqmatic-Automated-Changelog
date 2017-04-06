@@ -99,10 +99,6 @@ module Core extend self
       raise ArgumentError, 'The configuration settings does not include any supported (d)vcs'
     end
   end
-  
-  def to_time(datestring)
-    DateTime.strptime(datestring, @@settings[:general]['date_template']).to_time    
-  end
 
   #This is now core functionality. The task of generating a collection of tasks based on the commits found
   #This takes in a PACCommitCollection and returns a PACTaskCollection 

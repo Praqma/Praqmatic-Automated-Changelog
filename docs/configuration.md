@@ -6,7 +6,6 @@ Each configuration part is explained below so you can pick and choose for your o
 Configuration file is YAML, so the : (colons), - (dash) and indentation matters.
 
 	:general:
-	  date_template: '%Y-%m-%d'
 	  :strict: false
 
 	:properties:
@@ -48,15 +47,6 @@ Configuration file is YAML, so the : (colons), - (dash) and indentation matters.
 	  :repo_location: '.'
 
 ## General
-
-### date_template
-
-With the **`date_template`** configuration you can chose your own date format to use with the `-d` option for PAC where commits are collected based on dates.
-Usefull if you get the date from another system and don't want to parse dates.
-
-Value must be parsable by Ruby's [Date](http://ruby-doc.org/stdlib-2.0.0/libdoc/date/rdoc/Date.html#method-c-parse) class. 
-
-_Defaults to `'%Y-%m-%d'`_
 
 ### strict
 

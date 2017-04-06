@@ -1,5 +1,4 @@
 :general:
-  date_template: '%Y-%m-%d'
   :strict: false
  
 :templates:

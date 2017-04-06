@@ -13,7 +13,6 @@ class GeneratorTest < Test::Unit::TestCase
 
   	@@c_noprops = <<-eos
 :general:
-  date_template: '%Y-%m-%d'
  
 :templates:
   - { location: templates/default_id_report.md }
@@ -30,7 +29,6 @@ eos
 
   	@@c_props = <<-eos
 :general:
-  date_template: '%Y-%m-%d'
 :properties:
   title: 'Awesome Changelog Volume 42'
   extra: 'Extra Stuff' 

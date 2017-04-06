@@ -89,7 +89,7 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
       # ./pac.rb --sha <to> []<from>]
       from="b20b118dd5986215bf0d76ad73a245433ba6768a"
       to="996967baae8b4cb9f862f18c31fb5d42bdd4439c"  ## note that this is not last commit, last one is c533da1bc3b74c55e58f27e7ac32cf2cb19be24d - this affect what we verifies below :-)
-      commit_map = Core.vcs.get_commit_messages_by_commit_sha(to,from)
+      commit_map = Core.vcs.get_delta(to,from)
       pp "########################################################################################"
       pp "All commit found between 'from' SHA #{ from } and 'to' SHA #{ to } on branch #{ branch }"
       pp "is in the commit map:"
@@ -224,7 +224,7 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
       # ./pac.rb --sha <to> []<from>]
       from="969e8311164b1086006edfee1d291c04da651cf9"
       to="2f4237b8dff65ec3caf842dc68106f34f8bc0cca"
-      commit_map = Core.vcs.get_commit_messages_by_commit_sha(to,from)
+      commit_map = Core.vcs.get_delta(to,from)
       
       pp "########################################################################################"
       pp "All commit found between 'from' SHA #{ from } and 'to' SHA #{ to } on branch #{ branch }"

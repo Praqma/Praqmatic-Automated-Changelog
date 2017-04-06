@@ -48,7 +48,7 @@ module PAC__TestCases_IdReport
 
       Core.settings = settings
       #PACCommitCollection
-      commit_map = Core.vcs.get_commit_messages_by_commit_sha("f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6", "fb493078d9f42d79ea0e3a56abca7956a0d47123")
+      commit_map = Core.vcs.get_delta("f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6", "fb493078d9f42d79ea0e3a56abca7956a0d47123")
       pp "#################################"
       pp "Commit map for the repository is:"
       pp commit_map

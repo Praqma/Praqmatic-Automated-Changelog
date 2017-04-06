@@ -41,7 +41,7 @@ module PAC__TestCases_IncludesSince
 
       Core.settings = settings
       #Returns a PACCommitCollection
-      commit_map = Core.vcs.get_commit_messages_by_tag_name('v1.0') # Since Commit 1
+      commit_map = Core.vcs.get_delta('v1.0') # Since Commit 1
       # These are the commits AFTER the 1.0 tag
       assert_true(commit_map.commits.include?(Model::PACCommit.new("dfd8fd3ade868072f31701aac6fba1f2cf965dd7"))) # Commit 3
       assert_true(commit_map.commits.include?(Model::PACCommit.new("62f42e26a401524637839ba4ff969194303cff7c"))) # Commit 2
@@ -57,7 +57,7 @@ module PAC__TestCases_IncludesSince
 
       Core.settings = settings
 
-      commit_map = Core.vcs.get_commit_messages_by_commit_sha('7164ed9cec32195e44c7f2a2abd764df37921863') # Since Commit 1
+      commit_map = Core.vcs.get_delta('7164ed9cec32195e44c7f2a2abd764df37921863') # Since Commit 1
       # These are the commits AFTER the 1.0 tag
       assert_true(commit_map.commits.include?(Model::PACCommit.new("dfd8fd3ade868072f31701aac6fba1f2cf965dd7"))) # Commit 3
       assert_true(commit_map.commits.include?(Model::PACCommit.new("62f42e26a401524637839ba4ff969194303cff7c"))) # Commit 2

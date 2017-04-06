@@ -11,27 +11,16 @@ We supply a PAC docker image, [`praqma/pac`](https://hub.docker.com/r/praqma/pac
 praqmatic automated changelog 
 
 Usage:
-  ./pac.rb (-d | --date) <to> [<from>] [options] [-v...] [-q...]
-  ./pac.rb (-s | --sha) <to> [<from>] [options] [-v...] [-q...]
-  ./pac.rb (-t | --tag) <to> [<from>] [options] [-v...] [-q...]
-  ./pac.rb from <oldest-ref> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
-  ./pac.rb from-date <from_date> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
-  ./pac.rb from-latest-tag <approximation> [--to <newest-ref> | --to-date <newest-date>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
-  ./pac.rb -h|--help
-
+  #{__FILE__} from <oldest-ref> [--to <newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+  #{__FILE__} from-latest-tag <approximation> [--to <newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
+  #{__FILE__} -h|--help
 
 Options:
   -h --help  Show this screen.
 
   --from <oldest-ref>  Specify where to stop searching for commit. For git this takes anything that rev-parse accepts. Such as HEAD~3 / Git sha or tag name.
 
-  --from-date <from-date>  Use dates to select the changesets.
-
   --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.  
-    
-  -d --date  Use dates to select the changesets.  
-
-  -s --sha  Deprecated since 2.1.0. Use --from instead.
               
   --settings=<path>  Path to the settings file used. If nothing is specified default_settings.yml is used      
 
@@ -55,9 +44,8 @@ Options:
 With the PAC docker container, [the basic usage examples in the README becomes:](../README.md#usage)
 
 		docker run --rm praqma/pac -h
-    docker run --rm -v $(pwd):/data -v $(pwd):/pac-templates praqma/pac --settings=/data/pac_settings.yml -t Release-1.0
-		docker run --rm -v $(pwd):/data -v $(pwd):/pac-templates praqma/pac --settings=/data/pac_settings.yml -t Release-1.0 Release-2.0
-    docker run --rm -v $(pwd):/data -v $(pwd):/pac-templates praqma/pac --settings=/data/pac_settings.yml -d 2013-10-01
+    docker run --rm -v $(pwd):/data -v $(pwd):/pac-templates praqma/pac --settings=/data/pac_settings.yml from Release-1.0
+		docker run --rm -v $(pwd):/data -v $(pwd):/pac-templates praqma/pac --settings=/data/pac_settings.yml from Release-1.0 --to Release-2.0
 
 Try out a more elaborate example: [Try PAC with a test repo and PAC docker image](try_pac_with_test_repo_and_docker.md)
 
@@ -74,9 +62,9 @@ Assume we have our nice templates stored in our home directory under `~/pac-temp
 Then when we run the docker container we mount in the git repository together with the templates:
 
 ```
-docker run --rm -v $(pwd):/data -v ~/pac-templates:/pac-templates --settings=/data/pac_settings.yml praqma/pac -d 2013-01-01
+docker run --rm -v $(pwd):/data -v ~/pac-templates:/pac-templates --settings=/data/pac_settings.yml praqma/pac from HEAD~3
 ```
-Running this command will produce a report that takes all commits from 2013 up till `HEAD` of the repository.
+Running this command will produce a report that takes all commits from 3 commits back up till `HEAD` of the repository.
 
 The relevant PAC configuration file matching the above needs templates defined as follows if we assume you've created a template `~/pac-templates/my-template.md`:
 

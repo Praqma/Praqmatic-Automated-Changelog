@@ -83,6 +83,6 @@ EOF
 
 #Run PAC. We do it by mounting our repository inside the container.
 docker build -t praqma/pac:snapshot .
-docker run --rm --net=host -v $(pwd)/demorepo/idReportTestRepository:/data praqma/pac:snapshot -s f9a66ca6d2e6 
+docker run --rm --net=host -v $(pwd)/demorepo/idReportTestRepository:/data praqma/pac:snapshot from f9a66ca6d2e6 
 #Stop it again, if needed for this we just use the one that came with the test
 ./test/resources/stop_task_system-jira-0000.sh "jira"

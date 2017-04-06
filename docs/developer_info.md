@@ -12,7 +12,7 @@ The original idea behind PAC can be found in the BluePrint dated back in 2013: [
  * A PAC docker image will also be released and pushed with the same version to [`praqma/pac`](https://hub.docker.com/r/praqma/pac/)
 
 
-Consideration on how we release PAC docker images is summarized in [Relase strategy and design for PAC docker image](docker_image_release_strategy.md)
+Consideration on how we release PAC docker images is summarized in [Release strategy and design for PAC docker image](docker_image_release_strategy.md)
 
 Thoughts on how to report version from PAC itself is explained in [Version reporting in PAC](versioning.md)
 
@@ -148,7 +148,7 @@ The module expects a list of tasks, the id of each task is used to query the tas
 
 #### Model example
 
-The first method we use is the one that traverses your git commit messages, for example, this is the output of the `Core.get_commit_messages_by_commit_sha` method:
+The first method we use is the one that traverses your git commit messages, for example, this is the output of the `Core.get_delta` method:
 
 ``` 
 #<Model::PACCommitCollection:0x007f05540f3df8

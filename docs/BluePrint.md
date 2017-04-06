@@ -7,29 +7,29 @@ Original idea from 2013/2014.
 # Motivation
 
 ## A good changelog and a customized release note
-A changelog is a description of changes between two different revisions of a software component. Such a list of changes is often generated bases on the VCS commit messages and revision history. For example it can be a list of patches to the source code, or it can be a list of commit messages with dates or authors.
+A changelog is a description of changes between two different revisions of a software component. Such a list of changes is often generated based on the VCS commit messages and revision history. For example it can be a list of patches to the source code, or it can be a list of commit messages with dates or authors.
 
-An important aspect of a changelog is that it should be targeted to a specific groups of readers. It could be project managers or it could be end-user and customers. This might requires two very different worded documents, though they are in the end based on the exact same information from the changelog.
+An important aspect of a changelog is that it should be targeted to a specific groups of readers. It could be project managers or it could be end-users and customers. This might requires two very different worded documents, though they are in the end based on the exact same information from the changelog.
 Often the document for customers are called _release note_.
 
 Determining changes between two different revision of a software component requires some kind of traceability in your software development. 
-Changes narrows down to what are changed in your VCS. As this might not be descriptive enough we often tries to combine and relate it with information from the task management system. Often developers must supply further and elaborated information as well.
-All this is much easier with some kind of traceability between commits and tasks. For example a mention of one or more  tasks in the commit message related to that commit.
+Changes narrows down to what is changed in your VCS. As this might not be descriptive enough we often try to combine and relate it with information from the task management system. Often developers must supply further and elaborated information as well.
+All this is much easier with some kind of traceability between commits and tasks. For example a mention of one or more tasks in the commit message related to that commit.
 
-Combining information will require manual work, because most of the information often needs some kind of rewriting or explanation to the non technical readers. Commits are targeted developers and often not a god explanation. Tasks are supposed to be more elaborate and at a higher level, but also often include developers internal notes.
+Combining information will require manual work, because most of the information often needs some kind of rewriting or explanation to the non technical readers. Commits are targeted at developers and often not a good explanation. Tasks are supposed to be more elaborate and at a higher level, but also often include developers internal notes.
 So basically there is lots of information, but rewriting is often needed to make some group of readers understand the change log (or release note).
 
 ## Continuous changelog
-In a continuous delivery world we are always ready to release, and as a release also include a changelog, or a release note, and other kind of documentation, these documents must also always be available continuously.
+In a continuous delivery world we are always ready to release, and as a release also includes a changelog, or a release note, and other kind of documentation, these documents must also always be available continuously.
 
-We recognize that the good release note requires some manual work and effort as above suggested, so this mean we must ensure most work are done continuously and up-front on that part as well:
+We recognize that the good release note requires some manual work and effort as above suggested, so this means that we must ensure most work is done continuously and up-front on that part as well:
 
   1) make sure the needed information for changelog is always available
   2) combine several sources of information with traceability
   3) make it easy and fully automated to generate the needed document(s)
 
 
-In an agile team doing continuous integration there will be many small commits and they will always reference a task. Such a commit, with a task reference, and preferably also a short description written for developers by developers will give the basic information to the changelog. Information that will always be there in the VCS.
+In an agile team doing continuous integration there will be many small commits and they will always reference a task. Such a commit, with a task reference, and preferably also a short description written for developers by developers, will give the basic information to the changelog. Information that will always be there in the VCS.
 
 With traces like a reference to a task, we can start to collect more information than the commit message itself.
 Information can be gathered from the task management system, even maybe from special fields in such a task, and we can start working with that information. Supply more fields with information, rewrite etc. which is often not possible with the commit messages.
@@ -43,13 +43,13 @@ A small research on what is already out there for git, showed that there is lots
 
 See "Research reference URLs" below
 
-To be able to collect more information that the commit message is interesting for three reasons:
+To be able to collect more information than the commit message is interesting for three reasons:
 
   §1 We will be able to edit the changelog easily, by editing the referenced information residing in another system, and redoing a changelog creation. It you don't like the idea that the changelog can change, it is always possible to store it in the artifact system together with the released artifacts.
 
   §2 We will avoid creating to many restrictions on commit messages, that might keep the developers from committing often if they find the requirement for commit messages to cumbersome. Most of the found change logs solutions is based on nicely created commit messages, with formatting rules etc. This will typically have an effect on how often developers commit. We will recommend to commit often, even thought the commit message is only a reference to a ticket or case and a short say description. Preparing nice commit messages and rewriting history before developers share their code, can have a negative effect on continuously integrating. Even though we consider only one nicely written commit message when rebasing to say master branch, it is still a time consuming task to write long commit message and they are not easily editable (§1).
 
-  §3 There is often another group of readers for a release note, than for commit messages, so having several aggregated (manually or automated) types of information is interesting.
+  §3 There is often another group of readers for a release note than for commit messages, so having several aggregated (manually or automated) types of information is interesting.
 
 
 ### Research reference URLs
@@ -123,12 +123,11 @@ Both developers and technical staff can understand the changelog, and pinpoint i
 We imagine the changelog can be called from command line, and then be used on both Jenkins build steps or by developers.
 Examples could be:
 
-	./PAC --tag 1.0.0 --tag 1.1.2
-	./PAC --date 2013-05-31 --date 2013-06-11
-	./PAC --vcs 27ab8ff --vcs 87e8ef
+	./PAC from 1.0.0 --to 1.1.2
+	./PAC from 27ab8ff --to 87e8ef
 
-In all cases two arguments are used for respectively a start- and a end-references. We can use tags, dates or VCS revision references like Git SHAs.
-The end reference can be omitted, for which we assume latest tag, today's date or latest commit.
+In all cases two arguments are used for respectively a start- and a end-references. We can use that rev-parse accepts, such as HEAD~3 / Git sha or tag name.
+The end reference can be omitted, for which we assume latest commit.
 Optionally other arguments like a configuration file is accepted.
 
 If no arguments are given, the arguments comes from a configuration file at a default location.
