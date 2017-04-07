@@ -191,6 +191,8 @@ Detailed instructions can be found in [Installing PAC on Windows](docs/windows_i
 
 ### 3.x versions
 
+**Incompatible with versions 2.x and earlier - see the [migration guide](docs/Migrating_2.X.X_to_3.X.X.md) for more information**
+
 * Removed all `date` related parameters
 * Removed deprecated `--sha` parameter (has been replaced with `from`)
 
