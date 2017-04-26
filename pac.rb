@@ -7,8 +7,8 @@ require_relative 'lib/report'
 
 doc = <<DOCOPT
 Usage:
-  #{__FILE__} from <oldest-ref> [--to <newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
-  #{__FILE__} from-latest-tag <approximation> [--to <newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
+  #{__FILE__} from <oldest-ref> [--to=<newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+  #{__FILE__} from-latest-tag <approximation> [--to=<newest-ref>] [options] [-v...] [-q...] [-c <user> <password> <target>]...
   #{__FILE__} -h|--help
 
 Options:
@@ -45,7 +45,7 @@ begin
     if File.exist?(dir+'/version.stamp')
       version = File.read(dir+'/version.stamp')
     else
-      version = "Unknown version"
+      version = "Version "+File.read(dir+'/version.properties').split("=")[1]
     end
     version
   end
