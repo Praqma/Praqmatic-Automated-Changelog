@@ -40,7 +40,7 @@ COPY Gemfile.lock /usr/src/app/
 
 #Ruby knows best how to install this particular version of PAC
 #This means that this dockerfile can build any version of PAC.
-RUN bundle install
+RUN bundle install --without=test_gems
 
 COPY . /usr/src/app
 
