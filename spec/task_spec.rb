@@ -1,26 +1,26 @@
 require_relative '../lib/model.rb'
 
 RSpec.describe Model do
-	describe "class PACTask" do 
+	describe "class PACTask" do
 		describe "method: new" do
 			context "When a PACTask is created" do
 				it "the data object should not be there" do
-					ta = Model::PACTask.new(1)
+					ta = Model::PACTask.new("1")
 					expect(ta.data).to be_nil
 				end
-			end  
+			end
 		end
 		describe "applies_to" do
-			let(:ta) { Model::PACTask.new(2) }
-			let(:ta_full) {  
-				m = Model::PACTask.new(2)
+			let(:ta) { Model::PACTask.new("2") }
+			let(:ta_full) {
+				m = Model::PACTask.new("2")
 				m.applies_to = 'jira'
 				m
 			}
 
 			context "Given a new task" do
 				it "applies_to should be empty" do
-					expect(ta.applies_to.length).to be 0 
+					expect(ta.applies_to.length).to be 0
 				end
 
 				it "should append the applied string when called" do
@@ -37,7 +37,7 @@ RSpec.describe Model do
 		end
 
 		describe "add_label" do
-			let(:std_task) { Model::PACTask.new(1) }
+			let(:std_task) { Model::PACTask.new("1") }
 			context "Given a new task" do
 				it "label should be empty" do
 					expect(std_task.label.length).to be 0
@@ -46,16 +46,15 @@ RSpec.describe Model do
 
 			context "When the user adds a label to the task" do
 				it "the label should be added to the list" do
-				end 
-			end 
+				end
+			end
 		end
 	end
 	describe "class: PACTaskCollection" do
 		context "Given a new collection" do
-			it "HAHA" do 
-				expect(1).to be 1 
+			it "HAHA" do
+				expect(1).to be 1
 			end
-		end 
+		end
 	end
 end
-

@@ -25,14 +25,14 @@ class ModelTest < Test::Unit::TestCase
 
 	# Applies to method is setting the tasks systems the PAC tasks have data in
 	def test_PACtask_applies_to_method
-		tc = Model::PACTask.new()
+		ts = Model::PACTask.new()
 
 
-		assert_equal(Set.new,tc.applies_to(),"Applies to is default empty set.")
+		assert_equal(Set.new,ts.applies_to(),"Applies to is default empty set.")
 		# Applies to take a string matching the entry for task system in the config file
-		tc.applies_to='mytasksystem'
+		ts.applies_to='mytasksystem'
 		tasksystem = Set.new ['mytasksystem']
-		assert_equal(tasksystem,tc.applies_to(),"Applies to tasks system not 'mytasksystem' as expected.")
+		assert_equal(tasksystem,ts.applies_to(),"Applies to tasks system not 'mytasksystem' as expected.")
 	end
 
 	def test_model_task_collection
