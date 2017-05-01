@@ -31,6 +31,11 @@ task :functional_vcs do
 	end		
 end
 
+#Example
+task :rspec do
+	`rspec --format='html' --out='results.html'` 
+end
+
 task :coverage do
   ENV['COVERAGE'] = 'on'
   Rake::Task['test'].execute
