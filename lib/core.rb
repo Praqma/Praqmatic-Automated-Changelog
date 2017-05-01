@@ -7,6 +7,38 @@ require_relative "./logging"
 
 module Core extend self
 
+  def cli_text(file)
+    cli = <<DOCOPT
+    Usage:
+      #{file} from <oldest-ref> [--to=<newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+      #{file} from-latest-tag <approximation> [--to=<newest-ref>] [options] [-v...] [-q...] [-c <user> <password> <target>]...
+      #{file} -h|--help
+
+    Options:
+      -h --help  Show this screen.
+
+      --from <oldest-ref>  Specify where to stop searching for commit. For git this takes anything that rev-parse accepts. Such as HEAD~3 / Git sha or tag name.
+
+      --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.  
+                  
+      --settings=<path>  Path to the settings file used. If nothing is specified default_settings.yml is used      
+
+      --properties=<properties>  
+
+        Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.* in 
+        your Liquid templates. Referenced like so '{{properties.[your-variable]}}' in your templates.
+
+        JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
+
+      -v  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
+
+      -q  Less verbose output. Can be repeated for more silence or to cancel out -v
+
+      -c  Override username and password. Example: `-c my_user my_password jira`. This will set username and password for task system jira.
+DOCOPT
+    cli    
+  end
+
   def settings
     if defined?(@@settings).nil?
       {}
