@@ -8,7 +8,7 @@ The [original blue print](/docs/BluePrint.md) behind a pragmatic automated chang
 
 _so we are able to collect information from several systems, one for developers and maybe one with end user docs_.
 
-> In a continuous delivery world we are always ready to release, and as a release also include a changelog, or a release note, and other kind of documentation, these documents must also always be available continuously. .. we recognize that the good release note requires some manual work ... 
+> In a continuous delivery world we are always ready to release, and as a release also include a changelog, or a release note, and other kind of documentation, these documents must also always be available continuously. .. we recognize that the good release note requires some manual work ...
 
 _so doing it continuously for every commit make missing work visible._
 
@@ -48,7 +48,7 @@ _Interfaces_ are mostly common data structures used to communicate between the m
 
 ## Testing and quality
 
-Today we have a fair amount of tests on different levels in PAC, from unit tests, to functional tests and integration tests that interacts with real systems.
+Today we have a fair amount of tests on different levels in PAC, from unit tests - that are not really unit tests, to functional tests and integration tests that interacts with real systems.
 
 When changing code, we have the following goals:
 

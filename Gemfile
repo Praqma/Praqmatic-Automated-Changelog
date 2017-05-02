@@ -11,11 +11,8 @@ gem 'flexmock'
 gem 'zip'
 gem 'liquid'
 gem 'xml-simple', '~> 1.1', '>= 1.1.5'
-
-group :test_gems do
-  gem 'rspec'
-  gem 'simplecov'
-  gem 'simplecov-rcov'
-  gem 'ci_reporter_test_unit'
-end
+gem 'simplecov'
+gem 'simplecov-rcov'
+gem 'ci_reporter_test_unit'
+gem 'rspec'
 
