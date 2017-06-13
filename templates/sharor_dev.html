@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>Modern software changelogs</title>
+  <meta name="description" content="website description" />
+  <meta name="keywords" content="website keywords, website keywords" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="sharor_html_css_fonts/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="sharor_html_css_fonts/css/listcss.css" />
+  <script type="text/javascript" src="sharor_html_css_fonts/js/modernizr-1.5.min.js"></script>
+</head>
+<body>
+  <div id="main">
+    <header>
+      <div id="logo">
+        <div id="logo_text">
+          <h1><a href="index.html">Release <span class="logo_colour">notes</span></a></h1>
+          <h2>Automated changelog template</h2>
+        </div>
+      </div>    
+    </header>
+
+		<div class="Listview">
+			<div style="text-align:center;">
+				<h1>{{title}}</h1>
+				
+			</div>
+			<h3>Referenced tasks</h3>
+			
+			{% for task in tasks.referenced %}
+			<div>
+				<h3 style="display: inline;">
+				<a href="https://github.com/{github-user}/{github-repository}/issues/{{task.task_id|remove: "{YourProjectID}-"}}">
+				Issue{{task.task_id}} ({{task.attributes.data.state}}) - 
+				{% for githublabel in {{task.attributes.data.labels}}%}
+				<mark style="color:#{{githublabel.color}};background: none;">
+				{{githublabel.name}} 
+				</mark>
+				{% endfor %}
+				- {{task.attributes.data.title}}
+				</a>
+				</h3>
+				<label>Check commits in issue:</label>
+				<input type="checkbox" checked>				
+					<div class="HideDiv">					
+						<ul>
+							{% for commit in task.commits %}					
+							<img src="sharor_html_css_fonts/Images/Yggdrasil.jpg"  height="25" width="25">
+														
+							 <li>								
+								<p>{{commit.header|remove: {{task.task_id}}</p>
+								<a href="https://github.com/{github-user}/{github-repository}/commit/{{commit.sha}}">Go to github for commit: {{commit.sha}}</a>					
+							</li>
+							{% endfor %}
+						</ul>					
+					</div>					
+			</div>
+			{% endfor %}
+			<!--Main loop ends-->
+			
+			<!-- Get Unreferenced-->
+			<h3 style="display: inline;">Unreferenced commits ({{pac_health|slice: 2,2}}% of commits referenced)</h3>			
+			<label>See unreferenced commits:</label>
+			<input type="checkbox" checked>
+				
+			<div class="HideDiv">	
+			{% for task in tasks.referenced %}					
+					<ul>
+						{% for commit in tasks.unreferenced %}	
+						<a href="https://github.com/{github-user}/{github-repository}/commit/{{commit.sha}}">Go to github for commit: {{commit.sha}}</a>									
+						<p>{{commit.header}}</p>			
+						{% endfor %}			
+					</ul>
+			{% endfor %}	
+			</div>	
+		</div>
+	
+    <div id="scroll">
+      <a title="Scroll to the top" class="top" href="#"><img src="sharor_html_css_fonts/images/top.png" alt="top" /></a>
+    </div>
+    <footer>
+      <p><a href="index.html">Home</a></p>      
+    </footer>
+  </div>
+  
+  <!-- javascript at the bottom for fast page loading -->
+  <script type="text/javascript" src="sharor_html_css_fonts/js/jquery.js"></script>
+  <script type="text/javascript" src="sharor_html_css_fonts/js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="sharor_html_css_fonts/js/jquery.sooperfish.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('ul.sf-menu').sooperfish();
+      $('.top').click(function() {$('html, body').animate({scrollTop:0}, 'fast'); return false;});
+    });
+  </script>
+</body>
+</html>

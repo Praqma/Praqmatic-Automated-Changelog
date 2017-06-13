@@ -1,0 +1,78 @@
+.Listview
+{
+	
+}
+
+* {margin: 0px; padding: 0;}
+
+.Listview div {
+  margin: 20px;
+}
+
+.Listview ul {
+  list-style-type: none;
+  width: 1300px;
+}
+.Listview h1{
+	margin-left:40px; 
+}
+
+.Listview h3 {
+  font: bold 20px/1.5 Helvetica, Verdana, sans-serif;
+  margin-left:40px; 
+}
+
+.Listview img {
+  float: left;
+  margin: 0 15px 0 0;
+  height: 70px;
+  width: 40px; 
+	
+}
+
+.Listview li img {
+  float: left;
+  margin: 0 15px 0 0;
+  height: 70px;
+  width: 40px; 
+}
+
+.Listview li p {
+  font: 200 12px/1.5 Georgia, Times New Roman, serif;
+}
+
+.Listview li a{
+	font: 200 12px/1.5 Georgia, Times New Roman, serif;
+}
+
+.Listview li {
+  padding: 10px;
+  overflow: auto;
+}
+
+.Listview li:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+.HideDiv ~div{
+height: 100px; /* Origional height */
+width: 95%; /* Origional width was 22%, this is changed to 100 to fit*/
+float: left; /* Just for presentation (Not required) */
+position: relative; /* Just for presentation (Not required) */
+transition:height 0.5s; /* Animation time */
+-webkit-transition:height 0.5s; /* For Safari */
+display: inline-block;/*display:block;*/
+overflow:auto;
+overflow-y: hidden; /* hide vertical scrollbar*/
+overflow-x: hidden; /*hide horizontal scrollbar*/ 
+vertical-align:top;
+border:1px solid black;
+overflow:hidden; 
+}
+
+input[type=checkbox]:checked ~div {
+   display: none;
+}
+
+}
