@@ -5,7 +5,7 @@ We supply a PAC docker image, [`praqma/pac`](https://hub.docker.com/r/praqma/pac
 ## Try it!
 
  1. Pull the image: `docker pull praqma/pac` 
- 2. Test-run the image: `docker run --rm praqm/pac` which when successful should output help and usage similar to this:
+ 2. Test-run the image: `docker run --rm praqma/pac` which when successful should output help and usage similar to this:
 
 ```
 praqmatic automated changelog 
