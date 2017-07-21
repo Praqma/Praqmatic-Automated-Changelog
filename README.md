@@ -221,6 +221,9 @@ For details on design and development info see [Developer information](docs/deve
 
 See also [contributing file](/CONTRIBUTING.md).
 
+## CodeScene analysis
+[![](https://codescene.io/projects/1494/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1494/jobs/latest-successful/results)
+
 ### Contributors
 
 * Mads Nielsen (man@praqma.net)
