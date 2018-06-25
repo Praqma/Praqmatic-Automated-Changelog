@@ -22,13 +22,12 @@ ENV LC_ALL en_US.UTF-8
 
 #This istalls a patched version of wkhtmltopdf that allows it to run headless without configuration
 RUN mkdir -p /var/lib/wkhtml
+
 WORKDIR /var/lib/wkhtml
 RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \
 		tar -xvf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \
 		rm wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \ 
 		ln -sf /var/lib/wkhtml/wkhtmltox/bin/wkhtmltopdf /usr/bin/wkhtmltopdf
-
-
 
 RUN bundle config --global frozen 1
 
@@ -49,6 +48,8 @@ RUN ln -s /usr/src/app/pac.rb /usr/bin/pac
 VOLUME ["/data"]
 WORKDIR /data
 
-ENTRYPOINT ["pac"]
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-CMD ["--help"] 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["pac"] 
