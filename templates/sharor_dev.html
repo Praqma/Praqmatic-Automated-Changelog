@@ -6,9 +6,9 @@
   <meta name="description" content="website description" />
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-  <link rel="stylesheet" type="text/css" href="sharor_html_css_fonts/css/style.css" />
-  <link rel="stylesheet" type="text/css" href="sharor_html_css_fonts/css/listcss.css" />
-  <script type="text/javascript" src="sharor_html_css_fonts/js/modernizr-1.5.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="templates/sharor_html_css_fonts/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="templates/sharor_html_css_fonts/css/listcss.css" />
+  <script type="text/javascript" src="templates/sharor_html_css_fonts/js/modernizr-1.5.min.js"></script>
 </head>
 <body>
   <div id="main">
@@ -31,8 +31,8 @@
 			{% for task in tasks.referenced %}
 			<div>
 				<h3 style="display: inline;">
-				<a href="https://github.com/{github-user}/{github-repository}/issues/{{task.task_id|remove: "{YourProjectID}-"}}">
-				Issue{{task.task_id}} ({{task.attributes.data.state}}) - 
+				<a href="https://github.com/jenkinsci/configuration-as-code-plugin/issues/{{task.task_id}}">
+				#{{task.task_id}} ({{task.attributes.data.state}}) - 
 				{% for githublabel in {{task.attributes.data.labels}}%}
 				<mark style="color:#{{githublabel.color}};background: none;">
 				{{githublabel.name}} 
@@ -46,11 +46,11 @@
 					<div class="HideDiv">					
 						<ul>
 							{% for commit in task.commits %}					
-							<img src="sharor_html_css_fonts/Images/Yggdrasil.jpg"  height="25" width="25">
+							<img src="templates/sharor_html_css_fonts/images/Yggdrasil.jpg"  height="25" width="25">
 														
 							 <li>								
-								<p>{{commit.header|remove: {{task.task_id}}</p>
-								<a href="https://github.com/{github-user}/{github-repository}/commit/{{commit.sha}}">Go to github for commit: {{commit.sha}}</a>					
+								<p>{{commit.header}}</p>
+								<a href="https://github.com/jenkinsci/configuration-as-code-plugin/commit/{{commit.sha}}">Go to github for commit: {{commit.sha}}</a>					
 							</li>
 							{% endfor %}
 						</ul>					
@@ -65,19 +65,17 @@
 			<input type="checkbox" checked>
 				
 			<div class="HideDiv">	
-			{% for task in tasks.referenced %}					
-					<ul>
-						{% for commit in tasks.unreferenced %}	
-						<a href="https://github.com/{github-user}/{github-repository}/commit/{{commit.sha}}">Go to github for commit: {{commit.sha}}</a>									
-						<p>{{commit.header}}</p>			
-						{% endfor %}			
-					</ul>
-			{% endfor %}	
+				<ul>
+					{% for co in unreferenced %}	
+					<a href="https://github.com/jenkinsci/configuration-as-code-plugin/commit/{{co.sha}}">Go to github for commit: {{co.sha}}</a>									
+					<p>{{co.header}}</p>			
+					{% endfor %}			
+				</ul>
 			</div>	
 		</div>
 	
     <div id="scroll">
-      <a title="Scroll to the top" class="top" href="#"><img src="sharor_html_css_fonts/images/top.png" alt="top" /></a>
+      <a title="Scroll to the top" class="top" href="#"><img src="templates/sharor_html_css_fonts/images/top.png" alt="top" /></a>
     </div>
     <footer>
       <p><a href="index.html">Home</a></p>      
@@ -85,9 +83,9 @@
   </div>
   
   <!-- javascript at the bottom for fast page loading -->
-  <script type="text/javascript" src="sharor_html_css_fonts/js/jquery.js"></script>
-  <script type="text/javascript" src="sharor_html_css_fonts/js/jquery.easing-sooper.js"></script>
-  <script type="text/javascript" src="sharor_html_css_fonts/js/jquery.sooperfish.js"></script>
+  <script type="text/javascript" src="templates/sharor_html_css_fonts/js/jquery.js"></script>
+  <script type="text/javascript" src="templates/sharor_html_css_fonts/js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="templates/sharor_html_css_fonts/js/jquery.sooperfish.js"></script>
   <script type="text/javascript">
     $(document).ready(function() {
       $('ul.sf-menu').sooperfish();

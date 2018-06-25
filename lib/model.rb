@@ -27,7 +27,6 @@ module Model
     attr_reader   :label
     attr_reader   :applies_to
     attr_reader   :attributes
-    attr_accessor :commits
 
     # accepts string
     def applies_to=(val)
@@ -37,6 +36,10 @@ module Model
 
     def add_commit(commit)
       @commit_collection.add(commit)
+    end
+
+    def commits
+      @commit_collection.commits
     end
 
     def attributes=(value)
@@ -107,9 +110,9 @@ module Model
     def unreferenced_commits
       output = @tasks.select { |t| t.task_id.nil? }
       if output.first.nil?
-		[]
+		    return []
       else
-		output.first.commits
+		    return output.first.commits
       end
     end
 
@@ -136,6 +139,10 @@ module Model
         }
       }
       labelled
+    end
+
+    def to_s
+      @tasks
     end
 
     def to_liquid

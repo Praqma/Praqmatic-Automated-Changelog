@@ -1,0 +1,16 @@
+:general:
+  :strict: true
+
+:templates:
+  - { location: /usr/src/app/templates/default_id_report.md, output: ids.md }
+  - { location: /usr/src/app/templates/default.md, output: default.md }
+  - { location: /usr/src/app/templates/default_html.html, pdf: true, output: default.html }
+
+:task_systems:
+  -
+    :name: none
+    :regex:
+      - { pattern: '/(#\d+)/', label: none }
+:vcs:
+  :type: git
+  :repo_location: '.'

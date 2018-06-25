@@ -304,6 +304,7 @@ module PAC__TestCases_GetCommitMessageOnCorrectBranch
       
       
       unreferenced = grouped_by_task_id.unreferenced_commits
+      assert_not_nil(unreferenced, grouped_by_task_id.to_s)
       pp "########################################################################################"
       pp "List of all commit that doesn't have a task ids (references):"
       pp "########################################################################################"

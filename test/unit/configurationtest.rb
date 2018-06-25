@@ -8,7 +8,7 @@ require_relative "../../lib/report.rb"
 class ConfigurationTest < Test::Unit::TestCase
 
 	def test_configuration_parsing
-		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
+		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
 		loaded = YAML::load(File.open(settings_file))
 		assert_true(loaded.has_key?(:general))
 		assert_equal(3, loaded[:task_systems].length)
@@ -17,7 +17,7 @@ class ConfigurationTest < Test::Unit::TestCase
 
 	#The everything ok scenario
 	def test_properties_parsing_ok
-		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
+		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
 		arguments = { '--settings' => "#{settings_file}", '--properties' => '{"title" : "PAC Changelog Name Override" }' }
 		file_parsed = Core.read_settings_file(arguments)
 		settings_parsed = Core.generate_settings(arguments, file_parsed)
@@ -29,7 +29,7 @@ class ConfigurationTest < Test::Unit::TestCase
 
 	#The sceenario where the JSON is invalid and cannot be parsed. Assert that an exception is thrown
 	def test_properties_incorrect_json
-		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
+		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
 		arguments = { '--settings' => "#{settings_file}", '--properties' => "{ title'PAC Chang} " }
 		file_parsed = Core.read_settings_file(arguments)		
 		assert_raise do |err|
@@ -39,7 +39,7 @@ class ConfigurationTest < Test::Unit::TestCase
 	
 	#Credentials test (test the -c option. for username and password overrides)
 	def test_configure_credentials
-		settings_file = File.join(File.dirname(__FILE__), '../../default_settings.yml')
+		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
 		#Notice the wierd way docopt handles it. The -c flag is a repeat flag, each option is then grouped positionally. So for each 'c' specified 
 		#c is incremented, and the index of the then the value specified.
 		arguments = { '--settings' => "#{settings_file}", '--properties' => '{"title" : "PAC Changelog Name Override" }', '-c' => 2, 

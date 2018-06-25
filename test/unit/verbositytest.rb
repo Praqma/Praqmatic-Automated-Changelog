@@ -1,10 +1,6 @@
 require 'test/unit'
-#require_relative "../../lib/model.rb"
-#require_relative "../../lib/task.rb"
-#require_relative "../../lib/decorators.rb"
 require_relative "../../lib/core.rb"
 require_relative "../../lib/logging.rb"
-#require_relative "../../lib/report.rb"
 
 class VerbosityTest < Test::Unit::TestCase
 

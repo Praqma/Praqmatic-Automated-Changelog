@@ -30,6 +30,7 @@
 		<h3>Referenced tasks</h3>
 		{% for task in tasks.referenced %}
 			<h5><a href="{{task.attributes.data.html_url}}">{{task.task_id}}</a> ({{task.attributes.data.state}})</h5>
+			<h5>{{task.attributes.data.user.login}}</h5>
 			<ul>
 			{% for commit in task.commits %}
 				<li> {{commit.shortsha}}:{{commit.header}}</li>
@@ -38,9 +39,14 @@
 		{% endfor %}
 		<h3>Unreferenced commits</h3>
 		<ul>
-			{% for commit in tasks.unreferenced %}
+			{% for commit in unreferenced %}
 			<li>{{commit.shortsha}}:{{commit.header}}</li>
 			{% endfor %}			
 		</ul>
+		<h3>Statistics</h3
+		<p>Number of commits: {{pac_c_count}}</p>
+		<p>Number of commits without a task reference: {{pac_c_unreferenced}}</p>
+		<p>Number of commits with a task reference: {{pac_c_referenced}}</p>
+		<p>Percentage of commits with task reference: {{pac_health}}</p>
 	</body>
 </html>

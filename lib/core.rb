@@ -54,7 +54,7 @@ DOCOPT
   #Reads the command line options. And based on this it will return the 
   #path of the settings file to use.
   def read_settings_file(input)
-    settings_file = File.join(Dir.pwd, 'default_settings.yml')
+    settings_file = File.join(Dir.pwd, 'settings/default_settings.yml')
     unless input['--settings'].nil?
       settings_file = input['--settings']
     end
