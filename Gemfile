@@ -15,4 +15,4 @@ gem 'simplecov'
 gem 'simplecov-rcov'
 gem 'ci_reporter_test_unit'
 gem 'rspec'
-
+gem 'xmlrpc'

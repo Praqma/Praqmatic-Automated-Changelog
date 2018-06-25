@@ -1,4 +1,4 @@
-FROM ruby:2.3
+FROM ruby:2.4
 
 RUN apt-get update && \
     apt-get install -y cmake && \
@@ -23,7 +23,7 @@ ENV LC_ALL en_US.UTF-8
 #This istalls a patched version of wkhtmltopdf that allows it to run headless without configuration
 RUN mkdir -p /var/lib/wkhtml
 WORKDIR /var/lib/wkhtml
-RUN wget http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \
+RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \
 		tar -xvf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \
 		rm wkhtmltox-0.12.3_linux-generic-amd64.tar.xz && \ 
 		ln -sf /var/lib/wkhtml/wkhtmltox/bin/wkhtmltopdf /usr/bin/wkhtmltopdf
