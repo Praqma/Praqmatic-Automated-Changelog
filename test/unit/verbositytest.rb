@@ -63,10 +63,10 @@ class VerbosityTest < Test::Unit::TestCase
 		assert_equal("yes", Logging.v(2, "yes"))
 	end
 
-	def test_no_exception
-		assert_nil(Logging.v(0, "no"))
-		assert_nil(Logging.v(-3, "no"))
-		assert_nil(Logging.v(-1, "no"))
+	def test_print_always_on_fail
+		assert_equal("yes", Logging.v(0, "yes"))
+		assert_equal("yes",Logging.v(-3, "yes"))
+		assert_equal("yes",Logging.v(-1, "yes"))
 	end
 
 	def test_set_settings_still_logging
