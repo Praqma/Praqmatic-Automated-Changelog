@@ -17,13 +17,31 @@ node("dockerhost1") {
     }
 
     stage("release") {
-        def version = readFile("version.properties").split("=")[1].trim()
-        def releaseTag = "$version-${env.BUILD_NUMBER}"
-        echo "Potential release candidate is: $releaseTag"
-        if(params?.isRelease) {
-            echo "Building release"
-        } else {
-            echo "Not building release"
+        try {
+            //Read version
+            def version = readFile("version.properties").split("=")[1].trim()
+            def releaseTag = "$version-${env.BUILD_NUMBER}"
+            echo "Potential release candidate is: $releaseTag"
+            
+            withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'docker_pw', usernameVariable: 'docker_user')]) {
+                sh 'echo $docker_pw | docker login --username $docker_user --password-stdin'
+            }
+
+            def rez = sh script:'docker build .', returnStdout: true
+            echo "$rez"
+
+            def matchedId = (rez =~ /(?m)^Successfully built ([a-z0-9]{12})$/)[0][1]
+            echo "Built image with id $matchedId"
+                        
+            
+            if(params?.isRelease) {
+                echo "Building release"
+            } else {
+                echo "Not building release"
+            }
+    
+        } finally {
+            sh 'docker logout'
         }
     }
     
