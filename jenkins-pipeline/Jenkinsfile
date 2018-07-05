@@ -1,0 +1,25 @@
+properties([parameters([booleanParam(defaultValue: false, description: '', name: 'isRelease')])])
+
+node("dockerhost1") {
+    stage("checkout") {
+        checkout scm
+    } 
+       
+    stage("build") {
+        docker.image("praqma/pac").inside() {
+            sh 'rake'
+        }
+    }
+
+    stage("changelog") {
+        pac()
+    }
+
+    stage("release") {
+        if(params?.isRelease) {
+            echo "Building release"
+        } else {
+            echo "Not building release"
+        }
+    }
+}
