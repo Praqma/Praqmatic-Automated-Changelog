@@ -33,7 +33,6 @@ node("dockerhost1") {
             def matchedId = (rez =~ /(?m)^Successfully built ([a-z0-9]{12})$/)[0][1]
             echo "Built image with id $matchedId"
                         
-            
             if(params?.isRelease) {
                 echo "Building release"
             } else {
