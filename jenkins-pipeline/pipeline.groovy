@@ -16,7 +16,8 @@ multibranchPipelineJob("Praqmatic Automated Changelog") {
     }
 
     configure {
-        it / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits' << 'jenkins.plugins.git.traits.CloneOptionTrait' {
+        def traitBlock = it / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
+        traitBlock << 'jenkins.plugins.git.traits.CloneOptionTrait' {
             extension(class: 'hudson.plugins.git.extensions.impl.CloneOption') {
                 shallow(false)
                 noTag(false)
@@ -25,5 +26,8 @@ multibranchPipelineJob("Praqmatic Automated Changelog") {
                 honorRefspec(false)
             }
         }
+
+        traitBlock << 'jenkins.plugins.git.traits.BranchDiscoveryTrait' { }
     }
+
 }
