@@ -4,14 +4,11 @@ multibranchPipelineJob("Praqmatic Automated Changelog") {
             scriptPath('jenkins-pipeline/Jenkinsfile')
         }
     }
+
     branchSources {
         git {
             credentialsId("github")
             remote("https://github.com/Praqma/Praqmatic-Automated-Changelog.git")
-        }
-
-        triggers {
-            periodic(20)
         }
     }
 
