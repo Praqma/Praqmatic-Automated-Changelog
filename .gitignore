@@ -13,3 +13,4 @@ default_ids.md
 default.pdf
 default-generated.*
 .bundle
+.idea/

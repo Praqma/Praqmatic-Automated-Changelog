@@ -31,7 +31,7 @@ begin
     configuration = Core.read_settings_file(input)
     loaded = Core.generate_settings(input, configuration)
     #Load the settings
-    Core.settings = loaded 
+    Core.settings = loaded
   rescue JSON::ParserError => pe
     Logging.verboseprint(0, "[PAC] Error paring JSON from --properties switch")
     Logging.verboseprint(0, "[PAC] Exception caught while parsing command line options: #{pe}")
@@ -43,7 +43,7 @@ begin
   end
 
   if (input['from'])
-    commit_map = Core.vcs.get_delta(input['<oldest-ref>'], input['<newest-ref>']) 
+    commit_map = Core.vcs.get_delta(input['<oldest-ref>'], input['--to'])
   elsif (input['from-latest-tag'])
     found_tag = Core.vcs.get_latest_tag(input['<approximation>'])
     commit_map = Core.vcs.get_delta(found_tag, input['<newest-ref>'])
@@ -53,10 +53,10 @@ begin
   #We need to iterate each task system
   tasks = Core.task_id_list(commit_map)
   everything_ok = true
-  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)  
+  #Apply the task system(s) to each task. Basically populate each task with data from the task system(s)
   Core.settings[:task_systems].each do |ts|
     res = Core.apply_task_system(ts, tasks)
-    everything_ok &= res 
+    everything_ok &= res
   end
 
   #Write the ID report (Basically just a list of referenced and non-referenced issues)
