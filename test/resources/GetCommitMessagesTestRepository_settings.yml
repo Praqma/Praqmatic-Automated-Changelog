@@ -17,4 +17,3 @@
   :usr:
   :pwd:
   :repo_location: 'test/resources/GetCommitMessagesTestRepository'
-  :release_regex: 'tags'

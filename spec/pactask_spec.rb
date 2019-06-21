@@ -17,8 +17,6 @@ RSpec.describe Model do
 			end
 		end
 
-
-
 		describe "applies_to" do
 			let(:pt) { Model::PACTask.new() }
 

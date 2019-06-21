@@ -15,7 +15,4 @@
   
 :vcs:
   :type: git
-  :usr:
-  :pwd:
   :repo_location: 'test/resources/idReportTestRepository'
-  :release_regex: 'tags'

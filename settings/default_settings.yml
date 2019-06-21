@@ -21,18 +21,8 @@
     :usr: "user"  
     :pw: "password"
     :regex:
-    - { pattern: '/(PRJ-\d+)/i', label: jira }      
-  -
-    :name: trac
-    :trac_url: "https://my.trac.site"
-    :trac_usr: "user"
-    :trac_pwd: "pass"
-    :regex:
-    - { pattern: '/Ticket-(\d+)/i', label: trac }  
+    - { pattern: '/(PRJ-\d+)/i', label: jira }        
   
 :vcs:
   :type: git
-  :usr:
-  :pwd:
   :repo_location: '.'
-  :release_regex: 'tags'

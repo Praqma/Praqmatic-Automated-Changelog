@@ -10,7 +10,7 @@ module Core extend self
   def cli_text(file)
     cli = <<DOCOPT
     Usage:
-      #{file} from <oldest-ref> [--to=<newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]... 
+      #{file} from <oldest-ref> [--to=<newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
       #{file} from-latest-tag <approximation> [--to=<newest-ref>] [options] [-v...] [-q...] [-c <user> <password> <target>]...
       #{file} -h|--help
 
@@ -19,16 +19,16 @@ module Core extend self
 
       --from <oldest-ref>  Specify where to stop searching for commit. For git this takes anything that rev-parse accepts. Such as HEAD~3 / Git sha or tag name.
 
-      --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.  
-                  
-      --settings=<path>  Path to the settings file used. If nothing is specified default_settings.yml is used      
+      --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.
 
-      --properties=<properties>  
+      --settings=<path>  Path to the settings file used. If nothing is specified default_settings.yml is used
 
-        Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.* in 
+      --properties=<properties>
+
+        Allows you to pass in additional variables to the Liquid templates. Must be in JSON format. Namespaced under properties.* in
         your Liquid templates. Referenced like so '{{properties.[your-variable]}}' in your templates.
 
-        JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'      
+        JSON keys and values should be wrapped in quotation marks '"' like so: --properties='{ "title":"PAC Changelog" }'
 
       -v  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
 
@@ -36,7 +36,7 @@ module Core extend self
 
       -c  Override username and password. Example: `-c my_user my_password jira`. This will set username and password for task system jira.
 DOCOPT
-    cli    
+    cli
   end
 
   def settings
@@ -44,14 +44,14 @@ DOCOPT
       {}
     else
       @@settings
-    end    
+    end
   end
 
   def settings=(val)
     @@settings = val
   end
 
-  #Reads the command line options. And based on this it will return the 
+  #Reads the command line options. And based on this it will return the
   #path of the settings file to use.
   def read_settings_file(input)
     settings_file = File.join(Dir.pwd, 'settings/default_settings.yml')
@@ -59,7 +59,7 @@ DOCOPT
       settings_file = input['--settings']
     end
 
-    unless File.exists?(settings_file) 
+    unless File.exists?(settings_file)
       raise "Settings file '#{settings_file}' does not exist"
     end
 
@@ -79,10 +79,6 @@ DOCOPT
       loaded[:properties] = {}
     end
 
-    unless cmdline['--pattern'].nil? 
-      loaded[:vcs][:release_regex] = input['--pattern']
-    end
-
     #User name override
     if cmdline['-c']
       (0..cmdline['-c']-1).each do |it|
@@ -97,31 +93,31 @@ DOCOPT
         end
       end
     end
-    
-    unless cmdline['--properties'].nil? 
+
+    unless cmdline['--properties'].nil?
       json_value = JSON.parse(cmdline['--properties'])
       loaded[:properties] = loaded[:properties].merge(json_value)
     end
     loaded[:verbosity] = Logging.calc_verbosity(cmdline)
-    loaded    
+    loaded
   end
-  
+
   #Requires a configuration section for the task system to be applied
   def apply_task_system(task_system, tasks)
     val = true
     Logging.verboseprint(1, "[PAC] Applying task system #{task_system[:name]}")
-    if task_system[:name] == 'trac'      
+    if task_system[:name] == 'trac'
       val = Task::TracTaskSystem.new(task_system).apply(tasks)
     end
     if task_system[:name] == 'jira'
       val = Task::JiraTaskSystem.new(task_system).apply(tasks)
-    end    
+    end
     if task_system[:name] == 'fogbugz'
       val = Task::FogBugzTaskSystem.new(task_system).apply(tasks)
     end
     val
   end
-  
+
   def vcs
     if @@settings[:vcs][:type] == 'git'
       Vcs::GitVcs.new(settings[:vcs])
@@ -133,7 +129,7 @@ DOCOPT
   end
 
   #This is now core functionality. The task of generating a collection of tasks based on the commits found
-  #This takes in a PACCommitCollection and returns a PACTaskCollection 
+  #This takes in a PACCommitCollection and returns a PACTaskCollection
   def task_id_list(commits)
     regex_arr = []
 
@@ -145,20 +141,20 @@ DOCOPT
       #Regex ~ Eacb regex in the task system
       settings[:task_systems].each do |ts|
         #Loop over each task system. Parse commits for matches
-        if ts.has_key? :delimiter 
-          split_pattern = eval(ts[:delimiter]) 
+        if ts.has_key? :delimiter
+          split_pattern = eval(ts[:delimiter])
         end
 
-        if ts.has_key? :regex 
+        if ts.has_key? :regex
           tasks_for_commit = c_pac.matchtask(ts[:regex], split_pattern)
-          tasks_for_commit.each do |t|    
+          tasks_for_commit.each do |t|
             t.applies_to = ts[:name]
-          end            
+          end
           #If a task was found
           unless tasks_for_commit.empty?
-            referenced = true          
-            tasks.add(tasks_for_commit)                
-          end          
+            referenced = true
+            tasks.add(tasks_for_commit)
+          end
         end
       end
 
@@ -166,10 +162,10 @@ DOCOPT
         task = Model::PACTask.new
         task.add_commit(c_pac)
         tasks.add(task)
-      end      
+      end
 
     end
 
-    tasks      
+    tasks
   end
 end
