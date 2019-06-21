@@ -5,7 +5,6 @@ require_relative "../../lib/decorators.rb"
 
 class ModelTest < Test::Unit::TestCase
 
-
 	# Testing new PAC task creation
 	# but not the trivial get/setters
 	def test_PACTask_initialize
@@ -26,8 +25,6 @@ class ModelTest < Test::Unit::TestCase
 	# Applies to method is setting the tasks systems the PAC tasks have data in
 	def test_PACtask_applies_to_method
 		ts = Model::PACTask.new()
-
-
 		assert_equal(Set.new,ts.applies_to(),"Applies to is default empty set.")
 		# Applies to take a string matching the entry for task system in the config file
 		ts.applies_to='mytasksystem'
@@ -97,7 +94,7 @@ class ModelTest < Test::Unit::TestCase
 		task_c = Model::PACTaskCollection.new
 		task_c.add(task11)
 		assert_false(task11.attributes.has_key?('data'))
-		task11.extend(JiraTaskDecorator)
+		task11.extend(JsonTaskDecorator)
 		#Notice how that 'task11' now responds to the attributes call with the data field (empty at the moment)
 		puts task11.attributes
 		assert_true(task11.attributes.has_key?('data'))

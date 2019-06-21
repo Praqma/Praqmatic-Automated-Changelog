@@ -43,9 +43,7 @@ module PAC__TestCases_IdReport
     def test_mytest
       require_relative '../../../lib/core'
       settings_file = File.join(File.dirname(__FILE__), '../../resources/idReportTestRepository_settings.yml')
-
       settings = YAML::load(File.open(settings_file))
-
       Core.settings = settings
       #PACCommitCollection
       commit_map = Core.vcs.get_delta("f9a66ca6d2e616b1012a1bdeb13f924c1bc9b4b6", "fb493078d9f42d79ea0e3a56abca7956a0d47123")

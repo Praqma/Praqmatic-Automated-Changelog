@@ -106,14 +106,8 @@ DOCOPT
   def apply_task_system(task_system, tasks)
     val = true
     Logging.verboseprint(1, "[PAC] Applying task system #{task_system[:name]}")
-    if task_system[:name] == 'trac'
-      val = Task::TracTaskSystem.new(task_system).apply(tasks)
-    end
-    if task_system[:name] == 'jira'
-      val = Task::JiraTaskSystem.new(task_system).apply(tasks)
-    end
-    if task_system[:name] == 'fogbugz'
-      val = Task::FogBugzTaskSystem.new(task_system).apply(tasks)
+    if task_system[:name] == 'json'
+      val = Task::JsonTaskSystem.new(task_system).apply(tasks)
     end
     val
   end
@@ -132,11 +126,8 @@ DOCOPT
   #This takes in a PACCommitCollection and returns a PACTaskCollection
   def task_id_list(commits)
     regex_arr = []
-
     tasks = Model::PACTaskCollection.new
-
     commits.each do |c_pac|
-
       referenced = false
       #Regex ~ Eacb regex in the task system
       settings[:task_systems].each do |ts|
@@ -163,7 +154,6 @@ DOCOPT
         task.add_commit(c_pac)
         tasks.add(task)
       end
-
     end
 
     tasks
