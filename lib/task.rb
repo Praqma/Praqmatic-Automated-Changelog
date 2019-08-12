@@ -1,23 +1,7 @@
 # encoding: utf-8
 require 'pp'
 require_relative 'decorators'
-begin
-  require 'pdfkit'
-rescue LoadError => error
-  puts error
-end
-
 module Task
-  #Configure PDFKit to use installation in env variable (Windows workaround)
-  if ENV["wkhtmltopdf"]
-    PDFKit.configure do |config|
-      config.wkhtmltopdf = ENV["wkhtmltopdf"]
-      config.default_options = {
-        :page_size => 'Legal',
-        :print_media_type => true
-      }
-    end
-  end
 
   #The task system is responsible for writing the changelog. We feed it with a list of commits, and an output directory for the changelogs
   #unless otherwise specified the path will be the current directory.
