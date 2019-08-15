@@ -110,7 +110,7 @@ module DecoratorUtils extend self
     unless usr.nil?
       Logging.verboseprint(3, "[PAC] Using basic authentication")
       req['Authorization'] = "Basic " + Base64.encode64(usr+":"+pw)
-      req["Content-Type'] = "application/json"
+      req['Content-Type'] = "application/json"
       req.basic_auth usr, pw
     end
 
