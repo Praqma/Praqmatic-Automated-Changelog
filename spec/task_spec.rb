@@ -50,11 +50,4 @@ RSpec.describe Model do
 			end
 		end
 	end
-	describe "class: PACTaskCollection" do
-		context "Given a new collection" do
-			it "HAHA" do
-				expect(1).to be 1
-			end
-		end
-	end
 end
