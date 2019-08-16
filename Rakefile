@@ -1,4 +1,4 @@
-task :default => [:test]
+task :default => [:test, :rspec]
 
 task :test do
 	Dir.glob('test/unit/*.rb').each do |testfile|
@@ -16,10 +16,4 @@ end
 task :rspec do
 	`rspec --format='html' --out='results.html'`
 end
-
-task :coverage do
-  ENV['COVERAGE'] = 'on'
-  Rake::Task['test'].execute
-end
-
 

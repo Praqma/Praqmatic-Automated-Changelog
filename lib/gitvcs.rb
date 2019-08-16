@@ -18,7 +18,6 @@ module Vcs
       if @walker.nil?
         return Rugged::Walker.new(@repository)
       end
-
       @walker
     end
 

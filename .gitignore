@@ -14,4 +14,8 @@ default.pdf
 default-generated.*
 .bundle
 .idea/
+<<<<<<< HEAD
 *.gem
+=======
+demorepo
+>>>>>>> remotes/origin/MadsNielsen-patch-1

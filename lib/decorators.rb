@@ -5,6 +5,7 @@ module JsonTaskDecorator
   require 'net/http'
   require 'uri'
   require 'json'
+  require 'base64'
   require_relative 'logging'
 
   attr_accessor :data
@@ -54,18 +55,13 @@ module DecoratorUtils extend self
     req = Net::HTTP::Get.new(uri)
     unless usr.nil?
       Logging.verboseprint(3, "[PAC] Using basic authentication")
+      req['Authorization'] = "Basic " + Base64.encode64(usr+":"+pw)
+      req['Content-Type'] = "application/json"
       req.basic_auth usr, pw
     end
-
-    if uri.scheme == 'https'
-      res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme = 'https') { |http|
-        http.request(req)
-      }
-    else
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
-        http.request(req)
-      }
-    end
+    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') { |http|
+      http.request(req)
+    }
   end
 
 end
