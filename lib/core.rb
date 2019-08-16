@@ -2,7 +2,6 @@
 require 'yaml'
 require_relative "./task.rb"
 require_relative "./gitvcs"
-require_relative "./mercurialvcs"
 require_relative "./logging"
 
 module Core extend self
