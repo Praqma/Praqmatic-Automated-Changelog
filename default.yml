@@ -1,0 +1,16 @@
+:general:
+  :strict: true
+:templates:
+  - { location: templates/default_id_report.md }
+:task_systems:
+  -
+    :name: json
+    :regex:
+      - { pattern: '/#(\d+)/', label: none }
+    :query_string: "http://localhost:28080/rest/api/latest/issue/#{task_id}"
+    :usr: 'admin'
+    :pw: 'admin'
+  
+:vcs:
+  :type: git
+  :repo_location: '.'

@@ -1,5 +1,5 @@
 # encoding: utf-8
-require_relative "./core.rb"
+require_relative 'core.rb'
 
 module Logging extend self
   def calc_verbosity(input)
