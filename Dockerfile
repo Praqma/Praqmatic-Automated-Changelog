@@ -1,4 +1,4 @@
-FROM ruby:2.5
+FROM ruby:2.5.5
 
 RUN apt-get update && \
     apt-get install -y cmake && \
@@ -17,8 +17,6 @@ COPY Gemfile /usr/src/app/
 COPY Gemfile.lock /usr/src/app/
 
 #Ruby knows best how to install this particular version of PAC
-#This means that this dockerfile can build any version of PAC.
-RUN bundle install --without=test_gems
 COPY . /usr/src/app
 RUN rake install
 
