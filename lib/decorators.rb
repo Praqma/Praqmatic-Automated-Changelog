@@ -108,21 +108,14 @@ module DecoratorUtils extend self
   def query(uri, usr = nil, pw = nil)
     req = Net::HTTP::Get.new(uri)
     unless usr.nil?
-      Logging.verboseprint(3, "[PAC] Using basic authentication")
-      req['Authorization'] = "Basic " + Base64.encode64(usr+":"+pw)
+      base64 = Base64.encode64(usr+":"+pw).delete("\n")
+      Logging.verboseprint(3, "[PAC] Using basic authentication with Base64 encoding")
+      req['Authorization'] = "Basic " + base64
       req['Content-Type'] = "application/json"
-      req.basic_auth usr, pw
     end
-
-    if uri.scheme == 'https'
-      res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme = 'https') { |http|
-        http.request(req)
-      }
-    else
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http|
-        http.request(req)
-      }
-    end
+    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') { |http|
+      http.request(req)
+    }
   end
 
 end
