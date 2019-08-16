@@ -6,7 +6,6 @@ changelog.html
 pac
 coverage
 test/reports
-test/resources/stop_task_system*
 default.html
 default.md
 default_ids.md
@@ -14,8 +13,4 @@ default.pdf
 default-generated.*
 .bundle
 .idea/
-<<<<<<< HEAD
 *.gem
-=======
-demorepo
->>>>>>> remotes/origin/MadsNielsen-patch-1

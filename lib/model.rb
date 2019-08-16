@@ -2,6 +2,8 @@ module Model
 
 	#Model object representing a discovered task
   class PACTask
+    require 'set'
+
     def initialize(task_id = nil)
       #Lookup key for task management system
       #We assume that task_id is a string
