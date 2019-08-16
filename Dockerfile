@@ -2,6 +2,8 @@ FROM ruby:2.4
 
 RUN apt-get update && \
     apt-get install -y cmake && \
+    apt-get install -y nano && \
+    apt-get install -y lynx && \
     apt-get install -y libxslt-dev && \
     apt-get install -y libxml2-dev && \
     rm -rf /var/lib/apt/lists/* 
