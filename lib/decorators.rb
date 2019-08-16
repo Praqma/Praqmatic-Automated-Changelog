@@ -113,7 +113,7 @@ module DecoratorUtils extend self
       req['Authorization'] = "Basic " + base64
       req['Content-Type'] = "application/json"
     end
-    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') { |http|
+    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) { |http|
       http.request(req)
     }
   end
