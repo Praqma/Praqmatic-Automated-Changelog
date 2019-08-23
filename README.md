@@ -73,8 +73,6 @@ This simple example do not extract data from task systems.
 	  :type: git
 	  :repo_location: '.'
 
-More about configuration in [Configuration](docs/configuration.md).
-
 Help writing regexp using Ruby IRB see this litle howto: [Howto write regexp using IRB](docs/howto_write_regexp_using_irb.md)
 
 ### Simple template
@@ -85,9 +83,6 @@ This example template simply lists the discovered issues as headers in a Markdow
 	{% for task in tasks.none %}
 	## {{task.task_id}}
 	{% endfor %}
-
-More about templates in [Templates](docs/templates.md).
-
 
 ## Usage
 
