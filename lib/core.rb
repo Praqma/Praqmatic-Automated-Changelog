@@ -86,6 +86,10 @@ DOCOPT
       loaded[:properties] = {}
     end
 
+    if loaded[:general].nil?
+      loaded[:general] = { }
+    end
+
     if loaded[:general][:ssl_verify].nil?
       loaded[:general][:ssl_verify] = true
     end
