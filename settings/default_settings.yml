@@ -9,7 +9,7 @@
   -
     :name: json
     :regex:
-      - { pattern: '/#(\d+)/', label: none }
+      - { pattern: '/#(\d+)/', label: github }
     :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
   
 :vcs:

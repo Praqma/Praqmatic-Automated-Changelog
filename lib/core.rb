@@ -160,7 +160,6 @@ DOCOPT
         if ts.has_key? :delimiter
           split_pattern = eval(ts[:delimiter])
         end
-
         if ts.has_key? :regex
           tasks_for_commit = c_pac.matchtask(ts[:regex], split_pattern)
           tasks_for_commit.each do |t|
