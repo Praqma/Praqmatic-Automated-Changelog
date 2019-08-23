@@ -29,7 +29,7 @@ module Task
 
     def apply(tasks)
       ok = true
-      tasks_with_no_jira_issues = []
+      tasks_without_issues = []
 
       tasks.each do |t|
         begin
@@ -40,7 +40,7 @@ module Task
         #This handles the case where we matched the regex. But the user might have a typo in the issue id.
         #This means the issue cannot be looked up.
         rescue Exception => err
-		      tasks_with_no_jira_issues << t
+		      tasks_without_issues << t
           Logging.verboseprint(0, "[PAC] Json #{err.message}")
           Logging.verboseprint(1, err.backtrace)
           ok = false

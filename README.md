@@ -143,16 +143,16 @@ Configure your Linux Ruby environment to run PAC and get PAC from sources:
 
 Prerequisites:
 
- * Ruby version 2 (you can see specific version in the [PAC docker image file](Dockerfile))
+ * Ruby version 2.5.5 (you can see specific version in the [PAC docker image file](Dockerfile))
  * The `bundler` Ruby Gem
+ * THe `rake` ruby gem (Install using `gem install rake`)
  * Native libraries - for Ubuntu they are: `sudo apt-get install cmake libxslt-dev libxml2-dev wkhtmltopdf`    
 
 Then get and use PAC:
               
 1. Clone the pac repository to your local machine: `git clone https://github.com/Praqma/Praqmatic-Automated-Changelog.git pac`
 2. Optionally check-out the `latest` tag or a specific release tag if you don't want bleeding edge.
-3. Change directory to `pac` (the git clone) and run the command `bundle install` to install all the used Ruby Gems.
-4. Optionally add a symlink to `pac.rb` in your path, for example: `ln -s [your install directory]/pac.rb /usr/bin/pac` 
+3. Change directory to `pac` (the git clone) and run the command `rake install` to install all the used gems and add `pac` as a gem to your system
 
 That's it. Test your installation by executing pac: `pac`. If you get a help screen the installation was successful.
 
@@ -163,12 +163,19 @@ Detailed instructions can be found in [Installing PAC on Windows](docs/windows_i
 
 ## Support and maintenance
 
-* PAC is maintained in the scope of [JOSRA](http://www.josra.org/).
 * Issue and work tracking is done using [Github issues](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
 * Support requests and questions can be created as Github issue or send us an mail on support@praqma.net
-* Our roadmap is availbe in [roadmap](/roadmap.md)
 
 ## Changelog
+
+### 4.x.x 
+
+**Incompatible with versions 3.x.x and below** 
+
+Refocus effort on optimitzing the docker image, removing dependencies and focusing on pure rest/json based tasks systems. 
+
+* The `jira` task system has been renamed `json`
+* Additional ssl options added. `--ssl-verify` and `--ssl-no-verify` options. Defaults to `true` to turn on ssl verification
 
 ### 3.x versions
 
@@ -201,13 +208,9 @@ _Initial release and proof-of-concept_
 For details on design and development info see [Developer information](docs/developer_info.md)
 
 See also [contributing file](/CONTRIBUTING.md).
-
-## CodeScene analysis
-[![](https://codescene.io/projects/1494/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1494/jobs/latest-successful/results)
-
-### Contributors
+### Maintainers
 
 * Mads Nielsen (man@praqma.net)
-* Bue Petersen (bue@praqma.net)
-* Andrius Ordojan (and@praqma.net)
 * Thierry Lacour (thi@praqma.net)
+* Jan Krag (jak@praqma.net)
+* Claus Schneider (cls@praqma.net)

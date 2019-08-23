@@ -41,7 +41,7 @@ module Core extend self
 
       -q  Less verbose output. Can be repeated for more silence or to cancel out -v
 
-      -c  Override username and password. Example: `-c my_user my_password jira`. This will set username and password for task system jira.
+      -c  Override username and password. Example: `-c my_user my_password json`. This will set username and password for task system json.
 DOCOPT
     cli
   end
