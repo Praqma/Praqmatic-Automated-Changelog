@@ -12,11 +12,7 @@ module Task
     end
 
     def apply(tasks)
-        true
-    end
-
-    def html_escape_non_ascii(text)
-      text.gsub(/Æ/,'&AElig;').gsub(/æ/,'&aelig;').gsub(/Ø/,'&Oslash;').gsub(/ø/,'&oslash;').gsub(/Å/,'&Aring;').gsub(/å/,'&aring;')
+      true
     end
   end
 
@@ -25,6 +21,8 @@ module Task
 
   #This is the Jira task system
   class JsonTaskSystem < TaskSystem
+    attr_accessor :general_settings
+
     def initialize(settings)
       super(settings)
     end
@@ -36,7 +34,7 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))
-            t.extend(JsonTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw])
+            t.extend(JsonTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw], Core.settings[:general][:ssl_verify])
             Logging.verboseprint(1, "[PAC] Applied task system Json to #{t.task_id}")
           end
         #This handles the case where we matched the regex. But the user might have a typo in the issue id.
@@ -53,5 +51,4 @@ module Task
       ok
     end
   end
-
 end

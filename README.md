@@ -21,10 +21,10 @@ Compared to other changelog solutions, PAC is very flexible and customizable. Th
 ## Features
 
 * Customizable change reports based on **Liquid templates**
-* Collects task references in SCM commits from **Git** or **Mercurial (hg)**
-* Extracts data from tasks systems like **Trac** and **JIRA** for the collected tasks
+* Collects task references in SCM commits from Git
+* Extracts data from tasks systems that has an open rest interface that returns `Json` (Basic authenticaton supported)
 * For task systems returning json data, all data can be used in the templates 
-* Supports **MarkDown**, **HTML** and **PDF** as report formats
+* Supports any textual output format. I.e you can write a template to produce css, markdown, html etc..
 * Supports extracting data from multiple referenced tasks systems at once
 * Supports creating changelog without data from external systems, basing it only on SCM commits
 * Easily create reports for several different audiences using data from several sources
@@ -32,29 +32,13 @@ Compared to other changelog solutions, PAC is very flexible and customizable. Th
 
 PAC has a flexible internal design, making it easy to extend with support for additional report formats, task management systems and so on.
 
-See our [roadmap](/roadmap.md) for future plans.
-
 ## Demo
 
-Take PAC for a quick spin with our demo scripts (requires Linux Bash, zip and docker).
+**Generates changelogs using data from GitHub**
 
-**Generate changelogs using only SCM commits**
+    ./github_example.sh
 
-    ./demo_setup_docker.sh
-
-This demo generates some reports based only on SCM commits of a small test repository.
-After running the demo, look for the reports in `demorepo/idReportTestRepository/default.[pdf|html|md|` and `demorepo/idReportTestRepository/ids.md`
-
-**Generates changelogs using data from JIRA**
-
-    ./demo_setup_docker_jira.sh
-
-This demo generates some reports through a custom template which uses data from SCM commits of a small test repository and a spun-up JIRA instance.
-
-**Try a manual demo using the pac-manuscript repository**
-
-The [pac-manuscript](https://github.com/praqma-test/pac-manuscript) repository is a short demonstration of how PAC works with Jira, where each step of gradually introduces more of the PAC configuration and features.
-The readme in the repository explain how to use it, but the pac-maunscript repository is a imaginary example on a source code repository matching some Jira issues where the series of commits are introducing new PAC features.
+This demo, using docker, generates some reports through a custom template which uses data from PAC's own repository where we mount the current directory and run PAC against it.
 
 ## Getting started
 
@@ -73,6 +57,8 @@ This is an example of a simple configuration file. It collects task references f
 This simple example do not extract data from task systems.
 
 	:general:
+	  :strict: false
+	  :ssl_verify: true
 
 	:templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
@@ -109,23 +95,23 @@ Basic usage examples for the PAC Ruby script:
 
 Show help
 
-    ./pac.rb -h
+    pac -h
     
 Get commits using tags from "Release-1.0" tag to "HEAD":
 
-    ./pac.rb from Release-1.0 --settings=./default_settings.yml
+    pac from Release-1.0 --settings=./default_settings.yml
 
-    ./pac.rb from-latest-tag "Release-1.0" --settings=./default_settings.yml
+    pac from-latest-tag "Release-1.0" --settings=./default_settings.yml
 
 Get commits using tags from "Release-1.0" to "Release-2.0"
 
-    ./pac.rb from Release-1.0 --to Release-2.0 --settings=./default_settings.yml 
+    pac from Release-1.0 --to Release-2.0 --settings=./default_settings.yml 
 
-    ./pac.rb from-latest-tag Release-1.0 --to Release-2.0 --settings=./default_settings.yml
+    pac from-latest-tag Release-1.0 --to Release-2.0 --settings=./default_settings.yml
 
 Get commits using latest tag of any name: 
 
-	./pac.rb from-latest-tag "*" --settings=./default_settings.yml
+	pac from-latest-tag "*" --settings=./default_settings.yml
 
 The above getting started is only a simple example, so to utilize all the features in PAC you can dive into the following sections.
 
@@ -153,7 +139,7 @@ We recommend to use our supplied [`praqma/pac`](https://hub.docker.com/r/praqma/
 
 If you like to configure your own Ruby environment and run PAC as simple Ruby script (`pac.rb`) follow instruction below for Linux (Ubuntu) or Windows.
 
-* PAC requires Ruby version 2 or later. Currently tested with version 2.3.0 of Ruby.
+* PAC requires Ruby version 2.5.5 or later. Currently tested with version 2.5.5 of Ruby.
 
 
 ### Run PAC on Linux (Ubuntu)

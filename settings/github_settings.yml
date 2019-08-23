@@ -1,6 +1,6 @@
 :general:
   :strict: false
-  :ssl_verify: false
+  #:ssl_verify: false
 
 :templates:
   - { location: templates/examples/github.html, output: 'github-report.html'}

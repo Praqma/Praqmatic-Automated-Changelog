@@ -16,6 +16,14 @@ module Core extend self
     Options:
       -h --help  Show this screen.
 
+      --no-ssl-verify  Disables peer verification over https
+
+      --ssl-verify  Enables peer verification over https
+
+      --strict  Enables strict mode. Will exit nonzero on error fetching data
+
+      --no-strict  Disables strict mode. Will ignore network errors while getting issues (Common issue: Misspelled issue number)
+
       --from <oldest-ref>  Specify where to stop searching for commit. For git this takes anything that rev-parse accepts. Such as HEAD~3 / Git sha or tag name.
 
       --from-latest-tag  Looks for the newest commit that the tag with <approximation> points to.
@@ -78,6 +86,10 @@ DOCOPT
       loaded[:properties] = {}
     end
 
+    if loaded[:general][:ssl_verify].nil?
+      loaded[:general][:ssl_verify] = true
+    end
+
     #User name override
     if cmdline['-c']
       (0..cmdline['-c']-1).each do |it|
@@ -91,6 +103,22 @@ DOCOPT
           end
         end
       end
+    end
+
+    if cmdline['--strict']
+      loaded[:general][:strict] = true
+    end
+
+    if cmdline['--no-strict']
+      loaded[:general][:strict] = false
+    end
+
+    if cmdline['--ssl-verify']
+      loaded[:general][:ssl_verify] = true
+    end
+
+    if cmdline['--no-ssl-verify']
+      loaded[:general][:ssl_verify] = false
     end
 
     unless cmdline['--properties'].nil?
@@ -112,13 +140,7 @@ DOCOPT
   end
 
   def vcs
-    if @@settings[:vcs][:type] == 'git'
-      Vcs::GitVcs.new(settings[:vcs])
-    elsif @@settings[:vcs][:type] == 'hg'
-      Vcs::MercurialVcs.new(@@settings[:vcs])
-    else
-      raise ArgumentError, 'The configuration settings does not include any supported (d)vcs'
-    end
+    Vcs::GitVcs.new(settings[:vcs])
   end
 
   #This is now core functionality. The task of generating a collection of tasks based on the commits found

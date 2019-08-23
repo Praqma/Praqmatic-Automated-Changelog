@@ -6,18 +6,19 @@ module JsonTaskDecorator
   require 'uri'
   require 'json'
   require 'base64'
+  require 'openssl'
   require_relative 'logging'
 
   attr_accessor :data
 
-  def fetch(query_string, usr, pw)
+  def fetch(query_string, usr, pw, ssl_verify)
     expanded = eval('"'+query_string+'"')
 	  uri = URI.parse(expanded)
 
     begin
-      res = DecoratorUtils.query(uri, usr, pw)
-    rescue Exception
-      raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}"
+      res = DecoratorUtils.query(uri, usr, pw, ssl_verify)
+    rescue Exception => net_error
+      raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}\n#{net_error}"
     end
 
     unless res.is_a? Net::HTTPOK
@@ -27,7 +28,7 @@ module JsonTaskDecorator
     begin
       Logging.verboseprint(3, "[PAC] Got the following data from #{expanded}: #{res.body}")
       @data = parse(res.body)
-      Logging.verboseprint(1, "[PAC] Fetched the following from Jira: #{@data}")
+      Logging.verboseprint(2, "[PAC] Fetched the following json data: #{@data}")
       @data
     rescue JSONError
       raise Exception, "Unparsable JSON data fetched from url #{expanded}"
@@ -51,15 +52,16 @@ end
 
 module DecoratorUtils extend self
 
-  def query(uri, usr = nil, pw = nil)
+  def query(uri, usr = nil, pw = nil, ssl_verify)
     req = Net::HTTP::Get.new(uri)
+    verification = ssl_verify ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
+    Logging.verboseprint(1, "[PAC] Verification (0 is off, 1 is peer authentication): #{verification}")
     unless usr.nil?
       Logging.verboseprint(3, "[PAC] Using basic authentication")
       req['Authorization'] = "Basic " + Base64.encode64(usr+":"+pw)
       req['Content-Type'] = "application/json"
-      req.basic_auth usr, pw
     end
-    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') { |http|
+    res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => verification ) { |http|
       http.request(req)
     }
   end
