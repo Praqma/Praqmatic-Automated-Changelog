@@ -1,6 +1,8 @@
 module Report
 	class Generator
 		require 'liquid'
+require 'fileutils'
+
 		require_relative 'logging'
 		#Constructor for the generator.
 		#Arguments:
@@ -17,6 +19,11 @@ module Report
 	  def generate(config)
 	    config[:templates].each do |t|
 	    	unless t['output'].nil?
+	    		dirname = File.dirname(t['output'])
+					unless File.directory?(dirname)
+					  FileUtils.mkdir_p(dirname)
+					  File.chmod(0777, dirname)
+					end
 		      File.open(t['output'],'w:UTF-8') do |file|
 		      	file << render_template(File.read(t['location']), to_liquid_properties(config))
 		        File.chmod(0777, file)

@@ -18,6 +18,7 @@ COPY Gemfile.lock /usr/src/app/
 
 #Ruby knows best how to install this particular version of PAC
 COPY . /usr/src/app
+
 RUN rake install
 
 VOLUME ["/data"]

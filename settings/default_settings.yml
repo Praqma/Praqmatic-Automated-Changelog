@@ -3,7 +3,7 @@
   #:ssl_verify: false
 
 :templates:
-  - { location: templates/examples/github.html, output: 'github-report.html'}
+  - { location: templates/examples/github.html, output: 'reports/github-report.html'}
 
 :task_systems:
   -
