@@ -11,6 +11,13 @@
     :regex:
       - { pattern: '/#(\d+)/', label: github }
     :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+    :auth:
+      :github:
+        :token: "ENV['GITHUB_API_TOKEN']"
+   #:auth:
+   #  :basic:
+   #    :username: "ENV['BASIC_USERNAME']"
+   #    :password: "ENV['BASIC_PW']" 
   
 :vcs:
   :type: git

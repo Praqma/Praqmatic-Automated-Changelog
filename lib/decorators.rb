@@ -11,12 +11,12 @@ module JsonTaskDecorator
 
   attr_accessor :data
 
-  def fetch(query_string, usr, pw, ssl_verify)
+  def fetch(query_string, auth)
     expanded = eval('"'+query_string+'"')
 	  uri = URI.parse(expanded)
 
     begin
-      res = DecoratorUtils.query(uri, usr, pw, ssl_verify)
+      res = DecoratorUtils.query(uri, auth)
     rescue Exception => net_error
       raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}\n#{net_error}"
     end
@@ -51,14 +51,18 @@ module JsonTaskDecorator
 end
 
 module DecoratorUtils extend self
+  require_relative 'authorization'
 
-  def query(uri, usr = nil, pw = nil, ssl_verify)
+  def query(uri, auth, ssl_verify)
     req = Net::HTTP::Get.new(uri)
     verification = ssl_verify ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
+    auth = Authorization.create(auth)
     Logging.verboseprint(1, "[PAC] Verification (0 is off, 1 is peer authentication): #{verification}")
-    unless usr.nil?
-      Logging.verboseprint(3, "[PAC] Using basic authentication")
-      req['Authorization'] = "Basic " + Base64.encode64(usr+":"+pw)
+    unless auth.nil?
+      Logging.verboseprint(3, "[PAC] Using #{auth}")
+      auth.headers.each { |k,v|
+        req[k] = v
+      }
       req['Content-Type'] = "application/json"
     end
     res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => verification ) { |http|

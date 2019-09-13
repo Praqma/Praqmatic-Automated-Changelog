@@ -38,7 +38,7 @@ PAC has a flexible internal design, making it easy to extend with support for ad
 
     ./github_example.sh
 
-This demo, using docker, generates some reports through a custom template which uses data from PAC's own repository where we mount the current directory and run PAC against it.
+This demo, using docker, generates some reports through a custom template which uses data from PAC's own repository where we mount the current directory and run PAC against it. If succesful, you should see a file in `reports/github-report.html`. 
 
 ## Getting started
 

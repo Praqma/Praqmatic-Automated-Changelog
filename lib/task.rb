@@ -34,7 +34,7 @@ module Task
       tasks.each do |t|
         begin
           if(t.applies_to.include?(@settings[:name]))
-            t.extend(JsonTaskDecorator).fetch(@settings[:query_string], @settings[:usr], @settings[:pw], Core.settings[:general][:ssl_verify])
+            t.extend(JsonTaskDecorator).fetch(@settings[:query_string], @settings[:auth], Core.settings[:general][:ssl_verify])
             Logging.verboseprint(1, "[PAC] Applied task system Json to #{t.task_id}")
           end
         #This handles the case where we matched the regex. But the user might have a typo in the issue id.
