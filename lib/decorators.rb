@@ -11,12 +11,12 @@ module JsonTaskDecorator
 
   attr_accessor :data
 
-  def fetch(query_string, auth)
+  def fetch(query_string, auth, ssl_verify)
     expanded = eval('"'+query_string+'"')
 	  uri = URI.parse(expanded)
 
     begin
-      res = DecoratorUtils.query(uri, auth)
+      res = DecoratorUtils.query(uri, auth, ssl_verify)
     rescue Exception => net_error
       raise Exception, "Unknown host error for task with id #{task_id} on url #{expanded}\n#{net_error}"
     end

@@ -94,21 +94,6 @@ DOCOPT
       loaded[:general][:ssl_verify] = true
     end
 
-    #User name override
-    if cmdline['-c']
-      (0..cmdline['-c']-1).each do |it|
-        u = cmdline['<user>'][it]
-        p = cmdline['<password>'][it]
-        t = cmdline['<target>'][it]
-        loaded[:task_systems].each do |ts|
-          if ts[:name] == t
-            ts[:usr] = u
-            ts[:pw] = p
-          end
-        end
-      end
-    end
-
     if cmdline['--strict']
       loaded[:general][:strict] = true
     end
