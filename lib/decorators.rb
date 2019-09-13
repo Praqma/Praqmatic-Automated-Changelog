@@ -59,7 +59,7 @@ module DecoratorUtils extend self
     auth = Authorization.create(auth)
     Logging.verboseprint(1, "[PAC] Verification (0 is off, 1 is peer authentication): #{verification}")
     unless auth.nil?
-      Logging.verboseprint(3, "[PAC] Using #{auth}")
+      Logging.verboseprint(0, "[PAC] Using #{auth}")
       auth.headers.each { |k,v|
         req[k] = v
       }
