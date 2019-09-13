@@ -14,7 +14,9 @@ module Authorization
     end
 
     def headers
-      { 'Authorization' => "token " + eval(@config[:token]), }
+      heads = { 'Authorization' => "token " + eval(@config[:token]), }
+      puts heads
+      heads
     end
 
     def to_s
