@@ -58,7 +58,9 @@ module DecoratorUtils extend self
     verification = ssl_verify ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
     auth = Authorization.create(auth)
     Logging.verboseprint(1, "[PAC] Verification (0 is off, 1 is peer authentication): #{verification}")
-    unless auth.nil?
+    if auth.nil?
+      Logging.verboseprint(0, "[PAC] Using no authentication")
+    else
       Logging.verboseprint(0, "[PAC] Using #{auth}")
       auth.headers.each { |k,v|
         req[k] = v

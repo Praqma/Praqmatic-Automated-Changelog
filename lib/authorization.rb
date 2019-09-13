@@ -1,6 +1,7 @@
 module Authorization
 
   def self.create(config = {})
+    puts config
     if config.has_key?('github')
       Authorization::GithubToken.new(config[:github])
     elsif config.has_key?('basic')
