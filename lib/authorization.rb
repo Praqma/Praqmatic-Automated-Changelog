@@ -1,7 +1,6 @@
 module Authorization
 
   def self.create(config = {})
-    puts config
     if config.has_key?(:github)
       Authorization::GithubToken.new(config[:github])
     elsif config.has_key?(:basic)
@@ -29,7 +28,9 @@ module Authorization
     end
 
     def headers
-      { 'Authorization' => "Basic " + Base64.encode64(eval(@config[:username]) + ":" + eval(@config[:basic][:password])), }
+      heads = { 'Authorization' => "Basic " + Base64.encode64(eval(@config[:username]) + ":" + eval(@config[:basic][:password])), }
+      puts heads
+      heads
     end
 
     def to_s
