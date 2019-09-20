@@ -29,7 +29,7 @@ See [/docs/versioning.md](/docs/versioning.md)
 
 Product owners:
 
-* Bue Petersen (Github handle: @buep)
+* Mads Nielsen (Github handle: @MadsNielsen)
 * Peers: Jan Krag (Github handle: @JKrag), Claus Schneider (Github handle: @bicschneider)
 
 _Product owners_ will take the daily responsibility for any change:
@@ -45,4 +45,4 @@ The _concept owners_ have the overall vision and make decisions on roadmap level
 
 Concept owner:
 
-* Bue Petersen
+* Mads Nielsen

@@ -1,9 +1,7 @@
 # encoding: utf-8
-require_relative "./core.rb"
+require_relative 'core.rb'
 
 module Logging extend self
-
-
   def calc_verbosity(input)
     loudness = 0
     v = input['-v']
@@ -21,7 +19,7 @@ module Logging extend self
   def v(fromlevel, str)
     if Core.settings[:verbosity].nil?
       return str
-    end 
+    end
     if Core.settings[:verbosity] >= fromlevel
       return str
     end

@@ -11,8 +11,8 @@ class ConfigurationTest < Test::Unit::TestCase
 		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
 		loaded = YAML::load(File.open(settings_file))
 		assert_true(loaded.has_key?(:general))
-		assert_equal(2, loaded[:task_systems].length)
-		assert_equal(3, loaded[:templates].length)
+		assert_equal(1, loaded[:task_systems].length)
+		assert_equal(1, loaded[:templates].length)
 	end
 
 	#The everything ok scenario
@@ -35,22 +35,6 @@ class ConfigurationTest < Test::Unit::TestCase
 		assert_raise do |err|
 			settings_parsed = Core.generate_settings(arguments, file_parsed)
 		end
-	end
-
-	#Credentials test (test the -c option. for username and password overrides)
-	def test_configure_credentials
-		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
-		#Notice the wierd way docopt handles it. The -c flag is a repeat flag, each option is then grouped positionally. So for each 'c' specified
-		#c is incremented, and the index of the then the value specified.
-		arguments = { '--settings' => "#{settings_file}", '--properties' => '{"title" : "PAC Changelog Name Override" }', '-c' => 2,
-			'<user>' => ["newuser", "tracuser"],
-			'<password>' => ["newpassword", "tracpassword"],
-			'<target>' => ["jira", "trac"] }
-
-		file_parsed = Core.read_settings_file(arguments)
-		settings_parsed = Core.generate_settings(arguments, file_parsed)
-		assert_equal('newuser', settings_parsed[:task_systems][1][:usr])
-		assert_equal('newpassword', settings_parsed[:task_systems][1][:pw])
 	end
 
 	def test_raise_exception_on_missing_settings_file
