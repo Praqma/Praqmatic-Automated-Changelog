@@ -7,10 +7,9 @@
 
 :task_systems:
   -
-    :dummy: <%= 
-      res = Netrc.read(/data/.netrc)
-      res[:user]
-    %>
+    <% res = Netrc.read(/data/.netrc) %>
+    <% net_rc_username = res[:user] %>  
+    :dummy: <%= net_rc_username %>
     :name: json
     :regex:
       - { pattern: '/#(\d+)/', label: github }
