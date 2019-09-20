@@ -31,7 +31,6 @@ RSpec.describe "Command line interactions" do
  			it "does as we expect" do
 				ARGV = "from 'sha' --to='somesha' --settings='pac_settings.yml' -c 'user' 'pass' 'tasksystem'"
 				input = Docopt::docopt(Core.cli_text(__FILE__))
-				puts input
  			end
 		end
 	end

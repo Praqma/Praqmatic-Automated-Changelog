@@ -70,9 +70,7 @@ DOCOPT
       raise "Settings file '#{settings_file}' does not exist"
     end
 
-    result = ERB.new(File.read(settings_file)).result
-    puts result
-    result
+    ERB.new(File.read(settings_file)).result
   end
 
   #Creates the final settings based on additonal command line arguments
