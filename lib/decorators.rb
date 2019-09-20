@@ -62,10 +62,10 @@ module DecoratorUtils extend self
       Logging.verboseprint(0, "[PAC] Using no authentication")
     else
       Logging.verboseprint(0, "[PAC] Using #{auth}")
+      req['Content-Type'] = "application/json"
       auth.headers.each { |k,v|
         req[k] = v
       }
-      req['Content-Type'] = "application/json"
     end
     res = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => verification ) { |http|
       http.request(req)

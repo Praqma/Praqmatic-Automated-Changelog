@@ -70,7 +70,6 @@ This simple example do not extract data from task systems.
 	      - { pattern: '/PAC\-(\d+)', label: none }
 
 	:vcs:
-	  :type: git
 	  :repo_location: '.'
 
 Help writing regexp using Ruby IRB see this litle howto: [Howto write regexp using IRB](docs/howto_write_regexp_using_irb.md)

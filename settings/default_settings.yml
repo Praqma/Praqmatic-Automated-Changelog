@@ -14,11 +14,14 @@
     :auth:
       :github:
         :token: "ENV['GITHUB_API_TOKEN']"
+        :headers:
+          Content-Type: "application/json"
+
+
    #:auth:
    #  :basic:
    #    :username: "ENV['BASIC_USERNAME']"
    #    :password: "ENV['BASIC_PW']" 
   
 :vcs:
-  :type: git
   :repo_location: '.'
