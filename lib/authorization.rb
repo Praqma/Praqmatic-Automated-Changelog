@@ -30,7 +30,7 @@ module Authorization
     end
 
     def headers
-      heads = { 'Authorization' => "Basic " + Base64.encode64(eval(@config[:username]) + ":" + eval(@config[:basic][:password])), }
+      heads = { 'Authorization' => "Basic " + Base64.encode64(eval(@config[:username]) + ":" + eval(@config[:password])), }
       heads.merge!(@config[:headers] || {})
       heads
     end

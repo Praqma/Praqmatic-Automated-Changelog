@@ -37,22 +37,6 @@ class ConfigurationTest < Test::Unit::TestCase
 		end
 	end
 
-	#Credentials test (test the -c option. for username and password overrides)
-	def test_configure_credentials
-		settings_file = File.join(File.dirname(__FILE__), '../../settings/default_settings.yml')
-		#Notice the wierd way docopt handles it. The -c flag is a repeat flag, each option is then grouped positionally. So for each 'c' specified
-		#c is incremented, and the index of the then the value specified.
-		arguments = { '--settings' => "#{settings_file}", '--properties' => '{"title" : "PAC Changelog Name Override" }', '-c' => 2,
-			'<user>' => ["newuser"],
-			'<password>' => ["newpassword"],
-			'<target>' => ["json"] }
-
-		file_parsed = Core.read_settings_file(arguments)
-		settings_parsed = Core.generate_settings(arguments, file_parsed)
-		assert_equal('newuser', settings_parsed[:task_systems][0][:usr])
-		assert_equal('newpassword', settings_parsed[:task_systems][0][:pw])
-	end
-
 	def test_raise_exception_on_missing_settings_file
 		config = { '--settings' => 'not-there.yml' }
 		assert_raise RuntimeError do

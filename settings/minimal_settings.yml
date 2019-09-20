@@ -10,5 +10,4 @@
     :regex:
       - { pattern: '/(#\d+)/', label: none }
 :vcs:
-  :type: git
   :repo_location: '.'

@@ -9,8 +9,8 @@ module Core extend self
   def cli_text(file)
     cli = <<DOCOPT
     Usage:
-      pac from <oldest-ref> [--to=<newest-ref>] [options] [-v...] [-q...] [-c (<user> <password> <target>)]...
-      pac from-latest-tag <approximation> [--to=<newest-ref>] [options] [-v...] [-q...] [-c <user> <password> <target>]...
+      pac from <oldest-ref> [--to=<newest-ref>] [options] [-v...] [-q...]
+      pac from-latest-tag <approximation> [--to=<newest-ref>] [options] [-v...] [-q...]
       pac -h|--help
 
     Options:
@@ -40,8 +40,6 @@ module Core extend self
       -v  More verbose output. Can be repeated to increase output verbosity or to cancel out -q
 
       -q  Less verbose output. Can be repeated for more silence or to cancel out -v
-
-      -c  Override username and password. Example: `-c my_user my_password json`. This will set username and password for task system json.
 DOCOPT
     cli
   end
