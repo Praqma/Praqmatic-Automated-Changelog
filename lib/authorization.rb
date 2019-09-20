@@ -39,9 +39,9 @@ module Authorization
         end
         netrc_usr, netrc_pw = netrc_config[@uri.hostname]
         puts netrc_usr
-        heads = { 'Authorization' => "Basic " + Base64.encode64(netrc_usr + ":" + netrc_pw), }
+        heads = { 'Authorization' => "Basic " + Base64.encode64(netrc_usr + ":" + netrc_pw).delete("\n"), }
       else
-        heads = { 'Authorization' => "Basic " + Base64.encode64(@config[:username] + ":" + @config[:password]), }
+        heads = { 'Authorization' => "Basic " + Base64.encode64(@config[:username] + ":" + @config[:password]).delete("\n"), }
       end
       heads.merge!(@config[:headers] || {})
       heads
