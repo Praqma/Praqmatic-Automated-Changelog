@@ -6,9 +6,8 @@
   - { location: templates/examples/github.html, output: 'reports/github-report.html'}
 
 :task_systems:
-  -
-    # Netrc.read(/data/.netrc)
-    <% res = "wat" %>
+  - 
+    <% res = Netrc.read("/data/.netrc") %>
     <% net_rc_username = res %>  
     :dummy: <%= net_rc_username %>
     :name: json
