@@ -16,8 +16,8 @@
         :token: <%= ENV['GITHUB_API_TOKEN'] %> #
 #    :auth:
 #      :basic:
-#        :username: <%= net_rc_username %>
-#        :password: <%= net_rc_password %>
+#        :username: 
+#        :password: 
 #    :auth:
 #      :basic:
 #        :netrc: #/data/.netrc 
