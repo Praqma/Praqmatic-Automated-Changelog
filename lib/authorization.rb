@@ -37,7 +37,8 @@ module Authorization
         else
           netrc_config = Netrc.read(@config[:netrc])
         end
-        netrc_usr, netrc_pw = netrc_config[uri.hostname]
+        netrc_usr, netrc_pw = netrc_config[@uri.hostname]
+        puts netrc_usr
         heads = { 'Authorization' => "Basic " + Base64.encode64(netrc_usr + ":" + netrc_pw), }
       else
         heads = { 'Authorization' => "Basic " + Base64.encode64(@config[:username] + ":" + @config[:password]), }
