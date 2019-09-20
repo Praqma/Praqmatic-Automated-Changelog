@@ -175,6 +175,31 @@ Refocus effort on optimitzing the docker image, removing dependencies and focusi
 
 * The `jira` task system has been renamed `json`
 * Additional ssl options added. `--ssl-verify` and `--ssl-no-verify` options. Defaults to `true` to turn on ssl verification
+* New authorization section. Supports token auth with GitHub token authentication and Basic Authentication for other systems 
+* Also able to read .netrc files using Basic Authentication
+
+```
+
+:task_systems:
+  - 
+    :name: json
+    :regex:
+      - { pattern: '/#(\d+)/', label: github }
+    :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+    # Option 1: GitHub token authentication (Store in Environment variable)
+    :auth:
+      :github:
+        :token: <%= ENV['GITHUB_API_TOKEN'] %> #
+    # Option 2: Use basic authentication with values from somewhere
+    :auth:
+      :basic:
+        :username: <%= ENV['BASIC_USR'] %>
+        :password: <%= ENV['BASIC_PW'] %>
+    # Option 3: Use .netrc file. Remember to mount the files to default location or known location when using docker.
+    :auth:
+      :basic:
+        :netrc: /data/.netrc 
+```
 
 ### 3.x versions
 
