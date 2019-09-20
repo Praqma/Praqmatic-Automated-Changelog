@@ -8,8 +8,8 @@
 :task_systems:
   -
     # Netrc.read(/data/.netrc)
-    <% res = wat %>
-    <% net_rc_username = res[:user] %>  
+    <% res = "wat" %>
+    <% net_rc_username = res %>  
     :dummy: <%= net_rc_username %>
     :name: json
     :regex:
