@@ -30,5 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'docopt', '~> 0.6.1', '>= 0.6.1'
   spec.add_runtime_dependency 'rugged', '~> 0.26', '>= 0.26'
   spec.add_runtime_dependency 'liquid', '~> 4.0.0', '>= 4.0.0'
+  spec.add_runtime_dependency 'netrc', '~> 0.11.0'
 
 end

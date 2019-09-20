@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'yaml'
 require 'erb'
+require 'netrc'
 require_relative "./task.rb"
 require_relative "./gitvcs"
 require_relative "./logging"
