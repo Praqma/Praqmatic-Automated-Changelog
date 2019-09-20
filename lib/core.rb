@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'yaml'
+require 'erb'
 require_relative "./task.rb"
 require_relative "./gitvcs"
 require_relative "./logging"
@@ -68,7 +69,9 @@ DOCOPT
       raise "Settings file '#{settings_file}' does not exist"
     end
 
-    File.read(settings_file)
+    result = ERB.new(File.read(settings_file)).result
+    puts result
+    result
   end
 
   #Creates the final settings based on additonal command line arguments
