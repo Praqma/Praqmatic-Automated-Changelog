@@ -63,7 +63,7 @@ module DecoratorUtils extend self
     else
       Logging.verboseprint(0, "[PAC] Using #{auth}")
       req['Content-Type'] = "application/json"
-      puts auth.headers
+      Logging.verboseprint(0, "TEMP: #{auth.headers}")
       auth.headers.each { |k,v|
         req[k] = v
       }
