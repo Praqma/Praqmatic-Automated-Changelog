@@ -56,13 +56,14 @@ module DecoratorUtils extend self
   def query(uri, auth, ssl_verify)
     req = Net::HTTP::Get.new(uri)
     verification = ssl_verify ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
-    auth = Authorization.create(auth)
+    auth = Authorization.create(auth, uri)
     Logging.verboseprint(1, "[PAC] Verification (0 is off, 1 is peer authentication): #{verification}")
     if auth.nil?
       Logging.verboseprint(0, "[PAC] Using no authentication")
     else
       Logging.verboseprint(0, "[PAC] Using #{auth}")
       req['Content-Type'] = "application/json"
+      puts auth.headers
       auth.headers.each { |k,v|
         req[k] = v
       }

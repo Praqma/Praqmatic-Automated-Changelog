@@ -1,3 +1,5 @@
+#<% res = Netrc.read("/data/.netrc") %>
+#<% net_rc_username, net_rc_password = res["github.com"] %> 
 :general:
   :strict: false
   #:ssl_verify: false
@@ -7,26 +9,21 @@
 
 :task_systems:
   - 
-    <% res = Netrc.read("/data/.netrc") %>
-    <% net_rc_username, net_rc_password = res["github.com"] %> 
-    :dummy: <%= net_rc_username %><%= net_rc_password %>
     :name: json
     :regex:
       - { pattern: '/#(\d+)/', label: github }
     :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+ #   :auth:
+ #     :github:
+ #       :token: <%= ENV['GITHUB_API_TOKEN'] %> # ""
+ #       :headers:
+ #         Content-Type: "application/json"
+   #:auth:
+   #  :basic:
+   #    :username: <%= net_rc_username %>
+   #    :password: <%= net_rc_password %>
     :auth:
-      :github:
-        :token: <%= ENV['GITHUB_API_TOKEN'] %> # ""
-        :headers:
-          Content-Type: "application/json"
-   #:auth:
-   #  :basic:
-   #    :username: "ENV['BASIC_USERNAME']"
-   #    :password: "ENV['BASIC_PW']" 
-   #:auth:
-   #  :basic:
-   #    :netrc_file: "ENV['BASIC_USERNAME']"
-
-  
+      :basic:
+        :netrc: "/data/.netrc" 
 :vcs:
   :repo_location: '.'
