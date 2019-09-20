@@ -2,21 +2,12 @@
 maintainer: JKrag
 ---
 
-Issue tracking: 
-[![Groomed](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20workable&title=Groomed)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog) 
-[![Up Next](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20up%20Next&title=UpNext)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog) 
-[![Work In Progress](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20in%20progress&title=InProgress)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog)
-[![Issues](https://img.shields.io/github/issues/Praqma/Praqmatic-Automated-Changelog.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
-
-
 # Praqmatic Automated Changelog (PAC)
 
 Tool for creating automated, but pragmatic, changelogs.
 
 PAC collects task references from SCM commit messages and creates changelog reports with additional information extracted from other systems, like your task management system.
 Compared to other changelog solutions, PAC is very flexible and customizable. The design allows you to solve the problems of having an unchangeable SCM commit history with incorrect task references.
-
-![The workflow behind PAC for creating changelogs](/docs/process.png)
 
 ## Features
 
@@ -121,44 +112,13 @@ All available configurations option for PAC is described in the [Configuration](
 
 Information on how to write templates for the changelog and use the extracted data can be found in the [Templates](docs/templates.md) section.
 
-### Take PAC for a spin
-
-You can try PAC using our PAC Docker container and a zipped github repository we use for testing. See [Try PAC with a test repo and PAC docker image](docs/try_pac_with_test_repo_and_docker.md)
-
-### Running PAC
+### Running PAC on Linux
 
 We recommend to use our supplied [`praqma/pac`](https://hub.docker.com/r/praqma/pac/) Docker image so you avoid configuring a Ruby environmnet yourself.
 
-* See [Using the PAC docker image](docs/using_the_pac_docker_image.md).
-
-If you like to configure your own Ruby environment and run PAC as simple Ruby script (`pac.rb`) follow instruction below for Linux (Ubuntu) or Windows.
-
-* PAC requires Ruby version 2.5.5 or later. Currently tested with version 2.5.5 of Ruby.
-
-
-### Run PAC on Linux (Ubuntu)
-
-Configure your Linux Ruby environment to run PAC and get PAC from sources:
-
-Prerequisites:
-
- * Ruby version 2.5.5 (you can see specific version in the [PAC docker image file](Dockerfile))
- * The `bundler` Ruby Gem
- * THe `rake` ruby gem (Install using `gem install rake`)
- * Native libraries - for Ubuntu they are: `sudo apt-get install cmake libxslt-dev libxml2-dev wkhtmltopdf`    
-
-Then get and use PAC:
-              
-1. Clone the pac repository to your local machine: `git clone https://github.com/Praqma/Praqmatic-Automated-Changelog.git pac`
-2. Optionally check-out the `latest` tag or a specific release tag if you don't want bleeding edge.
-3. Change directory to `pac` (the git clone) and run the command `rake install` to install all the used gems and add `pac` as a gem to your system
-
-That's it. Test your installation by executing pac: `pac`. If you get a help screen the installation was successful.
-
 ### Run PAC on Windows
 
-Detailed instructions can be found in [Installing PAC on Windows](docs/windows_instructions.md).
-
+Detailed instructions can be found in [Running PAC on Windows](docs/windows_instructions.md).
 
 ## Support and maintenance
 
@@ -176,7 +136,8 @@ Refocus effort on optimitzing the docker image, removing dependencies and focusi
 * The `jira` task system has been renamed `json`
 * Additional ssl options added. `--ssl-verify` and `--ssl-no-verify` options. Defaults to `true` to turn on ssl verification
 * New authorization section. Supports token auth with GitHub token authentication and Basic Authentication for other systems 
-* Also able to read .netrc files using Basic Authentication
+* Also able to read .netrc files and using this information in Basic Authentication
+* The configuration file is now interpreted using ERB. This means that you can use ERB code blocks like `<%= ...expression %>` in the configuration file. Useful if you want to have certain things happinging in a test environment and other things going on in a production envrionment. **WARNING** This can be a potential secrity issue
 
 ```
 
@@ -186,6 +147,7 @@ Refocus effort on optimitzing the docker image, removing dependencies and focusi
     :regex:
       - { pattern: '/#(\d+)/', label: github }
     :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+    # Option 0: No auth. Just remove the :auth: section
     # Option 1: GitHub token authentication (Store in Environment variable)
     :auth:
       :github:
@@ -232,6 +194,7 @@ _Initial release and proof-of-concept_
 For details on design and development info see [Developer information](docs/developer_info.md)
 
 See also [contributing file](/CONTRIBUTING.md).
+
 ### Maintainers
 
 * Mads Nielsen (man@praqma.net)
