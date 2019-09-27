@@ -137,7 +137,7 @@ Refocus effort on optimitzing the docker image, removing dependencies and focusi
 * Additional ssl options added. `--ssl-verify` and `--ssl-no-verify` options. Defaults to `true` to turn on ssl verification
 * New authorization section. Supports token auth with GitHub token authentication and Basic Authentication for other systems 
 * Also able to read .netrc files and using this information in Basic Authentication
-* The configuration file is now interpreted using ERB. This means that you can use ERB code blocks like `<%= ...expression %>` in the configuration file. Useful if you want to have certain things happinging in a test environment and other things going on in a production envrionment. **WARNING** This can be a potential secrity issue
+* The configuration file is now interpreted using ERB. This means that you can use ERB code blocks like `<%= ...expression %>` in the configuration file. Useful if you want to have certain things happinging in a test environment and other things going on in a production envrionment. **WARNING** This can be a potential security issue
 
 ```
 
