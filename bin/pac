@@ -2,27 +2,14 @@
 #encoding: utf-8
 require 'docopt'
 require 'liquid'
-require_relative 'lib/core'
-require_relative 'lib/report'
+require_relative '../lib/core'
+require_relative '../lib/version'
+require_relative '../lib/report'
 
 doc = Core.cli_text(__FILE__)
 
 begin
   require "pp"
-
-  #Versioning strategy see the file docs/versioning.md
-  #We need to read where the symlink points to because the docker container links pac to /usr/bin
-  def version
-    path = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
-    dir = File.dirname(path)
-    if File.exist?(dir+'/version.stamp')
-      version = File.read(dir+'/version.stamp')
-    else
-      version = "Version "+File.read(dir+'/version.properties').split("=")[1]
-    end
-    version
-  end
-
   input = Docopt::docopt(doc)
 
   #This should print out any and all errors related to creating settings for PAC. This captures
@@ -63,18 +50,23 @@ begin
   #Takes the list of discovered tasks, and only needs the template settings
   generator = Report::Generator.new(tasks, commit_map)
   generator.generate(Core.settings)
-  unless everything_ok
+  if !everything_ok
   	if Core.settings[:general][:strict]
+      Logging.verboseprint(0, '[PAC] Error: Errors encountered while fetching data')
   		exit 15
   	else
-  	  Logging.verboseprint(1, '[PAC] Ignoring encountered errors. Strict mode is disabled.')
+  	  Logging.verboseprint(0, '[PAC] Error: Ignoring encountered errors. Strict mode is disabled.')
   	  exit 0
   	end
+  else
+    if Core.settings[:general][:strict] then Logging.verboseprint(0, '[PAC] Strict mode is enabled!') end
+    Logging.verboseprint(0, '[PAC] Success!')
+    exit 0
   end
 
 rescue Docopt::Exit => e
   puts "Praqmatic Automated Changelog (PAC)"
-  puts "#{version}\n"
+  puts "#{PAC::VERSION}\n"
   puts e.message
   puts
 end

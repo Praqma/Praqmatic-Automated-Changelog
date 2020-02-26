@@ -32,11 +32,13 @@
 			{% endfor %}				
 			</ul>
 		{% endfor %}
+		{% if tasks.unreferenced.size > 0 %}
 		<h3>Unreferenced commits</h3>
 		<ul>
 			{% for commit in tasks.unreferenced %}
 			<li>{{commit.shortsha}}:{{commit.header}}</li>
 			{% endfor %}			
 		</ul>
+		{% endif %}
 	</body>
 </html>

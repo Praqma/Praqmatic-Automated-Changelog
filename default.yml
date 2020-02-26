@@ -1,0 +1,17 @@
+:general:
+  :strict: false
+  :ssl_verify: false
+
+:templates:
+  - { location: templates/examples/github.html, output: 'github-report.html'}
+
+:task_systems:
+  -
+    :name: json
+    :regex:
+      - { pattern: '/#(\d+)/', label: none }
+    :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+  
+:vcs:
+  :type: git
+  :repo_location: '.'
