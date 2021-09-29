@@ -4,7 +4,7 @@ gem 'mercurial-ruby', :require => false
 gem 'pdfkit'
 gem 'rake'
 gem 'rugged', '~> 0.24.0'
-gem 'trac4r', :require => false
+gem 'trac4r', '>= 1.2.4', :require => false
 gem 'docopt'
 gem 'ruby-fogbugz', :require => false
 gem 'flexmock'
