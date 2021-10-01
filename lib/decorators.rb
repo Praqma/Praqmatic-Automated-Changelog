@@ -45,61 +45,7 @@ module JiraTaskDecorator
       }
     )
   end
-  
-end
 
-module TracTaskDecorator
-  require 'trac4r'
-
-  def self.trac_instance
-    @@trac_instance    
-  end
-
-  def self.trac_instance=(trac)
-    @@trac_instance = trac
-  end
-
-  def fetch
-    begin
-      unless task_id.nil? 
-        ticket = TracTaskDecorator.trac_instance.tickets.get task_id.to_i
-        @data = { :summary => ticket.summary, :status => ticket.status, :description => ticket.description }
-        Logging.verboseprint(1, "[PAC] Fetched the following from Trac: #{@data}")
-        @data        
-      end
-    rescue Trac::TracException => e
-      raise Exception, "[PAC] The ticket with the id #{task_id} not found in Trac"
-    end    
-  end
-
-  def attributes
-    super.merge!(
-      { 
-        'data' => @data
-      }
-    )    
-  end
-
-  attr_accessor :data  
-end
-
-module FogbugzTaskDecorator
-
-  require 'xmlsimple'
-
-  def fetch(query_string)
-    expanded = eval('"'+query_string+'"')    
-    uri = URI.parse(expanded)    
-    res = DecoratorUtils.query(uri)
-    Logging.verboseprint(3, "[PAC] Got the following data from #{expanded}: #{res.body}")
-    @data = XmlSimple.xml_in res.body
-    Logging.verboseprint(1, "[PAC] Fetched the following from FogBugz: #{@data}")
-    @data    
-  end
-
-  def attributes
-    super.merge!({ 'data' => @data })
-  end
 end
 
 module DecoratorUtils extend self  
@@ -121,5 +67,4 @@ module DecoratorUtils extend self
       }        
     end    
   end
-
 end

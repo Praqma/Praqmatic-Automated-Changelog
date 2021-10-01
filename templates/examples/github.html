@@ -39,7 +39,7 @@
 		{% endfor %}
 		<h3>Unreferenced commits</h3>
 		<ul>
-			{% for commit in unreferenced %}
+			{% for commit in tasks.unreferenced_commits %}
 			<li>{{commit.shortsha}}:{{commit.header}}</li>
 			{% endfor %}			
 		</ul>

@@ -20,13 +20,6 @@ module Report
 		      	file << render_template(File.read(t['location']), to_liquid_properties(config)) 
 		        File.chmod(0777, file)
 		      end
-
-		      if t['pdf'] == true
-		        output_file_path = t['output'].sub(/\.html$/, '.pdf')
-		        kit = PDFKit.new(File.new(t['output']), :page_size => 'A4')
-		        kit.to_file(output_file_path)
-		        File.chmod(0777, output_file_path)
-		      end
 		    else
 		    	puts "========== #{t['location']} =========="
 		    	puts render_template(File.read(t['location']), to_liquid_properties(config))
@@ -41,6 +34,7 @@ module Report
 	  # props    - A ruby has with additional properties
 	  #Returns - The rendered template	  
 	  def render_template(template, props = {})
+			Logging.verboseprint(5, "[PAC] Render variables: #{@tasks.unreferenced_commits}")
 			Liquid::Template.parse(template).render( { 
         'tasks' => @tasks, 	     
         'pac_c_count' => @commits.count,

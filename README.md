@@ -85,6 +85,7 @@ This simple example do not extract data from task systems.
 
 	:vcs:
 	  :type: git
+      :s
 	  :repo_location: '.'
 
 More about configuration in [Configuration](docs/configuration.md).
@@ -133,27 +134,7 @@ The above getting started is only a simple example, so to utilize all the featur
 
 We recommend using the PAC docker image, as described below in [Running PAC](#running-pac). The basic usage examples then becomes like described in [Usage](docs/using_the_pac_docker_image.md#usage) in [Using the PAC Docker image](docs/using_the_pac_docker_image.md).
 
-### Configuring PAC
 
-All available configurations option for PAC is described in the [Configuration](docs/configuration.md) section.
-
-### Writing templates
-
-Information on how to write templates for the changelog and use the extracted data can be found in the [Templates](docs/templates.md) section.
-
-### Take PAC for a spin
-
-You can try PAC using our PAC Docker container and a zipped github repository we use for testing. See [Try PAC with a test repo and PAC docker image](docs/try_pac_with_test_repo_and_docker.md)
-
-### Running PAC
-
-We recommend to use our supplied [`praqma/pac`](https://hub.docker.com/r/praqma/pac/) Docker image so you avoid configuring a Ruby environmnet yourself.
-
-* See [Using the PAC docker image](docs/using_the_pac_docker_image.md).
-
-If you like to configure your own Ruby environment and run PAC as simple Ruby script (`pac.rb`) follow instruction below for Linux (Ubuntu) or Windows.
-
-* PAC requires Ruby version 2 or later. Currently tested with version 2.3.0 of Ruby.
 
 
 ### Run PAC on Linux (Ubuntu)
@@ -178,7 +159,6 @@ That's it. Test your installation by executing pac: `pac`. If you get a help scr
 ### Run PAC on Windows
 
 Detailed instructions can be found in [Installing PAC on Windows](docs/windows_instructions.md).
-
 
 ## Support and maintenance
 

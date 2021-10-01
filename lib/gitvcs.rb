@@ -46,7 +46,7 @@ module Vcs
     end
 
     #Super simplified query for git
-    def get_delta(oldest, newest=nil) 
+    def get_delta(oldest, newest=nil)
       if newest.nil?
         head = repository.lookup(repository.head.target.oid)
       else
@@ -58,14 +58,26 @@ module Vcs
       walker = createWalker
 
       commits = Model::PACCommitCollection.new
+      #puts head.inspect
+      walker.push(head.oid)
+      walker.hide(tail.oid)
 
-      walker.push(head)
-      walker.hide(tail)
+      Logging.verboseprint(0, "[PAC] Warning! Both :sparse and :filter_paths are defined! Using sparse") if @settings[:filter_paths] and @settings[:sparse]
 
-      walker.each do |commit|
-        p_commit = Model::PACCommit.new(commit.oid, commit.message, commit.time)
-        Logging.verboseprint(3, "[PAC] Added commit #{commit.oid}")
-        commits.add(p_commit)        
+      git_data = if @settings[:sparse]
+                  `git log --pretty=format:"%h" --sparse`.split("\n")
+                 elsif @settings[:filter_paths]
+                   `git log --pretty=format:"%h" -- #{@settings[:filter_paths].join(' ')}`.split("\n")
+                 else
+                   nil
+                 end
+
+      walker.inject([]) do |c, commit|
+        if not git_data or git_data.any? { |c|  commit.oid.to_s.include?(c) }
+          p_commit = Model::PACCommit.new(commit.oid, commit.message, commit.time)
+          Logging.verboseprint(3, "[PAC] Added commit #{commit.oid}")
+          commits.add(p_commit)
+        end
       end
       commits
     end
