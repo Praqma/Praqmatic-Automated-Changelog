@@ -30,32 +30,6 @@ Compared to other changelog solutions, PAC is very flexible and customizable. Th
 * Easily create reports for several different audiences using data from several sources
 * Collects statistic on commits with and without task references
 
-PAC has a flexible internal design, making it easy to extend with support for additional report formats, task management systems and so on.
-
-See our [roadmap](/roadmap.md) for future plans.
-
-## Demo
-
-Take PAC for a quick spin with our demo scripts (requires Linux Bash, zip and docker).
-
-**Generate changelogs using only SCM commits**
-
-    ./demo_setup_docker.sh
-
-This demo generates some reports based only on SCM commits of a small test repository.
-After running the demo, look for the reports in `demorepo/idReportTestRepository/default.[pdf|html|md|` and `demorepo/idReportTestRepository/ids.md`
-
-**Generates changelogs using data from JIRA**
-
-    ./demo_setup_docker_jira.sh
-
-This demo generates some reports through a custom template which uses data from SCM commits of a small test repository and a spun-up JIRA instance.
-
-**Try a manual demo using the pac-manuscript repository**
-
-The [pac-manuscript](https://github.com/praqma-test/pac-manuscript) repository is a short demonstration of how PAC works with Jira, where each step of gradually introduces more of the PAC configuration and features.
-The readme in the repository explain how to use it, but the pac-maunscript repository is a imaginary example on a source code repository matching some Jira issues where the series of commits are introducing new PAC features.
-
 ## Getting started
 
 You'll need to have some commits that reference tasks in one way or another, otherwise your changelog will look rather dull.
@@ -85,7 +59,6 @@ This simple example do not extract data from task systems.
 
 	:vcs:
 	  :type: git
-      :s
 	  :repo_location: '.'
 
 More about configuration in [Configuration](docs/configuration.md).
@@ -106,55 +79,7 @@ More about templates in [Templates](docs/templates.md).
 
 ## Usage
 
-Basic usage examples for the PAC Ruby script:
-
-Show help
-
-    ./pac.rb -h
-    
-Get commits using tags from "Release-1.0" tag to "HEAD":
-
-    ./pac.rb from Release-1.0 --settings=./default_settings.yml
-
-    ./pac.rb from-latest-tag "Release-1.0" --settings=./default_settings.yml
-
-Get commits using tags from "Release-1.0" to "Release-2.0"
-
-    ./pac.rb from Release-1.0 --to Release-2.0 --settings=./default_settings.yml 
-
-    ./pac.rb from-latest-tag Release-1.0 --to Release-2.0 --settings=./default_settings.yml
-
-Get commits using latest tag of any name: 
-
-	./pac.rb from-latest-tag "*" --settings=./default_settings.yml
-
-The above getting started is only a simple example, so to utilize all the features in PAC you can dive into the following sections.
-
-*Verbosity:*  As most unix tools, pac supports `-v` and `-q` to indicate that it should be more or less verbose in its output. Both switches can be provided multiple times (e.g. `-vv`) for increased effect. One can be used to cancel out the other, which can be useful for instance for reverting behaviour added in a bash alias.
-
-We recommend using the PAC docker image, as described below in [Running PAC](#running-pac). The basic usage examples then becomes like described in [Usage](docs/using_the_pac_docker_image.md#usage) in [Using the PAC Docker image](docs/using_the_pac_docker_image.md).
-
-
-
-
-### Run PAC on Linux (Ubuntu)
-
-Configure your Linux Ruby environment to run PAC and get PAC from sources:
-
-Prerequisites:
-
- * Ruby version 2 (you can see specific version in the [PAC docker image file](Dockerfile))
- * The `bundler` Ruby Gem
- * Native libraries - for Ubuntu they are: `sudo apt-get install cmake libxslt-dev libxml2-dev wkhtmltopdf`    
-
-Then get and use PAC:
-              
-1. Clone the pac repository to your local machine: `git clone https://github.com/Praqma/Praqmatic-Automated-Changelog.git pac`
-2. Optionally check-out the `latest` tag or a specific release tag if you don't want bleeding edge.
-3. Change directory to `pac` (the git clone) and run the command `bundle install` to install all the used Ruby Gems.
-4. Optionally add a symlink to `pac.rb` in your path, for example: `ln -s [your install directory]/pac.rb /usr/bin/pac` 
-
-That's it. Test your installation by executing pac: `pac`. If you get a help screen the installation was successful.
+Basic usage examples for the PAC Ruby script, run PAC with the `--help` parameter for usage explanation.
 
 ### Run PAC on Windows
 
@@ -201,12 +126,9 @@ For details on design and development info see [Developer information](docs/deve
 
 See also [contributing file](/CONTRIBUTING.md).
 
-## CodeScene analysis
-[![](https://codescene.io/projects/1494/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1494/jobs/latest-successful/results)
-
 ### Contributors
 
-* Mads Nielsen (man@praqma.net)
+* Mads Nielsen (mads.nielsen@eficode.com)
 * Bue Petersen (bue@praqma.net)
 * Andrius Ordojan (and@praqma.net)
-* Thierry Lacour (thi@praqma.net)
+* Thierry Lacour (thierry.lacour@eficode.com)
