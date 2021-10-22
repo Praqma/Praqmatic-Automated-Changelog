@@ -86,34 +86,6 @@ Detailed instructions can be found in [Installing PAC on Windows](docs/windows_i
 * Support requests and questions can be created as Github issue or send us an mail on support@praqma.net
 * Our roadmap is availbe in [roadmap](/roadmap.md)
 
-## Changelog
-
-### 3.x versions
-
-**Incompatible with versions 2.x and earlier - see the [migration guide](docs/Migrating_2.X.X_to_3.X.X.md) for more information**
-
-* Removed all `date` related parameters
-* Removed deprecated `--sha` parameter (has been replaced with `from`)
-
-### 2.x versions
-
-**Incompatible with versions 1.x and earlier - see the [migration guide](docs/Migrating_1.X.X_to_2.X.X.md) for more information.**
-
-* Support for report templates
-* Support for JIRA
-
-### 1.x versions
-
-* Support for 'none' report - changelog without task system interaction
-
-### 0.x versions
-
-_Initial release and proof-of-concept_
-
-* Trac support
-* Markdown, HTML, PDF
-
-
 ## Developer information
 
 For details on design and development info see [Developer information](docs/developer_info.md)
