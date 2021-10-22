@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-#pdfkit and kramdown reqires sudo apt-get install wkhtmltopdf on the machines
+
 gem 'rake'
 gem 'rugged'
 gem 'docopt'

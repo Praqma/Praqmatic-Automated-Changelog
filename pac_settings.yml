@@ -2,7 +2,7 @@
   :strict: false
  
 :templates:
-  - { location: ./templates/default_html.html, output: default-generated.html }
+  - { location: templates/default_html.html }
 
 :task_systems:
   -
@@ -16,3 +16,5 @@
 :vcs:
   :type: git
   :repo_location: '.'
+  :filter_paths:
+    - 'lib/'

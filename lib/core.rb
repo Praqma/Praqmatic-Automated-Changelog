@@ -105,26 +105,14 @@ DOCOPT
   def apply_task_system(task_system, tasks)
     val = true
     Logging.verboseprint(1, "[PAC] Applying task system #{task_system[:name]}")
-    if task_system[:name] == 'trac'
-      val = Task::TracTaskSystem.new(task_system).apply(tasks)
-    end
     if task_system[:name] == 'jira'
       val = Task::JiraTaskSystem.new(task_system).apply(tasks)
-    end
-    if task_system[:name] == 'fogbugz'
-      val = Task::FogBugzTaskSystem.new(task_system).apply(tasks)
     end
     val
   end
 
   def vcs
-    if @@settings[:vcs][:type] == 'git'
-      Vcs::GitVcs.new(settings[:vcs])
-    elsif @@settings[:vcs][:type] == 'hg'
-      Vcs::MercurialVcs.new(@@settings[:vcs])
-    else
-      raise ArgumentError, 'The configuration settings does not include any supported (d)vcs'
-    end
+    Vcs::GitVcs.new(settings[:vcs])
   end
 
   #This is now core functionality. The task of generating a collection of tasks based on the commits found
@@ -135,7 +123,6 @@ DOCOPT
     tasks = Model::PACTaskCollection.new
 
     commits.each do |c_pac|
-
       referenced = false
       #Regex ~ Eacb regex in the task system
       settings[:task_systems].each do |ts|
@@ -143,7 +130,6 @@ DOCOPT
         if ts.has_key? :delimiter
           split_pattern = eval(ts[:delimiter])
         end
-
         if ts.has_key? :regex
           tasks_for_commit = c_pac.matchtask(ts[:regex], split_pattern)
           tasks_for_commit.each do |t|

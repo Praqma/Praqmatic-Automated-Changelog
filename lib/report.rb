@@ -15,17 +15,18 @@ module Report
 	  # config 		- The configuration used 
 	  def generate(config)
 	    config[:templates].each do |t|
-	    	unless t['output'].nil?        
-		      File.open(t['output'],'w:UTF-8') do |file|
-		      	file << render_template(File.read(t['location']), to_liquid_properties(config)) 
-		        File.chmod(0777, file)
-		      end
-		    else
-		    	puts "========== #{t['location']} =========="
-		    	puts render_template(File.read(t['location']), to_liquid_properties(config))
-		    	footer = "=" * (t['location'].length + 22)
-		    	puts "#{footer}"
-	    	end
+				if File.file?(t['location'])
+					unless t['output'].nil?
+						File.open(t['output'],'w:UTF-8') do |file|
+							file << render_template(File.read(t['location']), to_liquid_properties(config))
+							File.chmod(0777, file)
+						end
+					else
+						puts render_template(File.read(t['location']), to_liquid_properties(config))
+					end
+				else
+					Logging.verboseprint(0, "[PAC] Template file '#{t['location']}' not found! ")
+				end
 	    end
 	  end
 

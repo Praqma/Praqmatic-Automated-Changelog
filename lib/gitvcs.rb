@@ -18,7 +18,6 @@ module Vcs
       if @walker.nil?
         return Rugged::Walker.new(@repository)
       end
-  
       @walker
     end
   
@@ -58,18 +57,13 @@ module Vcs
       walker = createWalker
 
       commits = Model::PACCommitCollection.new
-      #puts head.inspect
+
       walker.push(head.oid)
       walker.hide(tail.oid)
 
-      Logging.verboseprint(0, "[PAC] Warning! Both :sparse and :filter_paths are defined! Using sparse") if @settings[:filter_paths] and @settings[:sparse]
-
-      git_data = if @settings[:sparse]
-                  `git log --pretty=format:"%h" --sparse`.split("\n")
-                 elsif @settings[:filter_paths]
+      git_data = if @settings[:filter_paths]
+                   Logging.verboseprint(1, '[PAC] Filter paths enabled!')
                    `git log --pretty=format:"%h" -- #{@settings[:filter_paths].join(' ')}`.split("\n")
-                 else
-                   nil
                  end
 
       walker.inject([]) do |c, commit|
