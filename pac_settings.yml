@@ -11,8 +11,8 @@
     :usr:
     :pw: 
     :regex:
-    - { pattern: '/#(\d+)/i', label: github }      
-  
+    - { pattern: '/#(\d+)/i', label: github }
+
 :vcs:
   :type: git
   :filter_paths:
