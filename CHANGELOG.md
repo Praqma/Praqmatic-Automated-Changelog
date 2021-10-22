@@ -3,7 +3,7 @@
 ### 4.0.0
 
 * No longer defaults to output files. Instead writes output to std. out. Pipe to file if you need your output elsewhere
-* Greatly simplified the docker container
+* Greatly simplified the docker image
 * No longer supports Mercurial
 * No longer supports PDF creation. You can still use external tools to turn the output into a pdf
 * Added support for filter-paths in [Issue #130](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues/130)
