@@ -15,6 +15,5 @@
   
 :vcs:
   :type: git
-  :repo_location: '.'
   :filter_paths:
     - 'lib/'

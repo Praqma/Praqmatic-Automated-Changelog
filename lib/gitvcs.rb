@@ -11,7 +11,11 @@ module Vcs
     
     def initialize(settings)
       @settings = settings
-      @repository = Rugged::Repository.new(@settings[:repo_location])    
+      @repository = if @settings[:repo_location]
+                      Rugged::Repository.new(@settings[:repo_location])
+                    else
+                      Rugged::Repository.new('.')
+                    end
     end
     
     def createWalker

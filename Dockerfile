@@ -23,6 +23,10 @@ VOLUME ["/templates"]
 
 FROM ruby:3.0.2-slim as executor
 
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /usr/src/app /usr/src/app
 COPY --from=build /usr/local/bundle/ /usr/local/bundle/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh

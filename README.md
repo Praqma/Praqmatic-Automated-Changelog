@@ -2,12 +2,8 @@
 maintainer: JKrag
 ---
 
-Issue tracking: 
-[![Groomed](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20workable&title=Groomed)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog) 
-[![Up Next](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20up%20Next&title=UpNext)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog) 
-[![Work In Progress](https://badge.waffle.io/Praqma/Praqmatic-Automated-Changelog.png?label=Status%20-%20in%20progress&title=InProgress)](https://waffle.io/Praqma/Praqmatic-Automated-Changelog)
+Issue tracking:
 [![Issues](https://img.shields.io/github/issues/Praqma/Praqmatic-Automated-Changelog.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
-
 
 # Praqmatic Automated Changelog (PAC)
 
@@ -16,15 +12,13 @@ Tool for creating automated, but pragmatic, changelogs.
 PAC collects task references from SCM commit messages and creates changelog reports with additional information extracted from other systems, like your task management system.
 Compared to other changelog solutions, PAC is very flexible and customizable. The design allows you to solve the problems of having an unchangeable SCM commit history with incorrect task references.
 
-![The workflow behind PAC for creating changelogs](/docs/process.png)
-
 ## Features
 
 * Customizable change reports based on **Liquid templates**
-* Collects task references in SCM commits from **Git** or **Mercurial (hg)**
-* Extracts data from tasks systems like **Trac** and **JIRA** for the collected tasks
+* Collects task references in SCM commits from **Git**
+* Extracts data from tasks systems which return json and has support for basic authentication.
 * For task systems returning json data, all data can be used in the templates 
-* Supports **MarkDown**, **HTML** and **PDF** as report formats
+* Supports **MarkDown**, **HTML** as report formats. You can always convert this to PDF through browser or other tools
 * Supports extracting data from multiple referenced tasks systems at once
 * Supports creating changelog without data from external systems, basing it only on SCM commits
 * Easily create reports for several different audiences using data from several sources
