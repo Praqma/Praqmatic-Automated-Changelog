@@ -21,7 +21,7 @@ COPY . /usr/src/app
 VOLUME ["/repo"]
 VOLUME ["/templates"]
 
-FROM ruby:3.0.2-slim as executor
+FROM ruby:3.1.0-slim as executor
 
 RUN apt-get update && \
     apt-get install -y git && \
