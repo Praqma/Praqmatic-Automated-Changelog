@@ -2,7 +2,7 @@
 .settings
 changelog.pdf
 changelog.html
-pac
+go-pac
 coverage
 test/reports
 test/resources/stop_task_system*
