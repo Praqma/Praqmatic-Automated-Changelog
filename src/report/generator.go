@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
@@ -33,15 +34,16 @@ func (g *Generator) Generate(settings *model.Settings) error {
 	// Process each template format
 	for _, template := range settings.Templates {
 		templateFile := template.Location
-		outputFile := template.Output
-
+		var outputFile string
+		
 		// Check if template file is specified
 		if templateFile == "" {
 			return fmt.Errorf("template file not specified")
 		}
-		// Check if output file is specified
-		if outputFile == "" {
-			return fmt.Errorf("output file not specified")
+		if template.Output == "" { 
+			outputFile = strings.Split(templateFile, "/")[len(strings.Split(templateFile, "/"))-1]
+		} else {
+			outputFile = template.Output
 		}
 		// Generate the report
 		if err := g.generateReport(templateFile, outputFile, settings); err != nil {
