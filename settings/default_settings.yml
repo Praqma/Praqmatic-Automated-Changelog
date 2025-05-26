@@ -3,7 +3,7 @@
  
 :templates:
   - { location: templates/default.md, output: temp/go_default.md }
-  - { location: templates/default_html.html, output: temp/go_default_html.html }
+  - { location: templates/default.html, output: temp/go_default.html }
 
 :task_systems:
   - 
