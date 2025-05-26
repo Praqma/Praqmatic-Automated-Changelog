@@ -24,19 +24,19 @@
 	<body>
 		<h1>PAC Changelog</h1>
 		<h3>Referenced tasks</h3>
-		{% for task in tasks.referenced %}
-			<h5>{{task.task_id}}</h5>
+		{{range .tasks.referenced}}
+			<h5>{{.TaskID}}</h5>
 			<ul>
-			{% for commit in task.commits %}
-				<li> {{commit.shortsha}}:{{commit.header}}</li>
-			{% endfor %}				
+			{{range .Commits}}
+				<li> {{.ShortSHA}}:{{.Header}}</li>
+			{{end}}				
 			</ul>
-		{% endfor %}
+		{{end}}
 		<h3>Unreferenced commits</h3>
 		<ul>
-			{% for commit in tasks.unreferenced %}
-			<li>{{commit.shortsha}}:{{commit.header}}</li>
-			{% endfor %}			
+			{{range .tasks.unreferenced}}
+			<li>{{.ShortSHA}}:{{.Header}}</li>
+			{{end}}			
 		</ul>
 	</body>
 </html>

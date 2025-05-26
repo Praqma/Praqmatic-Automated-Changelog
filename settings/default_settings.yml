@@ -2,8 +2,8 @@
   :strict: false
  
 :templates:
-  - { location: templates/default.md }
-  - { location: templates/default_html.html }
+  - { location: templates/default.md, output: temp/go_default.md }
+  - { location: templates/default_html.html, output: temp/go_default_html.html }
 
 :task_systems:
   - 
@@ -17,10 +17,11 @@
   -
     :name: jira
     :query_string: "http://your.server.hostname/rest/api/latest/issue/#{task_id}"
-    :usr: "user"  
-    :pw: "password"
+    :username: ${JIRA_USER} 
+    :password: ${JIRA_PASSWORD}
     :regex:
-    - { pattern: '/(PRJ-\d+)/i', label: jira }        
+    - { pattern: '/(PRJ-\d+)/i', label: jira }
   
 :vcs:
-  :type: git
+  :repo: .
+
