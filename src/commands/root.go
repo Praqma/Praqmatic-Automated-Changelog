@@ -42,7 +42,7 @@ var VersionCmd = &cobra.Command{
 }
 
 var RootCmd = &cobra.Command{
-	Use:   "Praqmatic-Automated-Changelog",
+	Use:   "go-pac",
 	Short: "Praqmatic Automation Changelog (PAC) - Command Line Interface",
 	Long:  `Praqmatic Automation Changelog (PAC) - Command Line Interface`,
 	Run: func(cmd *cobra.Command, args []string) {
