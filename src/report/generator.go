@@ -67,6 +67,9 @@ func (g *Generator) generateReport(templateFile, outputFile string, settings *mo
 
 	// Create template with functions
 	tmpl := template.New(filepath.Base(templateFile))
+	
+	// Add custom functions before parsing
+	tmpl = tmpl.Funcs(GetTemplateFuncs())
 
 	// Parse the template
 	tmpl, err = tmpl.Parse(templateContent)
@@ -111,22 +114,11 @@ func (g *Generator) findAndReadTemplate(templateName string) (string, error) {
 func (g *Generator) createTemplateData(properties map[string]any) map[string]interface{} {
 	data := make(map[string]interface{})
 
+	// Pass the task collection directly
+	data["tasks"] = g.tasks
+	
 	// Basic information
-	data["date"] = time.Now().Format("2006-01-02")
-
-	// Create a structure compatible with the original Ruby template
-	tasksMap := make(map[string]interface{})
-	tasksMap["referenced"] = g.tasks.GetReferencedTasks()
-	tasksMap["unreferenced"] = g.tasks.GetUnreferencedCommits()
-	data["tasks"] = tasksMap
-
-	// Also provide direct access to tasks and commits
-	data["all_tasks"] = g.tasks.Tasks
-	data["referenced_tasks"] = g.tasks.GetReferencedTasks()
-	data["unreferenced_commits"] = g.tasks.GetUnreferencedCommits()
-
-	// Organize tasks by label
-	data["tasks_by_label"] = g.tasks.GetTasksByLabel()
+	data["date"] = time.Now()
 
 	// Add properties from settings
 	if properties != nil {

@@ -24,7 +24,7 @@
 	<body>
 		<h1>PAC Changelog</h1>
 		<h3>Referenced tasks</h3>
-		{{range .tasks.referenced}}
+		{{range referencedTasks .tasks}}
 			<h5>{{.TaskID}}</h5>
 			<ul>
 			{{range .Commits}}
@@ -34,7 +34,7 @@
 		{{end}}
 		<h3>Unreferenced commits</h3>
 		<ul>
-			{{range .tasks.unreferenced}}
+			{{range unreferencedCommits .tasks}}
 			<li>{{.ShortSHA}}:{{.Header}}</li>
 			{{end}}			
 		</ul>
