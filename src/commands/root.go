@@ -32,7 +32,6 @@ func init() {
 	
 	// Add commands to the root command
 	RootCmd.AddCommand(FromCmd)
-	RootCmd.AddCommand(GHTaskCmd)
 }
 
 var VersionCmd = &cobra.Command{
