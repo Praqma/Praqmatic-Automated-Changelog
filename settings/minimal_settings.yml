@@ -10,7 +10,7 @@ task_systems:
   -
     name: none
     regex:
-      - { pattern: '(#\d+)', label: none }
+      - { pattern: '(#\d+)'}
 vcs:
   repo: "."
   token: ""

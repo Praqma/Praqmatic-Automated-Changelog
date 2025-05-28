@@ -14,10 +14,10 @@ task_systems:
     name: github
     query_string: https://github.com/Praqma/Praqmatic-Automated-Changelog
     regex:
-      - { pattern: '/Issue:\s*(\d+)/i', label: github }
-      - { pattern: '/Issue:\s*(none)/i', label: github }
-      - { pattern: '(#\d+)', label: github }
-      - { pattern: 'us:(\d+)', label: github }
+      - { pattern: '/Issue:\s*(\d+)/i'}
+      - { pattern: '/Issue:\s*(none)/i'}
+      - { pattern: '(#\d+)' }
+      - { pattern: 'us:(\d+)'}
   
 vcs:
   repo: https://github.com/Praqma/Praqmatic-Automated-Changelog

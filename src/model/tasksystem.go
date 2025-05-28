@@ -13,7 +13,6 @@ type TaskSystem struct {
 // RegexRule represents a regex pattern and label for task identification
 type RegexRule struct {
 	Pattern string `yaml:"pattern" json:"pattern"`
-	Label   string `yaml:"label" json:"label"`
 }
 
 // NewTaskSystem creates a new TaskSystem with default values
