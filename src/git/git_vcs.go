@@ -105,7 +105,7 @@ func (g *GitVCS) GetCommitsBetween(from, to string) (*model.PACCommitCollection,
 		if commit.Hash == *fromHash {
 			return fmt.Errorf("break")
 		}
-		commits.Add(model.NewPACCommit(commit.Hash.String(), commit.Message, commit.Author.When))
+		commits.Add(model.NewPACCommit(commit.Hash.String(), commit.Message, commit.Author.When, commit.Author.Name))
 		return nil
 	})
 

@@ -20,6 +20,7 @@ var (
 )
 
 func init() {
+	FromCmd.Flags().BoolP("analyze", "a", false, "Analyze the task Json file output and print the results to stdout.")
 	FromCmd.Flags().StringVar(&toSha, "to", "", "Specify where to start searching for commit <newest-ref>. For git this takes anything that rev-parse accepts. Such as HEAD / Git sha or tag name.")
 }
 
@@ -52,7 +53,17 @@ var FromCmd = &cobra.Command{
 			return
 		}
 
-		taskCollection := task.TaskIDList(Settings.TaskSystems, commits)
+		taskCollection, err := task.TaskIDList(Settings.TaskSystems, commits)
+		if err != nil {
+			fmt.Printf("Error processing tasks: %v\n", err)
+			return
+		}
+
+		if cmd.Flags().Changed("analyze") {
+			fmt.Println(string(taskCollection.ToJSON()))
+			return
+		}
+		fmt.Println("Generating report(s)...")
 
 		generator := report.NewGenerator(taskCollection)
 		if err := generator.Generate(&Settings); err != nil {

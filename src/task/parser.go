@@ -1,60 +1,45 @@
 package task
 
 import (
+	"fmt"
+
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
 )
 
 // TaskIDList generates a collection of tasks based on the commits found
-func TaskIDList(taskSystem []model.TaskSystem, commits *model.PACCommitCollection) *model.PACTaskCollection {
+func TaskIDList(taskSystems []model.TaskSystem, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
 	tasks := model.NewPACTaskCollection()
 
-	for _, commit := range commits.Commits {
-		referenced := false
-
-		// Loop over each task system
-		for _, taskSystem := range taskSystem {
-			// Get the delimiter if defined
-			var splitPattern string
-			if taskSystem.Delimiter != "" {
-				// Convert the Ruby-style delimiter to a Go-compatible one
-				// This simplified implementation handles common cases
-				if taskSystem.Delimiter == "/,/" {
-					splitPattern = ","
-				} else if taskSystem.Delimiter == "/\\s+/" {
-					splitPattern = "\\s+"
-				} else {
-					// Strip the leading/trailing slashes for other patterns
-					delimLen := len(taskSystem.Delimiter)
-					if delimLen > 2 {
-						splitPattern = taskSystem.Delimiter[1 : delimLen-1]
-					}
-				}
-			}
-
-			// Convert RegexRules to the format expected by MatchTask
-			var patterns []map[string]string
-			for _, rule := range taskSystem.Regex {
-				patterns = append(patterns, map[string]string{
-					"pattern": rule.Pattern,
-					"label":   rule.Label,
-				})
-			}
-
-			// Match tasks against this commit
-			matchedTasks := commit.MatchTask(patterns, splitPattern)
-			if len(matchedTasks) > 0 {
-				referenced = true
-				tasks.Add(matchedTasks...)
-			}
+	for _, taskSystem := range taskSystems {
+		systemTasks, err := processTaskSystem(taskSystem, commits)
+		if err != nil {
+			return nil, fmt.Errorf("error processing task system %s: %w", taskSystem.Name, err)
 		}
 
-		// If no task was matched, create an unreferenced task
-		if !referenced {
-			task := model.NewPACTask("")
-			task.AddCommit(commit)
+		// Merge results
+		for _, task := range systemTasks.Tasks {
 			tasks.Add(task)
 		}
 	}
+	return tasks, nil
+}
 
-	return tasks
+// processTaskSystem handles processing for a specific task system
+func processTaskSystem(taskSystem model.TaskSystem, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
+	switch taskSystem.Name {
+	case "github":
+		ghTaskSystem, err := NewGHTask(taskSystem.QueryString, taskSystem.Token)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing GitHub task system: %w", err)
+		}
+		return ghTaskSystem.ProcessCommits(taskSystem, commits)
+	case "jira":
+		return nil, fmt.Errorf("jira is not supported yet")
+	case "gitlab":
+		return nil, fmt.Errorf("gitlab is not supported yet")
+	case "bitbucket":
+		return nil, fmt.Errorf("bitbucket is not supported yet")
+	default:
+		return nil, fmt.Errorf("unsupported task system: %s", taskSystem.Name)
+	}
 }

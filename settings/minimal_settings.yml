@@ -10,6 +10,6 @@
   -
     :name: none
     :regex:
-      - { pattern: '/(#\d+)/', label: none }
+      - { pattern: '(#\d+)', label: none }
 :vcs:
   :type: git

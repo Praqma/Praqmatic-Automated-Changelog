@@ -1,27 +1,25 @@
 :general:
   :strict: false
  
+:properties:
+  title: 'PAC Changelog'
+  product: 'Awesome product'
+  
 :templates:
   - { location: templates/default.md, output: temp/go_default.md }
   - { location: templates/default.html, output: temp/go_default.html }
 
 :task_systems:
   - 
-    :name: none
+    :name: github
+    :query_string: https://github.com/Praqma/Praqmatic-Automated-Changelog
+    :token: ""
     :regex:
-      - { pattern: '/Issue:\s*(\d+)/i', label: none }
-      - { pattern: '/Issue:\s*(none)/i', label: none }
-      - { pattern: '/(#\d+)/', label: none }
-      - { pattern: '/us:(\d+)/', label: none }
-    :delimiter: '/,|\s/'
-  -
-    :name: jira
-    :query_string: "http://your.server.hostname/rest/api/latest/issue/#{task_id}"
-    :username: ${JIRA_USER} 
-    :password: ${JIRA_PASSWORD}
-    :regex:
-    - { pattern: '/(PRJ-\d+)/i', label: jira }
+      - { pattern: '/Issue:\s*(\d+)/i', label: github }
+      - { pattern: '/Issue:\s*(none)/i', label: github }
+      - { pattern: '(#\d+)', label: github }
+      - { pattern: 'us:(\d+)', label: github }
   
 :vcs:
-  :repo: .
+  :repo: https://github.com/Praqma/Praqmatic-Automated-Changelog
 

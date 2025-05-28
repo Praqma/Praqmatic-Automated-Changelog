@@ -15,6 +15,7 @@ var (
 	SettingsConfig string
 	Template       string
 	Repo           string
+	ghToken        string
 )
 
 func init() {
@@ -24,12 +25,14 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&Repo, "repo", "", "Path or URL to the git repository")
 	RootCmd.PersistentFlags().StringVar(&SettingsConfig, "settings", "", "Path to the settings configuration file")
 	RootCmd.PersistentFlags().StringVar(&Template, "template", "", "Path to the template file(s) to use for changelog generation")
-	
+	RootCmd.PersistentFlags().StringVar(&ghToken, "gh-token", "", "GitHub token to use for authentication. If not specified in the settings file it will use this token if specified. Lastly the GITHUB_TOKEN environment variable is used.")
+
 	// Add root command flags
 	RootCmd.Flags().BoolP("version", "v", false, "Display the version of the CLI application")
 	
 	// Add commands to the root command
 	RootCmd.AddCommand(FromCmd)
+	RootCmd.AddCommand(GHTaskCmd)
 }
 
 var VersionCmd = &cobra.Command{
@@ -76,6 +79,17 @@ func Execute() {
 		if Repo != "" {
 			Settings.VCS.Repo = Repo
 		}
+
+		
+		for i := range Settings.TaskSystems {
+			if Settings.TaskSystems[i].Name == "github" && Settings.TaskSystems[i].Token == "" {
+				Settings.TaskSystems[i].Token = ghToken
+			}
+			if Settings.TaskSystems[i].Name == "github" && Settings.TaskSystems[i].Token == "" && os.Getenv("GITHUB_TOKEN") != "" {
+				Settings.TaskSystems[i].Token = os.Getenv("GITHUB_TOKEN")
+			}
+		}
+
 	}
 
 	if err := RootCmd.Execute(); err != nil {

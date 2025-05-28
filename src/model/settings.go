@@ -7,7 +7,7 @@ type Settings struct {
 	Templates   []Template     `yaml:":templates" json:"templates"`
 	TaskSystems []TaskSystem   `yaml:":task_systems" json:"task_systems"`
 	VCS         VCS            `yaml:":vcs" json:"vcs"`
-	Properties  map[string]any `yaml:"properties" json:"properties"`
+	Properties  map[string]any `yaml:":properties" json:"properties"`
 	Verbosity   int            `yaml:"verbosity" json:"verbosity"`
 }
 

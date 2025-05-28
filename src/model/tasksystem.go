@@ -3,6 +3,7 @@ package model
 // TaskSystem represents a task tracking system configuration
 type TaskSystem struct {
 	Name        string      `yaml:":name" json:"name"`
+	Token 	 	string      `yaml:":token" json:"token,omitempty"`
 	Regex       []RegexRule `yaml:":regex" json:"regex"`
 	Delimiter   string      `yaml:":delimiter" json:"delimiter,omitempty"`
 	QueryString string      `yaml:":query_string" json:"query_string,omitempty"`
