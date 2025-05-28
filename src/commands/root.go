@@ -79,14 +79,10 @@ func Execute() {
 			Settings.VCS.Repo = Repo
 		}
 
-		
-		for i := range Settings.TaskSystems {
-			if Settings.TaskSystems[i].Name == "github" && Settings.TaskSystems[i].Token == "" {
-				Settings.TaskSystems[i].Token = ghToken
-			}
-			if Settings.TaskSystems[i].Name == "github" && Settings.TaskSystems[i].Token == "" && os.Getenv("GITHUB_TOKEN") != "" {
-				Settings.TaskSystems[i].Token = os.Getenv("GITHUB_TOKEN")
-			}
+		if ghToken != "" {
+			Settings.VCS.Token = ghToken
+		} else if Settings.VCS.Token == "" {
+			Settings.VCS.Token = os.Getenv("GITHUB_TOKEN")
 		}
 
 	}

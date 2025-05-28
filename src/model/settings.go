@@ -3,17 +3,17 @@ package model
 
 // Settings represents the root configuration structure for PAC
 type Settings struct {
-	General     General        `yaml:":general" json:"general"`
-	Templates   []Template     `yaml:":templates" json:"templates"`
-	TaskSystems []TaskSystem   `yaml:":task_systems" json:"task_systems"`
-	VCS         VCS            `yaml:":vcs" json:"vcs"`
-	Properties  map[string]any `yaml:":properties" json:"properties"`
+	General     General        `yaml:"general" json:"general"`
+	Templates   []Template     `yaml:"templates" json:"templates"`
+	TaskSystems []TaskSystem   `yaml:"task_systems" json:"task_systems"`
+	VCS         VCS            `yaml:"vcs" json:"vcs"`
+	Properties  map[string]any `yaml:"properties" json:"properties"`
 	Verbosity   int            `yaml:"verbosity" json:"verbosity"`
 }
 
 // General contains global application settings
 type General struct {
-	Strict bool `yaml:":strict" json:"strict"`
+	Strict bool `yaml:"strict" json:"strict"`
 }
 
 // Template represents an output template configuration
@@ -24,7 +24,8 @@ type Template struct {
 
 // VCS contains version control system configuration
 type VCS struct {
-	Repo string `yaml:":repo" json:"repo_location"`
+	Repo string `yaml:"repo" json:"repo_location"`
+	Token string `yaml:"token" json:"token,omitempty"`
 }
 
 // NewSettings creates a default Settings struct
@@ -37,6 +38,7 @@ func NewSettings() *Settings {
 		TaskSystems: []TaskSystem{},
 		VCS: VCS{
 			Repo: ".",
+			Token: "",
 		},
 		Properties: make(map[string]any),
 		Verbosity:  1,

@@ -53,7 +53,7 @@ var FromCmd = &cobra.Command{
 			return
 		}
 
-		taskCollection, err := task.TaskIDList(Settings.TaskSystems, commits)
+		taskCollection, err := task.TaskIDList(Settings, commits)
 		if err != nil {
 			fmt.Printf("Error processing tasks: %v\n", err)
 			return

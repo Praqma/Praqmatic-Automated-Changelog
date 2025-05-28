@@ -7,8 +7,10 @@
 #### {{.TaskID}} - {{.Title}}
 - State: {{.State}}
 - Labels: {{joinLabels .Labels ", "}}
+
+Commits:
 {{range .Commits}}
-  - {{commitSHA . 7}}: {{commitHeader .}}
+- {{commitSHA . 7}}: {{commitHeader .}}
 {{end}}
 {{end}}
 {{end}}

@@ -7,11 +7,13 @@ import (
 )
 
 // TaskIDList generates a collection of tasks based on the commits found
-func TaskIDList(taskSystems []model.TaskSystem, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
+func TaskIDList(settings model.Settings, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
 	tasks := model.NewPACTaskCollection()
 
+	taskSystems := settings.TaskSystems
+
 	for _, taskSystem := range taskSystems {
-		systemTasks, err := processTaskSystem(taskSystem, commits)
+		systemTasks, err := processTaskSystem(settings, taskSystem, commits)
 		if err != nil {
 			return nil, fmt.Errorf("error processing task system %s: %w", taskSystem.Name, err)
 		}
@@ -25,10 +27,10 @@ func TaskIDList(taskSystems []model.TaskSystem, commits *model.PACCommitCollecti
 }
 
 // processTaskSystem handles processing for a specific task system
-func processTaskSystem(taskSystem model.TaskSystem, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
+func processTaskSystem(settings model.Settings, taskSystem model.TaskSystem, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
 	switch taskSystem.Name {
 	case "github":
-		ghTaskSystem, err := NewGHTask(taskSystem.QueryString, taskSystem.Token)
+		ghTaskSystem, err := NewGHTask(taskSystem.QueryString, settings.VCS.Token)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing GitHub task system: %w", err)
 		}
