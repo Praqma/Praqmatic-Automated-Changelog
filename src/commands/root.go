@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/config"
+	"github.com/Praqma/Praqmatic-Automated-Changelog/src/logging"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
 )
 
@@ -16,6 +17,7 @@ var (
 	Settings       model.Settings
 	SettingsConfig string
 	OutputFormat   string
+	Verbose        bool
 )
 
 func init() {
@@ -29,6 +31,7 @@ func init() {
 	// Add the global flags to the root command
 	RootCmd.PersistentFlags().StringVar(&SettingsConfig, "settings", "", "Path to the settings configuration file")
 	RootCmd.PersistentFlags().StringVarP(&OutputFormat, "output", "o", "", "Output format for configuration (yaml|json)")
+	RootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "V", false, "Enable verbose output for debugging")
 	
 	// VCS flags
 	RootCmd.PersistentFlags().String("repo", "", "Path or URL to the git repository")
@@ -90,6 +93,11 @@ var RootCmd = &cobra.Command{
 func Execute() {
 	// Set up a PersistentPreRun function to run after flags are parsed but before any command
 	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		// Enable verbose logging if flag is set
+		logging.SetVerbose(Verbose)
+		logging.VerboseSection("PAC Starting")
+		logging.Verbose("Command: %s", cmd.Name())
+		
 		// Skip for config command
 		if cmd.Name() == "config" {
 			return
@@ -103,27 +111,36 @@ func Execute() {
 
 		// Load settings from file if specified
 		if SettingsConfig != "" {
+			logging.Verbose("Loading settings from: %s", SettingsConfig)
 			viper.SetConfigFile(SettingsConfig)
 			if err := viper.ReadInConfig(); err != nil {
 				fmt.Printf("Error reading config file: %v\n", err)
 				os.Exit(1)
 			}
+			logging.Verbose("Settings file loaded successfully")
 		}
 
 		// Merge settings from viper
+		logging.Verbose("Merging settings from configuration")
 		if err := config.MergeViperSettings(&Settings); err != nil {
 			fmt.Printf("Error merging settings: %v\n", err)
 			os.Exit(1)
 		}
 
 		// Apply command line flags using settings builder
+		logging.Verbose("Applying command line flags to settings")
 		builder := NewSettingsBuilder(cmd)
 		builder.ApplyFlagsToSettings(&Settings)
 		
 		// Handle environment variable for GitHub token if not set
 		if Settings.VCS.Token == "" {
-			Settings.VCS.Token = os.Getenv("GITHUB_TOKEN")
+			if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+				logging.Verbose("Using GitHub token from environment variable")
+				Settings.VCS.Token = token
+			}
 		}
+		
+		logging.Verbose("Settings initialized successfully")
 	}
 
 	if err := RootCmd.Execute(); err != nil {

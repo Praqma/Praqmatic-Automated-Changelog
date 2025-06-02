@@ -72,16 +72,3 @@ func GenerateSettings(settingsPath string) (*model.Settings, error) {
 // 			settings.Properties[k] = v
 // 		}
 // 	}
-
-// 	// Set verbosity level
-// 	verbosity := 1
-// 	if vFlags, ok := cmdArgs["-v"].(int); ok {
-// 		verbosity += vFlags
-// 	}
-// 	if qFlags, ok := cmdArgs["-q"].(int); ok {
-// 		verbosity -= qFlags
-// 	}
-// 	settings.Verbosity = verbosity
-
-// 	return settings, nil
-// }

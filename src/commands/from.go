@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/git"
+	"github.com/Praqma/Praqmatic-Automated-Changelog/src/logging"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/report"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/task"
 )
@@ -32,43 +33,63 @@ var FromCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fromSha = args[0]
 
+		logging.VerboseSection("Changelog Generation")
+		logging.Verbose("Repository: %s", Settings.VCS.Repo)
+		logging.Verbose("From SHA: %s", fromSha)
+
 		fmt.Println("repo:", Settings.VCS.Repo)
 		fmt.Printf("Generating changelog from %s", fromSha)
 		if toSha != "" {
 			fmt.Printf(" to %s", toSha)
+			logging.Verbose("To SHA: %s", toSha)
 		} else {
 			toSha = "HEAD"
+			logging.Verbose("To SHA: HEAD (default)")
 		}
 		fmt.Println()
 
+		logging.VerboseSection("Git VCS Initialization")
 		gitVCS, err := git.NewGitVCS(Settings.VCS)
 		if err != nil {
 			fmt.Printf("Error initializing Git VCS: %v\n", err)
 			return
 		}
+		logging.Verbose("Git VCS initialized successfully")
 
+		logging.VerboseSection("Fetching Commits")
+		logging.Verbose("Getting commits between %s and %s", fromSha, toSha)
 		commits, err := gitVCS.GetCommitsBetween(fromSha, toSha)
 		if err != nil {
 			fmt.Printf("Error getting commits: %v\n", err)
 			return
 		}
+		logging.Verbose("Found %d commits", commits.Count())
 
+		logging.VerboseSection("Processing Tasks")
 		taskCollection, err := task.TaskIDList(Settings, commits)
 		if err != nil {
 			fmt.Printf("Error processing tasks: %v\n", err)
 			return
 		}
+		logging.Verbose("Processed %d tasks", len(taskCollection.Tasks))
+		logging.Verbose("Found %d unreferenced commits", len(taskCollection.GetUnreferencedCommits()))
 
 		if cmd.Flags().Changed("analyze") {
+			logging.Verbose("Analyze mode - outputting JSON")
 			fmt.Println(string(taskCollection.ToJSON()))
 			return
 		}
+
 		fmt.Println("Generating report(s)...")
+		logging.VerboseSection("Report Generation")
+		logging.Verbose("Number of templates configured: %d", len(Settings.Templates))
 
 		generator := report.NewGenerator(taskCollection)
 		if err := generator.Generate(&Settings); err != nil {
 			fmt.Printf("Error generating report: %v\n", err)
 			return
 		}
+
+		logging.Verbose("Report generation completed successfully")
 	},
 }

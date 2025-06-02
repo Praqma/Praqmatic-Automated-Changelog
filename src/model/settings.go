@@ -8,7 +8,6 @@ type Settings struct {
 	TaskSystems []TaskSystem   `yaml:"task_systems" json:"task_systems"`
 	VCS         VCS            `yaml:"vcs" json:"vcs"`
 	Properties  map[string]any `yaml:"properties" json:"properties"`
-	Verbosity   int            `yaml:"verbosity" json:"verbosity"`
 }
 
 // General contains global application settings
@@ -41,6 +40,5 @@ func NewSettings() *Settings {
 			Token: "",
 		},
 		Properties: make(map[string]any),
-		Verbosity:  1,
 	}
 }
