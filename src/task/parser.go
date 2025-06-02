@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
 )
@@ -41,7 +42,28 @@ func processTaskSystem(settings model.Settings, taskSystem model.TaskSystem, com
 		return nil, fmt.Errorf("gitlab is not supported yet")
 	case "bitbucket":
 		return nil, fmt.Errorf("bitbucket is not supported yet")
+	case "none":
+		noneTaskSystem := NewNoneTaskSystem()
+		return noneTaskSystem.ProcessCommits(commits, taskSystem)
+
 	default:
 		return nil, fmt.Errorf("unsupported task system: %s", taskSystem.Name)
 	}
+}
+
+
+// extractTaskID extracts task ID from commit using regex patterns
+func extractTaskID(commit *model.PACCommit, regexRules []model.RegexRule) string {
+	if len(regexRules) == 0 {
+		return ""
+	}
+
+	for _, rule := range regexRules {
+		pattern := regexp.MustCompile(rule.Pattern)
+		if pattern.MatchString(commit.Message) {
+			return pattern.FindString(commit.Header())
+		}
+	}
+
+	return ""
 }

@@ -177,7 +177,7 @@ func (t *GHTask) ProcessCommits(taskSystem model.TaskSystem, commits *model.PACC
 	fmt.Println("Processing commits for GitHub task system:", taskSystem.Name)
 
 	for _, commit := range commits.Commits {
-		matchID := t.extractTaskID(commit, taskSystem.Regex)
+		matchID := extractTaskID(commit, taskSystem.Regex)
 		if matchID == "" {
 			// Create a task with empty ID for unmatched commits
 			task := model.NewPACTask("")
@@ -197,21 +197,6 @@ func (t *GHTask) ProcessCommits(taskSystem model.TaskSystem, commits *model.PACC
 	return tasks, nil
 }
 
-// extractTaskID extracts task ID from commit using regex patterns
-func (t *GHTask) extractTaskID(commit *model.PACCommit, regexRules []model.RegexRule) string {
-	if len(regexRules) == 0 {
-		return ""
-	}
-
-	for _, rule := range regexRules {
-		pattern := regexp.MustCompile(rule.Pattern)
-		if pattern.MatchString(commit.Message) {
-			return pattern.FindString(commit.Header())
-		}
-	}
-
-	return ""
-}
 
 // createTaskFromCommit creates a PACTask from a commit and GitHub issue
 func (t *GHTask) createTaskFromCommit(commit *model.PACCommit, matchID string) (*model.PACTask, error) {

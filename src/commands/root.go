@@ -3,8 +3,10 @@ package commands
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/config"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
@@ -13,25 +15,49 @@ import (
 var (
 	Settings       model.Settings
 	SettingsConfig string
-	Template       string
-	Repo           string
-	ghToken        string
+	OutputFormat   string
 )
 
 func init() {
 	Settings = *model.NewSettings()
 	
+	// Initialize viper
+	viper.SetEnvPrefix("PAC")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
+	
 	// Add the global flags to the root command
-	RootCmd.PersistentFlags().StringVar(&Repo, "repo", "", "Path or URL to the git repository")
 	RootCmd.PersistentFlags().StringVar(&SettingsConfig, "settings", "", "Path to the settings configuration file")
-	RootCmd.PersistentFlags().StringVar(&Template, "template", "", "Path to the template file(s) to use for changelog generation")
-	RootCmd.PersistentFlags().StringVar(&ghToken, "gh-token", "", "GitHub token to use for authentication. If not specified in the settings file it will use this token if specified. Lastly the GITHUB_TOKEN environment variable is used.")
+	RootCmd.PersistentFlags().StringVarP(&OutputFormat, "output", "o", "", "Output format for configuration (yaml|json)")
+	
+	// VCS flags
+	RootCmd.PersistentFlags().String("repo", "", "Path or URL to the git repository")
+	RootCmd.PersistentFlags().String("gh-token", "", "GitHub token to use for authentication")
+	
+	// General flags
+	RootCmd.PersistentFlags().Bool("strict", false, "Enable strict mode")
+	
+	// Template flags
+	RootCmd.PersistentFlags().StringSlice("template", []string{}, "Template location (can be used multiple times)")
+	RootCmd.PersistentFlags().StringSlice("template-output", []string{}, "Template output file (must match number of templates)")
+	
+	// Properties flags - multiple ways to specify
+	RootCmd.PersistentFlags().StringToString("property", map[string]string{}, "Properties to pass to templates (key=value)")
+	RootCmd.PersistentFlags().StringToString("set", map[string]string{}, "Set property values (alias for --property)")
+	
+	// Bind flags to viper
+	viper.BindPFlag("vcs.repo", RootCmd.PersistentFlags().Lookup("repo"))
+	viper.BindPFlag("vcs.token", RootCmd.PersistentFlags().Lookup("gh-token"))
+	viper.BindPFlag("general.strict", RootCmd.PersistentFlags().Lookup("strict"))
+	viper.BindPFlag("templates", RootCmd.PersistentFlags().Lookup("template"))
 
 	// Add root command flags
 	RootCmd.Flags().BoolP("version", "v", false, "Display the version of the CLI application")
 	
 	// Add commands to the root command
 	RootCmd.AddCommand(FromCmd)
+	RootCmd.AddCommand(ConfigCmd)
+	RootCmd.AddCommand(VersionCmd)
 }
 
 var VersionCmd = &cobra.Command{
@@ -48,6 +74,11 @@ var RootCmd = &cobra.Command{
 	Short: "Praqmatic Automation Changelog (PAC) - Command Line Interface",
 	Long:  `Praqmatic Automation Changelog (PAC) - Command Line Interface`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// If output format is specified, generate config
+		if OutputFormat != "" {
+			ConfigCmd.Run(cmd, args)
+			return
+		}
 		fmt.Println("Please use the help command to see available options.")
 	},
 
@@ -57,39 +88,46 @@ var RootCmd = &cobra.Command{
 }
 
 func Execute() {
-
 	// Set up a PersistentPreRun function to run after flags are parsed but before any command
 	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		// Skip for config command
+		if cmd.Name() == "config" {
+			return
+		}
+		
 		versionFlag, _ := cmd.Flags().GetBool("version")
 		if versionFlag {
 			VersionCmd.Run(cmd, args)
 			os.Exit(0)
 		}
 
+		// Load settings from file if specified
 		if SettingsConfig != "" {
-			s, err := config.GenerateSettings(SettingsConfig)
-			if err != nil {
-				fmt.Println(err)
+			viper.SetConfigFile(SettingsConfig)
+			if err := viper.ReadInConfig(); err != nil {
+				fmt.Printf("Error reading config file: %v\n", err)
 				os.Exit(1)
 			}
-			Settings = *s
 		}
 
-		if Repo != "" {
-			Settings.VCS.Repo = Repo
+		// Merge settings from viper
+		if err := config.MergeViperSettings(&Settings); err != nil {
+			fmt.Printf("Error merging settings: %v\n", err)
+			os.Exit(1)
 		}
 
-		if ghToken != "" {
-			Settings.VCS.Token = ghToken
-		} else if Settings.VCS.Token == "" {
+		// Apply command line flags using settings builder
+		builder := NewSettingsBuilder(cmd)
+		builder.ApplyFlagsToSettings(&Settings)
+		
+		// Handle environment variable for GitHub token if not set
+		if Settings.VCS.Token == "" {
 			Settings.VCS.Token = os.Getenv("GITHUB_TOKEN")
 		}
-
 	}
 
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 }

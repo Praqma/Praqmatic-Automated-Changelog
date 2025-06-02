@@ -24,7 +24,7 @@ type Template struct {
 
 // VCS contains version control system configuration
 type VCS struct {
-	Repo string `yaml:"repo" json:"repo_location"`
+	Repo  string `yaml:"repo" json:"repo"`
 	Token string `yaml:"token" json:"token,omitempty"`
 }
 
@@ -32,12 +32,12 @@ type VCS struct {
 func NewSettings() *Settings {
 	return &Settings{
 		General: General{
-			Strict: true,
+			Strict: false,
 		},
 		Templates:   []Template{},
 		TaskSystems: []TaskSystem{},
 		VCS: VCS{
-			Repo: ".",
+			Repo:  ".",
 			Token: "",
 		},
 		Properties: make(map[string]any),

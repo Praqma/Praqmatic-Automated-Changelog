@@ -20,5 +20,5 @@ task_systems:
       - { pattern: 'us:(\d+)'}
   
 vcs:
-  repo: https://github.com/Praqma/Praqmatic-Automated-Changelog
+  repo: .
   token: ""
