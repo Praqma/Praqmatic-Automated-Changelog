@@ -44,8 +44,12 @@ func (sb *SettingsBuilder) BuildFromFlags() *model.Settings {
 	// Properties
 	settings.Properties = sb.buildProperties()
 	
-	// Add default task system if none specified
-	if len(settings.TaskSystems) == 0 {
+	// Task systems
+	taskSystems := sb.buildTaskSystems()
+	if len(taskSystems) > 0 {
+		settings.TaskSystems = taskSystems
+	} else {
+		// Add default task system if none specified
 		settings.TaskSystems = []model.TaskSystem{
 			{
 				Name: "none",
@@ -87,6 +91,12 @@ func (sb *SettingsBuilder) ApplyFlagsToSettings(settings *model.Settings) {
 	
 	for k, v := range sb.buildProperties() {
 		settings.Properties[k] = v
+	}
+	
+	// Task systems (replace if specified)
+	taskSystems := sb.buildTaskSystems()
+	if len(taskSystems) > 0 {
+		settings.TaskSystems = taskSystems
 	}
 }
 
@@ -140,6 +150,100 @@ func (sb *SettingsBuilder) buildProperties() map[string]any {
 	}
 	
 	return props
+}
+
+// buildTaskSystems builds task system configurations from flags
+func (sb *SettingsBuilder) buildTaskSystems() []model.TaskSystem {
+	var taskSystems []model.TaskSystem
+	taskSystemMap := make(map[string]*model.TaskSystem)
+	
+	// 1. Task systems from JSON string
+	if sb.hasFlag("task-system-json") {
+		jsonStr := sb.getString("task-system-json")
+		var jsonTaskSystems []model.TaskSystem
+		if err := json.Unmarshal([]byte(jsonStr), &jsonTaskSystems); err == nil {
+			for _, ts := range jsonTaskSystems {
+				taskSystemMap[ts.Name] = &ts
+			}
+		}
+	}
+	
+	// 2. Task systems from simple flags
+	if sb.hasFlag("task-system") {
+		systems := sb.getStringSlice("task-system")
+		
+		for _, system := range systems {
+			if _, exists := taskSystemMap[system]; !exists {
+				ts := model.TaskSystem{
+					Name:  system,
+					Regex: []model.RegexRule{},
+				}
+				
+				// Use predefined patterns for known systems
+				switch strings.ToLower(system) {
+				case "jira":
+					ts.Regex = []model.RegexRule{
+						{Pattern: `([A-Z]+-\d+)`},
+					}
+				case "github":
+					ts.Regex = []model.RegexRule{
+						{Pattern: `(#\d+)`},
+					}
+				case "none":
+					ts.Regex = []model.RegexRule{
+						{Pattern: `(#\d+)`},
+					}
+				}
+				
+				taskSystemMap[system] = &ts
+			}
+		}
+	}
+	
+	// 3. Add regex patterns from --task-regex flag
+	if sb.hasFlag("task-regex") {
+		regexMap := sb.getStringMap("task-regex")
+		
+		for systemName, pattern := range regexMap {
+			// Create task system if it doesn't exist
+			if _, exists := taskSystemMap[systemName]; !exists {
+				taskSystemMap[systemName] = &model.TaskSystem{
+					Name:  systemName,
+					Regex: []model.RegexRule{},
+				}
+			}
+			
+			// Add the regex pattern
+			taskSystemMap[systemName].Regex = append(taskSystemMap[systemName].Regex, model.RegexRule{
+				Pattern: pattern,
+			})
+		}
+	}
+	
+	// 4. Add query strings from --task-query flag
+	if sb.hasFlag("task-query") {
+		queryMap := sb.getStringMap("task-query")
+		
+		for systemName, query := range queryMap {
+			// Create task system if it doesn't exist
+			if _, exists := taskSystemMap[systemName]; !exists {
+				taskSystemMap[systemName] = &model.TaskSystem{
+					Name:  systemName,
+					Regex: []model.RegexRule{},
+				}
+			}
+			
+			// Set the query string
+			taskSystemMap[systemName].QueryString = query
+		}
+	}
+	
+	// Convert map to slice
+	for _, ts := range taskSystemMap {
+		taskSystems = append(taskSystems, *ts)
+	}
+	
+	return taskSystems
 }
 
 // Helper methods

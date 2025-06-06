@@ -5,7 +5,7 @@ type TaskSystem struct {
 	Name        string      `yaml:"name" json:"name"`
 	Regex       []RegexRule `yaml:"regex" json:"regex"`
 	Delimiter   string      `yaml:"delimiter" json:"delimiter,omitempty"`
-	QueryString string      `yaml:"query_string" json:"query_string,omitempty"`
+	QueryString string      `yaml:"query_string" json:"query_string,omitempty" mapstructure:"query_string"`
 	Username    string      `yaml:"usr" json:"usr,omitempty"`
 	Password    string      `yaml:"pw" json:"pw,omitempty"`
 }

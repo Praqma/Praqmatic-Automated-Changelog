@@ -5,7 +5,7 @@ package model
 type Settings struct {
 	General     General        `yaml:"general" json:"general"`
 	Templates   []Template     `yaml:"templates" json:"templates"`
-	TaskSystems []TaskSystem   `yaml:"task_systems" json:"task_systems"`
+	TaskSystems []TaskSystem   `yaml:"task_systems" json:"task_systems" mapstructure:"task_systems"`
 	VCS         VCS            `yaml:"vcs" json:"vcs"`
 	Properties  map[string]any `yaml:"properties" json:"properties"`
 }

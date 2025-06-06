@@ -37,10 +37,7 @@ var FromCmd = &cobra.Command{
 		logging.Verbose("Repository: %s", Settings.VCS.Repo)
 		logging.Verbose("From SHA: %s", fromSha)
 
-		fmt.Println("repo:", Settings.VCS.Repo)
-		fmt.Printf("Generating changelog from %s", fromSha)
 		if toSha != "" {
-			fmt.Printf(" to %s", toSha)
 			logging.Verbose("To SHA: %s", toSha)
 		} else {
 			toSha = "HEAD"

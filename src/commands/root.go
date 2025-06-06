@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/Praqma/Praqmatic-Automated-Changelog/src/config"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/logging"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
 )
@@ -47,6 +46,12 @@ func init() {
 	// Properties flags - multiple ways to specify
 	RootCmd.PersistentFlags().StringToString("property", map[string]string{}, "Properties to pass to templates (key=value)")
 	RootCmd.PersistentFlags().StringToString("set", map[string]string{}, "Set property values (alias for --property)")
+	
+	// Task system flags
+	RootCmd.PersistentFlags().StringSlice("task-system", []string{}, "Task system name (e.g., jira, github, none)")
+	RootCmd.PersistentFlags().StringToString("task-regex", map[string]string{}, "Task regex patterns (name=pattern, can be used multiple times per system)")
+	RootCmd.PersistentFlags().StringToString("task-query", map[string]string{}, "Task query strings (name=query)")
+	RootCmd.PersistentFlags().String("task-system-json", "", "Task systems configuration as JSON")
 	
 	// Bind flags to viper
 	viper.BindPFlag("vcs.repo", RootCmd.PersistentFlags().Lookup("repo"))
@@ -122,7 +127,7 @@ func Execute() {
 
 		// Merge settings from viper
 		logging.Verbose("Merging settings from configuration")
-		if err := config.MergeViperSettings(&Settings); err != nil {
+		if err := viper.Unmarshal(&Settings); err != nil {
 			fmt.Printf("Error merging settings: %v\n", err)
 			os.Exit(1)
 		}

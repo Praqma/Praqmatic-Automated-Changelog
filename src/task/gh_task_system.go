@@ -86,41 +86,6 @@ func parseGitHubURL(repoURL string) (owner, repo, branch string) {
 	return
 }
 
-// GetIssues retrieves issues from the GitHub repository
-func (t *GHTask) GetIssues() ([]*github.Issue, error) {
-	opts := &github.IssueListByRepoOptions{
-		State: "all", // Can be "open", "closed", or "all"
-		ListOptions: github.ListOptions{
-			PerPage: 100, // Get maximum 100 issues per page (GitHub API limit)
-		},
-	}
-	ctx := context.Background()
-	
-	// Store all issues
-	var allIssues []*github.Issue
-	
-	// Get issues page by page
-	for {
-		issues, resp, err := t.Github.Issues.ListByRepo(ctx, t.Owner, t.Repo, opts)
-		if err != nil {
-			return nil, fmt.Errorf("error fetching issues: %w", err)
-		}
-		
-		// Add issues from current page to our collection
-		allIssues = append(allIssues, issues...)
-		
-		// If there are no more pages, break
-		if resp.NextPage == 0 {
-			break
-		}
-		
-		// Otherwise, update page number for next iteration
-		opts.ListOptions.Page = resp.NextPage
-	}
-	
-	return allIssues, nil
-}
-
 func (t *GHTask) GetIssueByNumber(number int) (*github.Issue, error) {
 	ctx := context.Background()
 	issue, resp, err := t.Github.Issues.Get(ctx, t.Owner, t.Repo, number)
@@ -304,4 +269,9 @@ func (t *GHTask) EnrichTaskWithPRData(task *model.PACTask) error {
 	}
 	
 	return nil
+}
+
+// GetName returns the name of this task system
+func (t *GHTask) GetName() string {
+	return "github"
 }

@@ -2,9 +2,8 @@ general:
   strict: true
 
 templates:
-  - { location: /usr/src/app/templates/default_id_report.md, output: ids.md }
-  - { location: /usr/src/app/templates/default.md, output: default.md }
-  - { location: /usr/src/app/templates/default_html.html, pdf: true, output: default.html }
+  - { location: templates/default.md, output: default.md }
+  - { location: templates/default.html, pdf: true, output: default.html }
 
 task_systems:
   -
