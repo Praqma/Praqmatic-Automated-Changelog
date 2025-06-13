@@ -45,24 +45,7 @@ func GetTemplateFuncs() template.FuncMap {
 			}
 			return filtered
 		},
-		"filterByState": func(tasks []*model.PACTask, state string) []*model.PACTask {
-			var filtered []*model.PACTask
-			for _, task := range tasks {
-				if task.State == state {
-					filtered = append(filtered, task)
-				}
-			}
-			return filtered
-		},
-		"filterByType": func(tasks []*model.PACTask, taskType string) []*model.PACTask {
-			var filtered []*model.PACTask
-			for _, task := range tasks {
-				if task.TaskType == taskType {
-					filtered = append(filtered, task)
-				}
-			}
-			return filtered
-		},
+
 		"filterByAuthor": func(tasks []*model.PACTask, author string) []*model.PACTask {
 			var filtered []*model.PACTask
 			for _, task := range tasks {
@@ -85,25 +68,7 @@ func GetTemplateFuncs() template.FuncMap {
 			}
 			return grouped
 		},
-		"groupByMilestone": func(tasks []*model.PACTask) map[string][]*model.PACTask {
-			grouped := make(map[string][]*model.PACTask)
-			for _, task := range tasks {
-				milestone := task.Milestone
-				if milestone == "" {
-					milestone = "No Milestone"
-				}
-				grouped[milestone] = append(grouped[milestone], task)
-			}
-			return grouped
-		},
-		"groupByState": func(tasks []*model.PACTask) map[string][]*model.PACTask {
-			grouped := make(map[string][]*model.PACTask)
-			for _, task := range tasks {
-				grouped[task.State] = append(grouped[task.State], task)
-			}
-			return grouped
-		},
-		
+
 		// Counting functions
 		"countTasks": func(tasks []*model.PACTask) int {
 			return len(tasks)
@@ -176,7 +141,7 @@ func GetTemplateFuncs() template.FuncMap {
 			if task.URL != "" {
 				return task.URL
 			}
-			return fmt.Sprintf("#%d", task.Number)
+			return fmt.Sprintf("#%s", task.ID)
 		},
 		
 		// Commit helpers
@@ -193,26 +158,13 @@ func GetTemplateFuncs() template.FuncMap {
 		// Statistics functions
 		"taskStats": func(tasks []*model.PACTask) map[string]interface{} {
 			stats := make(map[string]interface{})
-			openCount := 0
-			closedCount := 0
+
 			issueCount := 0
-			prCount := 0
 			
 			labelCounts := make(map[string]int)
 			authorCounts := make(map[string]int)
 			
 			for _, task := range tasks {
-				if task.IsOpen() {
-					openCount++
-				} else if task.IsClosed() {
-					closedCount++
-				}
-				
-				if task.TaskType == "issue" {
-					issueCount++
-				} else if task.TaskType == "pull_request" {
-					prCount++
-				}
 				
 				// Count labels
 				for _, label := range task.Labels {
@@ -226,34 +178,13 @@ func GetTemplateFuncs() template.FuncMap {
 			}
 			
 			stats["total"] = len(tasks)
-			stats["open"] = openCount
-			stats["closed"] = closedCount
 			stats["issues"] = issueCount
-			stats["pull_requests"] = prCount
 			stats["labels"] = labelCounts
 			stats["authors"] = authorCounts
 			
 			return stats
 		},
 		
-		// Sorting helpers (returns sorted copy, doesn't modify original)
-		"sortTasksByDate": func(tasks []*model.PACTask) []*model.PACTask {
-			// Create a copy to avoid modifying the original
-			sorted := make([]*model.PACTask, len(tasks))
-			copy(sorted, tasks)
-			
-			// Sort by created date (newest first)
-			for i := 0; i < len(sorted)-1; i++ {
-				for j := i + 1; j < len(sorted); j++ {
-					if sorted[i].CreatedAt != nil && sorted[j].CreatedAt != nil {
-						if sorted[i].CreatedAt.Before(*sorted[j].CreatedAt) {
-							sorted[i], sorted[j] = sorted[j], sorted[i]
-						}
-					}
-				}
-			}
-			return sorted
-		},
 		
 		// Task collection functions
 		"referencedTasks": func(tc *model.PACTaskCollection) []*model.PACTask {

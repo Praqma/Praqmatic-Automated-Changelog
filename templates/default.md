@@ -3,8 +3,7 @@
 {{range $author, $tasks := groupByAuthor (referencedTasks .tasks)}}
 ### {{$author}}
 {{range $tasks}}
-#### {{.TaskID}} - {{.Title}}
-- State: {{.State}}
+#### {{.TaskID}} - {{.Data.github.title}}
 - Labels: {{joinLabels .Labels ", "}}
 Commits:
 {{range .Commits}}
@@ -12,7 +11,7 @@ Commits:
 {{end}}{{end}}{{end}}
 ## All Referenced Tasks
 {{range referencedTasks .tasks}}
-### {{.TaskID}} - {{.Title}}
+### {{.TaskID}} - {{.Data.github.title}}
 {{range .Commits}}
 - {{.ShortSHA}}: {{.Header}}
 {{end}}{{end}}
@@ -26,6 +25,4 @@ Commits:
 - Open: {{$stats.open}} | Closed: {{$stats.closed}}
 - Issues: {{$stats.issues}} | Pull Requests: {{$stats.pull_requests}}
 ## Closed Tasks
-{{range filterByState (referencedTasks .tasks) "closed"}}
-- [{{.TaskID}}]({{issueURL .}}) - {{.Title}}
-{{end}}
+

@@ -2,35 +2,27 @@ package model
 
 import (
 	"slices"
-	"time"
 )
 
 // PACTask represents a task from a task management system
 type PACTask struct {
-	TaskID      string
+	ID      	string
 	Title       string
-	Body        string
-	State       string
-	TaskType    string
 	Commits     []*PACCommit
 	Labels      []string
 	Assignees   []string
 	Author      string
 	URL         string
-	Number      int
-	Milestone   string
-	CreatedAt   *time.Time
-	UpdatedAt   *time.Time
-	ClosedAt    *time.Time
-
+	Data 	 	map[string]interface{}
 }
 
-func NewPACTask(TaskID string) *PACTask {
+func NewPACTask(ID string) *PACTask {
 	return &PACTask{
-		TaskID:     TaskID,
+		ID:     ID,
 		Commits:    make([]*PACCommit, 0),
 		Labels:     make([]string, 0),
 		Assignees:  make([]string, 0),
+		Data:       make(map[string]interface{}),
 	}
 }
 
@@ -73,17 +65,7 @@ func (t *PACTask) ClearLabels() {
 	t.Labels = make([]string, 0)
 }
 
-// IsOpen returns true if the task is in an open state
-func (t *PACTask) IsOpen() bool {
-	return t.State == "open"
-}
-
-// IsClosed returns true if the task is in a closed state
-func (t *PACTask) IsClosed() bool {
-	return t.State == "closed"
-}
-
 // Equal checks if two tasks are the same based on their ID
 func (t *PACTask) Equal(other *PACTask) bool {
-	return t.TaskID == other.TaskID
+	return t.ID == other.ID
 }

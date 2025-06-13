@@ -49,7 +49,7 @@ func (tc *PACTaskCollection) Add(tasks ...*PACTask) {
 // GetTaskByID returns a task by its ID
 func (tc *PACTaskCollection) GetTaskByID(id string) *PACTask {
 	for _, task := range tc.Tasks {
-		if task.TaskID == id {
+		if task.ID == id {
 			return task
 		}
 	}
@@ -60,7 +60,7 @@ func (tc *PACTaskCollection) GetTaskByID(id string) *PACTask {
 func (tc *PACTaskCollection) GetReferencedTasks() []*PACTask {
 	var result []*PACTask
 	for _, task := range tc.Tasks {
-		if task.TaskID != "" {
+		if task.ID != "" {
 			result = append(result, task)
 		}
 	}
@@ -71,7 +71,7 @@ func (tc *PACTaskCollection) GetReferencedTasks() []*PACTask {
 func (tc *PACTaskCollection) GetUnreferencedCommits() []*PACCommit {
 	var result []*PACCommit
 	for _, task := range tc.Tasks {
-		if task.TaskID == "" {
+		if task.ID == "" {
 			result = append(result, task.Commits...)
 		}
 	}

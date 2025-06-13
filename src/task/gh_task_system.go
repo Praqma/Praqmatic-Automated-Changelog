@@ -2,11 +2,14 @@ package task
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/Praqma/Praqmatic-Automated-Changelog/src/logging"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/src/model"
 	"github.com/google/go-github/v72/github"
 )
@@ -16,12 +19,6 @@ type GHTask struct {
 	Owner  string
 	Repo   string
 	Branch string
-	PR     int
-	Title  string
-	Body   string
-	Labels []string
-	Assignees []string
-	Reviewers []string
 }
 
 // NewGHTask creates an instance that connects to a remote GitHub repository based on a URL only. it fills in the
@@ -87,7 +84,10 @@ func parseGitHubURL(repoURL string) (owner, repo, branch string) {
 }
 
 func (t *GHTask) GetIssueByNumber(number int) (*github.Issue, error) {
-	ctx := context.Background()
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	
 	issue, resp, err := t.Github.Issues.Get(ctx, t.Owner, t.Repo, number)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching issue #%d: %w", number, err)
@@ -139,7 +139,7 @@ func (t *GHTask) GetPullRequests(ctx context.Context, state string) ([]*github.P
 func (t *GHTask) ProcessCommits(taskSystem model.TaskSystem, commits *model.PACCommitCollection) (*model.PACTaskCollection, error) {
 	tasks := model.NewPACTaskCollection()
 
-	fmt.Println("Processing commits for GitHub task system:", taskSystem.Name)
+	logging.Verbose("Processing commits for GitHub task system")
 
 	for _, commit := range commits.Commits {
 		matchID := extractTaskID(commit, taskSystem.Regex)
@@ -150,6 +150,7 @@ func (t *GHTask) ProcessCommits(taskSystem model.TaskSystem, commits *model.PACC
 			tasks.Add(task)
 			continue
 		}
+		logging.Verbose("Found task ID %s in commit %s", matchID, commit.SHA)
 
 		task, err := t.createTaskFromCommit(commit, matchID)
 		if err != nil {
@@ -179,24 +180,10 @@ func (t *GHTask) createTaskFromCommit(commit *model.PACCommit, matchID string) (
 	task.AddCommit(commit)
 	
 	// Populate all the new fields
-	task.Number = issueNumber
+	task.ID = strconv.Itoa(issueNumber)
 	task.Title = issue.GetTitle()
-	task.Body = issue.GetBody()
-	task.State = issue.GetState()
 	task.URL = issue.GetHTMLURL()
-	task.CreatedAt = issue.CreatedAt.GetTime()
-	task.UpdatedAt = issue.UpdatedAt.GetTime()
-	task.ClosedAt = issue.ClosedAt.GetTime()
-	
-	// Set task type
-	if issue.IsPullRequest() {
-		task.TaskType = "pull_request"
-	} else {
-		task.TaskType = issue.Type.GetName()
-		if task.TaskType == "" {
-			task.TaskType = "issue"
-		}
-	}
+
 	
 	// Add author
 	if issue.User != nil {
@@ -210,18 +197,24 @@ func (t *GHTask) createTaskFromCommit(commit *model.PACCommit, matchID string) (
 		}
 	}
 	
-	// Add milestone
-	if issue.Milestone != nil {
-		task.Milestone = issue.Milestone.GetTitle()
-	}
-	
 	// Add labels
 	for _, label := range issue.Labels {
 		task.AddLabel(label.GetName())
 	}
 	
 	// Store the raw issue data for potential future use
-	//task.Data = issue
+	// Convert issue struct to JSON then to map
+	issueJSON, err := json.Marshal(issue)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling issue to JSON: %w", err)
+	}
+
+	var issueData map[string]interface{}
+	if err := json.Unmarshal(issueJSON, &issueData); err != nil {
+		return nil, fmt.Errorf("error unmarshaling issue JSON to map: %w", err)
+	}
+
+	task.Data[t.GetName()] = issueData
 
 	return task, nil
 }
@@ -244,11 +237,13 @@ func (t *GHTask) GetPullRequestByNumber(number int) (*github.PullRequest, error)
 
 // EnrichTaskWithPRData enriches a task with pull request specific data
 func (t *GHTask) EnrichTaskWithPRData(task *model.PACTask) error {
-	if task.TaskType != "pull_request" {
-		return nil
+
+	prNumber, err := strconv.Atoi(task.ID)
+	if err != nil {
+		return fmt.Errorf("error converting task ID to number: %w", err)
 	}
 	
-	pr, err := t.GetPullRequestByNumber(task.Number)
+	pr, err := t.GetPullRequestByNumber(prNumber)
 	if err != nil {
 		return err
 	}

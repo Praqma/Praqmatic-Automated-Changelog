@@ -21,7 +21,7 @@ func IsVerbose() bool {
 // Verbose prints a message if verbose mode is enabled
 func Verbose(format string, args ...interface{}) {
 	if verboseEnabled {
-		timestamp := time.Now().Format("15:04:05")
+		timestamp := time.Now().Format("15:04:05.000")
 		message := fmt.Sprintf(format, args...)
 		fmt.Fprintf(os.Stderr, "[%s] %s\n", timestamp, message)
 	}

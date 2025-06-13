@@ -77,7 +77,6 @@ var FromCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println("Generating report(s)...")
 		logging.VerboseSection("Report Generation")
 		logging.Verbose("Number of templates configured: %d", len(Settings.Templates))
 

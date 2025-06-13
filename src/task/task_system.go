@@ -38,8 +38,11 @@ func (f *TaskSystemFactory) CreateTaskSystem(taskSystem model.TaskSystem, token 
 	case "none":
 		return NewNoneTaskSystem(), nil
 	case "jira":
-		// TODO: Implement Jira task system
-		return nil, fmt.Errorf("jira task system not implemented yet")
+		jiraTaskSystem, err := NewJiraTaskSystem(taskSystem.QueryString)
+		if err != nil {
+			return nil, err
+		}
+		return jiraTaskSystem, nil
 	case "gitlab":
 		// TODO: Implement GitLab task system
 		return nil, fmt.Errorf("gitlab task system not implemented yet")
