@@ -179,22 +179,6 @@ func (sb *SettingsBuilder) buildTaskSystems() []model.TaskSystem {
 					Regex: []model.RegexRule{},
 				}
 				
-				// Use predefined patterns for known systems
-				switch strings.ToLower(system) {
-				case "jira":
-					ts.Regex = []model.RegexRule{
-						{Pattern: `([A-Z]+-\d+)`},
-					}
-				case "github":
-					ts.Regex = []model.RegexRule{
-						{Pattern: `(#\d+)`},
-					}
-				case "none":
-					ts.Regex = []model.RegexRule{
-						{Pattern: `(#\d+)`},
-					}
-				}
-				
 				taskSystemMap[system] = &ts
 			}
 		}
@@ -217,6 +201,28 @@ func (sb *SettingsBuilder) buildTaskSystems() []model.TaskSystem {
 			taskSystemMap[systemName].Regex = append(taskSystemMap[systemName].Regex, model.RegexRule{
 				Pattern: pattern,
 			})
+		}
+	} else {
+		// Only add predefined patterns if none are already defined
+		for _, ts := range taskSystemMap {
+		system := ts.Name
+		if len(ts.Regex) == 0 {
+			// Use predefined patterns for known systems
+			switch strings.ToLower(system) {
+			case "jira":
+				ts.Regex = []model.RegexRule{
+					{Pattern: `([A-Z]+-\d+)`},
+				}
+			case "github":
+				ts.Regex = []model.RegexRule{
+					{Pattern: `(#\d+)`},
+				}
+			case "none":
+				ts.Regex = []model.RegexRule{
+					{Pattern: `(#\d+)`},
+				}
+			}
+		}
 		}
 	}
 	
