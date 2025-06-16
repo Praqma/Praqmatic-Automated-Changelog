@@ -11,17 +11,16 @@ import (
 
 // JiraTaskSystem handles Jira task integration
 type JiraTaskSystem struct {
-	JiraClient *jira.Client // Assuming JiraClient is a struct that handles Jira API interactions
+	JiraClient *jira.Client
 }
 
 // NewJiraTaskSystem creates a new Jira task system instance
 func NewJiraTaskSystem(baseURL string) (*JiraTaskSystem, error) {
 
-	jt := jira.BasicAuthTransport{
-		Username: os.Getenv("JIRA_USER"),
-		Password: os.Getenv("JIRA_TOKEN"),
+	tp := jira.BearerAuthTransport{
+		Token: os.Getenv("JIRA_TOKEN"),
 	}
-	client, err := jira.NewClient(jt.Client(), baseURL)
+	client, err := jira.NewClient(tp.Client(), baseURL)
 	if err != nil {
 
 		return &JiraTaskSystem{
@@ -42,7 +41,6 @@ func (j *JiraTaskSystem) ProcessCommits(taskSystem model.TaskSystem, commits *mo
 	for _, commit := range commits.Commits {
 		taskID := extractTaskID(commit, taskSystem.Regex)
 		if taskID == "" {
-			// Create a task with empty ID for unmatched commits
 			task := model.NewPACTask("")
 			task.AddCommit(commit)
 			tasks.Add(task)
@@ -78,11 +76,10 @@ func (j *JiraTaskSystem) createTaskFromCommit(commit *model.PACCommit, taskID st
 	task := model.NewPACTask(taskID)
 	task.AddCommit(commit)
 
-	// Populate task fields from Jira issue
 	task.Title = issue.Fields.Summary
-	task.ID = issue.ID // Assuming ID is the unique identifier for the task
-	task.URL = j.JiraClient.GetBaseURL().RawPath
-	task.Author = issue.Fields.Reporter.Name // Assuming Assignee is not nil
+	task.ID = issue.Key 
+	task.URL = "https://" + j.JiraClient.GetBaseURL().Host + "/browse/" + issue.Key
+	task.Author = issue.Fields.Reporter.Name 
 	task.AddAssignee(issue.Fields.Assignee.Name)
 
 	for _, label := range issue.Fields.Labels {
@@ -103,16 +100,52 @@ func (j *JiraTaskSystem) createTaskFromCommit(commit *model.PACCommit, taskID st
 		return nil, fmt.Errorf("error unmarshaling issue JSON to map: %w", err)
 	}
 
-	task.Data[j.GetName()] = issueData
+	// Remove nil values from the map
+	cleanedData := removeNilValues(issueData)
+
+	task.Data[j.GetName()] = cleanedData
 
 
 	return task, nil
 }
 
+func removeNilValues(data interface{}) interface{} {
+	switch v := data.(type) {
+	case map[string]interface{}:
+		cleaned := make(map[string]interface{})
+		for key, value := range v {
+			if value != nil {
+				if cleanedValue := removeNilValues(value); cleanedValue != nil {
+					cleaned[key] = cleanedValue
+				}
+			}
+		}
+		if len(cleaned) == 0 {
+			return nil
+		}
+		return cleaned
+	case []interface{}:
+		var cleaned []interface{}
+		for _, item := range v {
+			if item != nil {
+				if cleanedValue := removeNilValues(item); cleanedValue != nil {
+					cleaned = append(cleaned, cleanedValue)
+				}
+			}
+		}
+		if len(cleaned) == 0 {
+			return nil
+		}
+		return cleaned
+	default:
+		return data
+	}
+}
+
 func (j *JiraTaskSystem) fetchIssueFromJira(taskID string) (jira.Issue, error) {
 	issue, resp, err := j.JiraClient.Issue.Get(taskID, nil)
 	if err != nil {
-		return jira.Issue{}, fmt.Errorf("error fetching Jira issue %s: %w", taskID, err)
+		return jira.Issue{}, fmt.Errorf("error fetching Jira issue %s: %d", taskID, resp.StatusCode)
 	}
 	if resp.StatusCode != 200 {
 		return jira.Issue{}, fmt.Errorf("error fetching Jira issue %s: received status code %d", taskID, resp.StatusCode)
