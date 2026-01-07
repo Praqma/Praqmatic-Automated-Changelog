@@ -1,5 +1,4 @@
-// Package task provides task system integrations for PAC.package task
-
+// Package task provides task system integrations for PAC.
 package task
 
 import "github.com/Praqma/Praqmatic-Automated-Changelog/internal/model"
