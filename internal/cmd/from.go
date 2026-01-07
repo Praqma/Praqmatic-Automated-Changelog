@@ -5,10 +5,8 @@ import (
 	"fmt"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/config"
+	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/core"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/logging"
-	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/report"
-	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/task"
-	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/vcs"
 	"github.com/spf13/cobra"
 )
 
@@ -43,9 +41,6 @@ func runFrom(cmd *cobra.Command, args []string) error {
 	// Set up logging
 	logging.SetVerbosity(verbosity - quiet)
 
-	logging.Info("PAC - Praqmatic Automated Changelog")
-	logging.Info("From: %s, To: %s", oldestRef, defaultString(toRef, "HEAD"))
-
 	// Load configuration
 	settings, err := loadSettings()
 	if err != nil {
@@ -57,8 +52,9 @@ func runFrom(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid settings: %w", err)
 	}
 
-	// Run the workflow
-	return runWorkflow(settings, oldestRef, toRef)
+	// Run the core workflow
+	_, err = core.Run(settings, oldestRef, toRef)
+	return err
 }
 
 func loadSettings() (*config.Settings, error) {
@@ -99,69 +95,4 @@ func buildOverrides() map[string]any {
 	}
 
 	return overrides
-}
-
-func runWorkflow(settings *config.Settings, oldestRef, newestRef string) error {
-	// Initialize VCS
-	gitVCS, err := vcs.NewGitVCS(settings.VCS)
-	if err != nil {
-		return fmt.Errorf("failed to initialize git: %w", err)
-	}
-
-	// Get commit delta
-	logging.Info("Collecting commits from %s to %s", oldestRef, defaultString(newestRef, "HEAD"))
-	commits, err := gitVCS.GetDelta(oldestRef, newestRef)
-	if err != nil {
-		return fmt.Errorf("failed to get commits: %w", err)
-	}
-
-	logging.Info("Found %d commits", commits.Count())
-
-	// Build task collection from commits
-	tasks := task.BuildTaskCollection(commits, settings.TaskSystems)
-
-	logging.Info("Found %d tasks, %d unreferenced commits",
-		len(tasks.Referenced()), len(tasks.UnreferencedCommits()))
-
-	// Apply task systems (fetch external data)
-	allOK := true
-	for _, tsCfg := range settings.TaskSystems {
-		ts, err := task.CreateTaskSystem(tsCfg)
-		if err != nil {
-			logging.Warn("Failed to create task system %s: %v", tsCfg.Name, err)
-			allOK = false
-			continue
-		}
-
-		if err := ts.Apply(tasks); err != nil {
-			logging.Warn("Task system %s encountered errors: %v", tsCfg.Name, err)
-			allOK = false
-		}
-	}
-
-	// Generate reports
-	generator := report.NewGenerator(tasks, commits)
-	if err := generator.Generate(settings); err != nil {
-		return fmt.Errorf("failed to generate reports: %w", err)
-	}
-
-	// Handle strict mode
-	if !allOK && settings.General.Strict {
-		return fmt.Errorf("errors encountered in strict mode")
-	}
-
-	if !allOK {
-		logging.Info("Ignoring encountered errors (strict mode disabled)")
-	}
-
-	logging.Info("Done! Health: %.1f%% commits reference tasks", commits.Health())
-
-	return nil
-}
-
-func defaultString(s, def string) string {
-	if s == "" {
-		return def
-	}
-	return s
 }

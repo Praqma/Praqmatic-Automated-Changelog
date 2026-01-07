@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/core"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/logging"
-	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/vcs"
 	"github.com/spf13/cobra"
 )
 
@@ -38,9 +38,6 @@ func runFromLatestTag(cmd *cobra.Command, args []string) error {
 	// Set up logging
 	logging.SetVerbosity(verbosity - quiet)
 
-	logging.Info("PAC - Praqmatic Automated Changelog")
-	logging.Info("Finding latest tag matching: %s", pattern)
-
 	// Load configuration
 	settings, err := loadSettings()
 	if err != nil {
@@ -52,20 +49,7 @@ func runFromLatestTag(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid settings: %w", err)
 	}
 
-	// Initialize VCS to find the latest tag
-	gitVCS, err := vcs.NewGitVCS(settings.VCS)
-	if err != nil {
-		return fmt.Errorf("failed to initialize git: %w", err)
-	}
-
-	// Find the latest matching tag
-	latestTag, err := gitVCS.GetLatestTag(pattern)
-	if err != nil {
-		return fmt.Errorf("failed to find tag matching %q: %w", pattern, err)
-	}
-
-	logging.Info("Found latest tag: %s", latestTag)
-
-	// Run the workflow from the found tag
-	return runWorkflow(settings, latestTag, toRef)
+	// Run the core workflow with tag pattern
+	_, err = core.RunFromLatestTag(settings, pattern, toRef)
+	return err
 }
