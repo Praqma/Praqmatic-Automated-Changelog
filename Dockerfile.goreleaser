@@ -1,0 +1,25 @@
+# Minimal Dockerfile for GoReleaser
+# The binary is already compiled, just need a minimal runtime
+
+FROM alpine:3.20
+
+# Install runtime dependencies
+RUN apk add --no-cache git ca-certificates tzdata
+
+# Create non-root user
+RUN adduser -D -u 1000 pac
+
+# Copy the pre-compiled binary (GoReleaser copies this automatically)
+COPY pac /usr/local/bin/pac
+
+# Copy templates
+COPY templates /usr/share/pac/templates
+
+# Set up working directory
+WORKDIR /repo
+
+# Switch to non-root user
+USER pac
+
+ENTRYPOINT ["pac"]
+CMD ["--help"]

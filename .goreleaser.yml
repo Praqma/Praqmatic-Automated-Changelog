@@ -1,0 +1,171 @@
+# GoReleaser configuration for PAC
+# https://goreleaser.com/customization/
+
+version: 2
+
+project_name: pac
+
+# Build configuration
+builds:
+  - id: pac
+    main: ./cmd/pac
+    binary: pac
+    
+    # Inject version information
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.Commit={{.Commit}}
+      - -X main.BuildTime={{.Date}}
+    
+    # Environment variables
+    env:
+      - CGO_ENABLED=0
+    
+    # Target platforms
+    goos:
+      - linux
+      - darwin
+      - windows
+    
+    goarch:
+      - amd64
+      - arm64
+    
+    # Exclude some combinations
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+# Archive configuration
+archives:
+  - id: default
+    format: tar.gz
+    
+    # Use zip for Windows
+    format_overrides:
+      - goos: windows
+        format: zip
+    
+    # Include additional files in archive
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+      - templates/**/*
+      - settings/*.yml
+    
+    # Archive naming template
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+# Checksum configuration
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+# Snapshot configuration (for non-tagged builds)
+snapshot:
+  version_template: "{{ .Tag }}-next"
+
+# Changelog generation
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - "Merge pull request"
+      - "Merge branch"
+  groups:
+    - title: "🚀 Features"
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: "📚 Documentation"
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 2
+    - title: "🔧 Maintenance"
+      order: 999
+
+# Release configuration
+release:
+  github:
+    owner: Praqma
+    name: Praqmatic-Automated-Changelog
+  
+  # Draft releases for review before publishing
+  draft: true
+  
+  # Release name template
+  name_template: "PAC v{{.Version}}"
+  
+  # Release header
+  header: |
+    ## PAC v{{.Version}}
+    
+    Praqmatic Automated Changelog - Git changelog generator with task system integration.
+
+# Docker image configuration
+dockers:
+  - id: pac-amd64
+    goos: linux
+    goarch: amd64
+    
+    dockerfile: Dockerfile.goreleaser
+    use: buildx
+    
+    image_templates:
+      - "ghcr.io/praqma/pac:{{ .Version }}-amd64"
+      - "ghcr.io/praqma/pac:latest-amd64"
+    
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    
+    extra_files:
+      - templates
+
+  - id: pac-arm64
+    goos: linux
+    goarch: arm64
+    
+    dockerfile: Dockerfile.goreleaser
+    use: buildx
+    
+    image_templates:
+      - "ghcr.io/praqma/pac:{{ .Version }}-arm64"
+      - "ghcr.io/praqma/pac:latest-arm64"
+    
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    
+    extra_files:
+      - templates
+
+# Docker manifest for multi-arch image
+docker_manifests:
+  - name_template: "ghcr.io/praqma/pac:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/praqma/pac:{{ .Version }}-amd64"
+      - "ghcr.io/praqma/pac:{{ .Version }}-arm64"
+  
+  - name_template: "ghcr.io/praqma/pac:latest"
+    image_templates:
+      - "ghcr.io/praqma/pac:latest-amd64"
+      - "ghcr.io/praqma/pac:latest-arm64"
+
+# Announce configuration (optional)
+announce:
+  skip: true

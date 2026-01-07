@@ -11,7 +11,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
 // GitVCS implements the VCS interface for Git repositories.
@@ -40,6 +39,8 @@ func NewGitVCS(settings config.VCSConfig) (*GitVCS, error) {
 
 // GetDelta returns all commits between oldest and newest references.
 // If newest is empty, HEAD is used as the default.
+// This includes all commits reachable from newest but not reachable from oldest,
+// properly handling merge commits and all branches of history.
 func (g *GitVCS) GetDelta(oldest, newest string) (*model.PACCommitCollection, error) {
 	commits := model.NewPACCommitCollection()
 
@@ -65,20 +66,42 @@ func (g *GitVCS) GetDelta(oldest, newest string) (*model.PACCommitCollection, er
 		}
 	}
 
-	// Create commit iterator starting from newest
-	commitIter, err := g.repo.Log(&git.LogOptions{
-		From: *newHash,
+	// First, collect all commits reachable from the oldest reference.
+	// These are the commits we want to EXCLUDE from our result.
+	excludeSet := make(map[plumbing.Hash]bool)
+	oldCommit, err := g.repo.CommitObject(*oldHash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get oldest commit object: %w", err)
+	}
+
+	// Add the oldest commit itself to the exclude set
+	excludeSet[*oldHash] = true
+
+	// Walk all ancestors of the oldest commit
+	oldIter := object.NewCommitIterCTime(oldCommit, nil, nil)
+	defer oldIter.Close()
+	err = oldIter.ForEach(func(c *object.Commit) error {
+		excludeSet[c.Hash] = true
+		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create commit iterator: %w", err)
+		return nil, fmt.Errorf("error walking old commits: %w", err)
 	}
-	defer commitIter.Close()
 
-	// Walk commits until we reach the oldest reference
-	err = commitIter.ForEach(func(c *object.Commit) error {
-		// Stop when we reach the oldest commit (exclusive)
-		if c.Hash == *oldHash {
-			return storer.ErrStop
+	// Now walk all commits from newest and include those NOT in the exclude set
+	newCommit, err := g.repo.CommitObject(*newHash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get newest commit object: %w", err)
+	}
+
+	// Use CommitIterCTime to iterate in chronological order and include all branches
+	newIter := object.NewCommitIterCTime(newCommit, nil, nil)
+	defer newIter.Close()
+
+	err = newIter.ForEach(func(c *object.Commit) error {
+		// Skip if this commit is reachable from oldest
+		if excludeSet[c.Hash] {
+			return nil
 		}
 
 		// Apply path filtering if configured
@@ -99,7 +122,7 @@ func (g *GitVCS) GetDelta(oldest, newest string) (*model.PACCommitCollection, er
 		return nil
 	})
 
-	if err != nil && err != storer.ErrStop {
+	if err != nil {
 		return nil, fmt.Errorf("error walking commits: %w", err)
 	}
 

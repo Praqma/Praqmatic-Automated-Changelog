@@ -2,6 +2,7 @@
 .settings
 changelog.pdf
 changelog.html
+bin
 coverage
 test/reports
 test/resources/stop_task_system*
