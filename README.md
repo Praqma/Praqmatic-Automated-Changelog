@@ -4,10 +4,14 @@ maintainer: JKrag
 
 Issue tracking:
 [![Issues](https://img.shields.io/github/issues/Praqma/Praqmatic-Automated-Changelog.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
+[![CI](https://github.com/Praqma/Praqmatic-Automated-Changelog/actions/workflows/ci.yml/badge.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Praqma/Praqmatic-Automated-Changelog)](https://goreportcard.com/report/github.com/Praqma/Praqmatic-Automated-Changelog)
 
 # Praqmatic Automated Changelog (PAC)
 
 Tool for creating automated, but pragmatic, changelogs.
+
+> **Note:** PAC is now available in Go! The Go version is faster, has no runtime dependencies, and provides cross-platform binaries. See [Go Documentation](docs/go/README.md) for details.
 
 PAC collects task references from SCM commit messages and creates changelog reports with additional information extracted from other systems, like your task management system.
 Compared to other changelog solutions, PAC is very flexible and customizable. The design allows you to solve the problems of having an unchangeable SCM commit history with incorrect task references.
@@ -71,7 +75,63 @@ This example template simply lists the discovered issues as headers in a Markdow
 More about templates in [Templates](docs/templates.md).
 
 
+## Installation
+
+### Go Version (Recommended)
+
+```bash
+# Using Go
+go install github.com/Praqma/Praqmatic-Automated-Changelog/cmd/pac@latest
+
+# Using Docker
+docker pull ghcr.io/praqma/pac:latest
+
+# Download pre-built binary from GitHub Releases
+# https://github.com/Praqma/Praqmatic-Automated-Changelog/releases
+```
+
+See [Installation Guide](docs/go/installation.md) for detailed instructions.
+
+### Ruby Version (Legacy)
+
+The original Ruby version is still available but the Go version is recommended for new projects.
+
+```bash
+# Using Docker
+docker pull praqma/pac:latest
+```
+
 ## Usage
+
+### Go Version
+
+```bash
+# Generate changelog from a specific tag to HEAD
+pac from v1.0.0 --settings pac_settings.yml
+
+# Generate changelog from latest matching tag
+pac from-latest-tag "v*" --settings pac_settings.yml
+
+# Output to specific file
+pac from v1.0.0 --settings pac_settings.yml
+
+# Increase verbosity for debugging
+pac from v1.0.0 -vvv
+
+# Override credentials for task system
+pac from v1.0.0 -c username -c password -c jira
+```
+
+### Docker Usage
+
+```bash
+docker run --rm \
+  -v $(pwd):/repo \
+  ghcr.io/praqma/pac:latest \
+  from v1.0.0 --settings pac_settings.yml
+```
+
+### Ruby Version (Legacy)
 
 Basic usage examples for the PAC Ruby script, run PAC with the `--help` parameter for usage explanation.
 
