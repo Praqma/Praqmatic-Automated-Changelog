@@ -66,3 +66,46 @@ func (tc *PACTaskCollection) FindOrCreate(taskID string) *PACTask {
 func (tc *PACTaskCollection) Count() int {
 	return len(tc.Tasks)
 }
+
+// Referenced returns tasks that have a non-empty TaskID.
+func (tc *PACTaskCollection) Referenced() []*PACTask {
+	result := make([]*PACTask, 0)
+	for _, task := range tc.Tasks {
+		if task.TaskID != "" {
+			result = append(result, task)
+		}
+	}
+	return result
+}
+
+// Unreferenced returns the task with empty TaskID (contains commits without task references).
+// Returns nil if no unreferenced commits exist.
+func (tc *PACTaskCollection) Unreferenced() *PACTask {
+	if task, exists := tc.taskIndex[""]; exists {
+		return task
+	}
+	return nil
+}
+
+// UnreferencedCommits returns all commits that don't reference any task.
+func (tc *PACTaskCollection) UnreferencedCommits() []*PACCommit {
+	unref := tc.Unreferenced()
+	if unref == nil {
+		return []*PACCommit{}
+	}
+	return unref.Commits.Commits
+}
+
+// GetLabels returns all labels as a slice.
+func (t *PACTask) GetLabels() []string {
+	labels := make([]string, 0, len(t.Labels))
+	for label := range t.Labels {
+		labels = append(labels, label)
+	}
+	return labels
+}
+
+// HasLabel checks if the task has a specific label.
+func (t *PACTask) HasLabel(label string) bool {
+	return t.Labels[label]
+}
