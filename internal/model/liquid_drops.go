@@ -4,12 +4,13 @@ package model
 // The keys match the Ruby implementation for template compatibility.
 func (c *PACCommit) ToLiquid() map[string]any {
 	return map[string]any{
-		"sha":      c.SHA,
-		"shortsha": c.ShortSHA,
-		"header":   c.Header,
-		"message":  c.Message,
-		"body":     c.Body,
-		"time":     c.Timestamp,
+		"sha":       c.SHA,
+		"shortsha":  c.ShortSHA,
+		"short_sha": c.ShortSHA, // Alias for Ruby compatibility
+		"header":    c.Header,
+		"message":   c.Message,
+		"body":      c.Body,
+		"time":      c.Timestamp,
 	}
 }
 
