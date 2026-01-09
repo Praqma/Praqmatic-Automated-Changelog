@@ -45,7 +45,7 @@ func TestDefaultMarkdownTemplate(t *testing.T) {
 	}
 
 	// Verify output is not empty
-	if len(output) == 0 {
+	if output == "" {
 		t.Error("expected non-empty output")
 	}
 
@@ -74,7 +74,7 @@ func TestDefaultHTMLTemplate(t *testing.T) {
 		t.Fatalf("failed to render template: %v", err)
 	}
 
-	if len(output) == 0 {
+	if output == "" {
 		t.Error("expected non-empty output")
 	}
 }

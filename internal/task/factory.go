@@ -8,7 +8,7 @@ import (
 )
 
 // CreateTaskSystem creates a TaskSystem based on the configuration.
-func CreateTaskSystem(cfg config.TaskSystemConfig) (TaskSystem, error) {
+func CreateTaskSystem(cfg *config.TaskSystemConfig) (TaskSystem, error) {
 	name := strings.ToLower(cfg.Name)
 
 	switch name {
@@ -27,10 +27,10 @@ func CreateTaskSystem(cfg config.TaskSystemConfig) (TaskSystem, error) {
 func CreateAllTaskSystems(configs []config.TaskSystemConfig) ([]TaskSystem, error) {
 	systems := make([]TaskSystem, 0, len(configs))
 
-	for _, cfg := range configs {
-		ts, err := CreateTaskSystem(cfg)
+	for i := range configs {
+		ts, err := CreateTaskSystem(&configs[i])
 		if err != nil {
-			return nil, fmt.Errorf("failed to create task system %q: %w", cfg.Name, err)
+			return nil, fmt.Errorf("failed to create task system %q: %w", configs[i].Name, err)
 		}
 		systems = append(systems, ts)
 	}

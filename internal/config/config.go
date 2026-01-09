@@ -7,6 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	// DefaultVCSType is the default version control system type
+	DefaultVCSType = "git"
+)
+
 // LoadSettings reads configuration from a YAML file and applies overrides.
 // The configPath should point to a YAML file in the Ruby symbol format (e.g., :key:).
 func LoadSettings(configPath string, overrides map[string]any) (*Settings, error) {
@@ -14,7 +19,7 @@ func LoadSettings(configPath string, overrides map[string]any) (*Settings, error
 
 	// Set defaults
 	v.SetDefault(":general::strict", false)
-	v.SetDefault(":vcs::type", "git")
+	v.SetDefault(":vcs::type", DefaultVCSType)
 
 	// Configure viper for the config file
 	v.SetConfigFile(configPath)
@@ -98,11 +103,11 @@ func (s *Settings) Validate() error {
 	}
 
 	if s.VCS.Type == "" {
-		s.VCS.Type = "git" // Default to git
+		s.VCS.Type = DefaultVCSType // Default to git
 	}
 
-	if s.VCS.Type != "git" {
-		return fmt.Errorf("unsupported VCS type: %s (only 'git' is supported)", s.VCS.Type)
+	if s.VCS.Type != DefaultVCSType {
+		return fmt.Errorf("unsupported VCS type: %s (only %q is supported)", s.VCS.Type, DefaultVCSType)
 	}
 
 	return nil

@@ -2,12 +2,12 @@ package model
 
 // PACTask represents a task extracted from commit messages.
 type PACTask struct {
-	TaskID     string                 // Task identifier (e.g., "JIRA-123")
-	Commits    *PACCommitCollection   // Commits associated with this task
-	Attributes map[string]any         // Additional attributes from external systems
-	AppliesTo  map[string]bool        // Which task systems this task applies to
-	Labels     map[string]bool        // Labels applied to this task (from regex matches)
-	Data       any                    // Raw data from external system (typically JSON)
+	TaskID     string               // Task identifier (e.g., "JIRA-123")
+	Commits    *PACCommitCollection // Commits associated with this task
+	Attributes map[string]any       // Additional attributes from external systems
+	AppliesTo  map[string]bool      // Which task systems this task applies to
+	Labels     map[string]bool      // Labels applied to this task (from regex matches)
+	Data       any                  // Raw data from external system (typically JSON)
 }
 
 // PACTaskCollection holds a collection of tasks with an index for quick lookup.

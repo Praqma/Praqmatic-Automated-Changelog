@@ -70,8 +70,8 @@ func TestFullWorkflow_WithRealGitRepo(t *testing.T) {
 	}
 
 	for _, ts := range systems {
-		if err := ts.Apply(tasks); err != nil {
-			t.Errorf("task system apply failed: %v", err)
+		if applyErr := ts.Apply(tasks); applyErr != nil {
+			t.Errorf("task system apply failed: %v", applyErr)
 		}
 	}
 
@@ -108,8 +108,8 @@ Tasks: {{ tasks.size }}
 - {{ task.task_id }}
 {% endfor %}
 `
-	if err := os.WriteFile(filepath.Join(tmpDir, "test_template.md"), []byte(templateContent), 0644); err != nil {
-		t.Fatalf("failed to write template: %v", err)
+	if writeErr := os.WriteFile(filepath.Join(tmpDir, "test_template.md"), []byte(templateContent), 0o644); writeErr != nil {
+		t.Fatalf("failed to write template: %v", writeErr)
 	}
 
 	generator := report.NewGenerator(tasks, commits)
@@ -211,8 +211,12 @@ func TestCommitFiltering_Integration(t *testing.T) {
 	runGit(t, tmpDir, "config", "user.name", "Test User")
 
 	// Create directories
-	os.MkdirAll(filepath.Join(tmpDir, "src"), 0755)
-	os.MkdirAll(filepath.Join(tmpDir, "docs"), 0755)
+	if mkdirErr := os.MkdirAll(filepath.Join(tmpDir, "src"), 0o755); mkdirErr != nil {
+		t.Fatalf("failed to create src dir: %v", mkdirErr)
+	}
+	if mkdirErr := os.MkdirAll(filepath.Join(tmpDir, "docs"), 0o755); mkdirErr != nil {
+		t.Fatalf("failed to create docs dir: %v", mkdirErr)
+	}
 
 	// Initial commit
 	writeFile(t, tmpDir, "README.md", "# Test")
@@ -416,7 +420,7 @@ func runGit(t *testing.T, dir string, args ...string) {
 func writeFile(t *testing.T, dir, name, content string) {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatalf("failed to write file %s: %v", path, err)
 	}
 }

@@ -45,8 +45,8 @@ func runFromLatestTag(cmd *cobra.Command, args []string) error {
 	}
 
 	// Validate settings
-	if err := settings.Validate(); err != nil {
-		return fmt.Errorf("invalid settings: %w", err)
+	if validateErr := settings.Validate(); validateErr != nil {
+		return fmt.Errorf("invalid settings: %w", validateErr)
 	}
 
 	// Run the core workflow with tag pattern
