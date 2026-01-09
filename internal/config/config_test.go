@@ -40,8 +40,8 @@ func TestLoadSettings_DefaultSettings(t *testing.T) {
 		t.Errorf("expected vcs type='git', got %q", settings.VCS.Type)
 	}
 
-	if settings.VCS.RepoLocation != "/data" {
-		t.Errorf("expected repo_location='/data', got %q", settings.VCS.RepoLocation)
+	if settings.VCS.RepoLocation != "" {
+		t.Errorf("expected repo_location='', got %q", settings.VCS.RepoLocation)
 	}
 }
 
