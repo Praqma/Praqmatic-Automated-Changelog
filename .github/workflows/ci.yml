@@ -68,7 +68,7 @@ jobs:
         run: go mod download
 
       - name: Run tests (Posix)
-        if: matrix.os == 'ubuntu-latest || matrix.os == "macos-latest"'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Run tests (Windows)
@@ -152,7 +152,7 @@ jobs:
           cache: true
 
       - name: Run integration tests
-        run: go test -v -tags=integration ./test/integration/...
+        run: go test -v -tags=integration ./test/...
 
   # ===========================================================================
   # Docker build verification
