@@ -8,7 +8,7 @@ import (
 )
 
 // CreateTaskSystem creates a TaskSystem based on the configuration.
-func CreateTaskSystem(cfg *config.TaskSystemConfig) (TaskSystem, error) {
+func CreateTaskSystem(cfg *config.TaskSystemConfig) (System, error) {
 	name := strings.ToLower(cfg.Name)
 
 	switch name {
@@ -24,8 +24,8 @@ func CreateTaskSystem(cfg *config.TaskSystemConfig) (TaskSystem, error) {
 }
 
 // CreateAllTaskSystems creates TaskSystem instances for all configured task systems.
-func CreateAllTaskSystems(configs []config.TaskSystemConfig) ([]TaskSystem, error) {
-	systems := make([]TaskSystem, 0, len(configs))
+func CreateAllTaskSystems(configs []config.TaskSystemConfig) ([]System, error) {
+	systems := make([]System, 0, len(configs))
 
 	for i := range configs {
 		ts, err := CreateTaskSystem(&configs[i])

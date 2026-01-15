@@ -63,7 +63,7 @@ func TestExtractTaskIDs(t *testing.T) {
 		name     string
 		message  string
 		configs  []config.RegexConfig
-		expected []TaskMatch
+		expected []Match
 	}{
 		{
 			name:    "extract issue number",
@@ -71,7 +71,7 @@ func TestExtractTaskIDs(t *testing.T) {
 			configs: []config.RegexConfig{
 				{Pattern: "/Issue:\\s*(\\d+)/i", Label: "issue"},
 			},
-			expected: []TaskMatch{
+			expected: []Match{
 				{TaskID: "123", Label: "issue"},
 			},
 		},
@@ -81,7 +81,7 @@ func TestExtractTaskIDs(t *testing.T) {
 			configs: []config.RegexConfig{
 				{Pattern: "/(#\\d+)/", Label: "github"},
 			},
-			expected: []TaskMatch{
+			expected: []Match{
 				{TaskID: "#456", Label: "github"},
 				{TaskID: "#789", Label: "github"},
 			},
@@ -92,7 +92,7 @@ func TestExtractTaskIDs(t *testing.T) {
 			configs: []config.RegexConfig{
 				{Pattern: "/(PRJ-\\d+)/i", Label: "jira"},
 			},
-			expected: []TaskMatch{
+			expected: []Match{
 				{TaskID: "PRJ-123", Label: "jira"},
 			},
 		},
@@ -102,7 +102,7 @@ func TestExtractTaskIDs(t *testing.T) {
 			configs: []config.RegexConfig{
 				{Pattern: "/Issue:\\s*(\\d+)/i", Label: "issue"},
 			},
-			expected: []TaskMatch{
+			expected: []Match{
 				{TaskID: "999", Label: "issue"},
 			},
 		},
@@ -121,7 +121,7 @@ func TestExtractTaskIDs(t *testing.T) {
 				{Pattern: "/(#\\d+)/", Label: "github"},
 				{Pattern: "/(PRJ-\\d+)/", Label: "jira"},
 			},
-			expected: []TaskMatch{
+			expected: []Match{
 				{TaskID: "#123", Label: "github"},
 				{TaskID: "PRJ-456", Label: "jira"},
 			},
@@ -132,7 +132,7 @@ func TestExtractTaskIDs(t *testing.T) {
 			configs: []config.RegexConfig{
 				{Pattern: "/(#\\d+)/", Label: "github"},
 			},
-			expected: []TaskMatch{
+			expected: []Match{
 				{TaskID: "#123", Label: "github"},
 			},
 		},

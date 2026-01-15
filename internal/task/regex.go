@@ -7,16 +7,16 @@ import (
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/config"
 )
 
-// TaskMatch represents a matched task ID with its associated label.
-type TaskMatch struct {
+// Match represents a matched task ID with its associated label.
+type Match struct {
 	TaskID string
 	Label  string
 }
 
 // ExtractTaskIDs extracts task IDs from a commit message using the configured regex patterns.
 // Returns a slice of TaskMatch containing the task ID and associated label.
-func ExtractTaskIDs(message string, regexConfigs []config.RegexConfig) []TaskMatch {
-	var matches []TaskMatch
+func ExtractTaskIDs(message string, regexConfigs []config.RegexConfig) []Match {
+	var matches []Match
 	seen := make(map[string]bool) // Avoid duplicate task IDs
 
 	for _, regexCfg := range regexConfigs {
@@ -47,7 +47,7 @@ func ExtractTaskIDs(message string, regexConfigs []config.RegexConfig) []TaskMat
 				taskID := match[1] // First capture group
 				if !seen[taskID] {
 					seen[taskID] = true
-					matches = append(matches, TaskMatch{
+					matches = append(matches, Match{
 						TaskID: taskID,
 						Label:  regexCfg.Label,
 					})
