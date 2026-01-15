@@ -1,37 +1,66 @@
-FROM ruby:3.0.2 as build
+# Multi-stage Dockerfile for Go-based PAC
+# Produces a minimal image with just the compiled binary
 
-RUN apt-get update && \
-    apt-get install -y cmake && \
-    apt-get install -y libxslt-dev && \
-    apt-get install -y libxml2-dev && \
-    rm -rf /var/lib/apt/lists/*
+# ============================================================================
+# Build stage: Compile the Go binary
+# ============================================================================
+FROM golang:1.24-alpine AS builder
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+# Install git for VCS information during build
+RUN apk add --no-cache git ca-certificates
 
-COPY Gemfile /usr/src/app/
-COPY Gemfile.lock /usr/src/app/
+WORKDIR /build
 
-#Ruby knows best how to install this particular version of PAC
-#This means that this dockerfile can build any version of PAC.
-RUN bundle install --without=test_gems
+# Copy go.mod and go.sum first for better layer caching
+COPY go.mod go.sum ./
+RUN go mod download
 
-COPY . /usr/src/app
+# Copy source code
+COPY . .
 
-VOLUME ["/repo"]
-VOLUME ["/templates"]
+# Build arguments for version information
+ARG VERSION=dev
+ARG COMMIT=unknown
+ARG BUILD_TIME=unknown
 
-FROM ruby:3.3.1-slim as executor
+# Build the binary with version information embedded
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags "-s -w -X main.Version=${VERSION} -X main.Commit=${COMMIT} -X main.BuildTime=${BUILD_TIME}" \
+    -o pac \
+    ./cmd/pac
 
-RUN apt-get update && \
-    apt-get install -y git && \
-    rm -rf /var/lib/apt/lists/*
+# ============================================================================
+# Runtime stage: Minimal image with just the binary
+# ============================================================================
+FROM alpine:3.20 AS runtime
 
-COPY --from=build /usr/src/app /usr/src/app
-COPY --from=build /usr/local/bundle/ /usr/local/bundle/
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN ln -s /usr/src/app/pac.rb /usr/bin/pac
+# Install git (required for repository operations) and ca-certificates
+RUN apk add --no-cache git ca-certificates tzdata
 
+# Create non-root user for security
+RUN adduser -D -u 1000 pac
+
+# Copy the compiled binary from builder
+COPY --from=builder /build/pac /usr/local/bin/pac
+
+# Copy default templates
+COPY --from=builder /build/templates /usr/share/pac/templates
+
+# Set up working directory
 WORKDIR /repo
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["pac"]
+
+# Switch to non-root user
+USER pac
+
+# Default entrypoint
+ENTRYPOINT ["pac"]
+CMD ["--help"]
+
+# ============================================================================
+# Labels for container metadata
+# ============================================================================
+LABEL org.opencontainers.image.title="PAC - Praqmatic Automated Changelog"
+LABEL org.opencontainers.image.description="Git changelog generator that integrates with task management systems"
+LABEL org.opencontainers.image.url="https://github.com/Praqma/Praqmatic-Automated-Changelog"
+LABEL org.opencontainers.image.source="https://github.com/Praqma/Praqmatic-Automated-Changelog"
+LABEL org.opencontainers.image.licenses="MIT"
