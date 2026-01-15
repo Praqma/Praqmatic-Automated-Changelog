@@ -53,9 +53,9 @@ func (g *GitVCS) GetDelta(oldest, newest string) (*model.PACCommitCollection, er
 	// Resolve the newest reference (default to HEAD)
 	var newHash *plumbing.Hash
 	if newest == "" {
-		head, err := g.repo.Head()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get HEAD: %w", err)
+		head, headErr := g.repo.Head()
+		if headErr != nil {
+			return nil, fmt.Errorf("failed to get HEAD: %w", headErr)
 		}
 		hash := head.Hash()
 		newHash = &hash
@@ -106,10 +106,7 @@ func (g *GitVCS) GetDelta(oldest, newest string) (*model.PACCommitCollection, er
 
 		// Apply path filtering if configured
 		if len(g.settings.FilterPaths) > 0 {
-			matches, err := g.commitMatchesFilter(c)
-			if err != nil {
-				return err
-			}
+			matches := g.commitMatchesFilter(c)
 			if !matches {
 				return nil // Skip this commit
 			}
@@ -144,19 +141,19 @@ func (g *GitVCS) GetLatestTag(pattern string) (string, error) {
 		tagName := ref.Name().Short()
 
 		// Match against pattern
-		matched, err := filepath.Match(pattern, tagName)
-		if err != nil {
-			return fmt.Errorf("invalid pattern %q: %w", pattern, err)
+		matched, matchErr := filepath.Match(pattern, tagName)
+		if matchErr != nil {
+			return fmt.Errorf("invalid pattern %q: %w", pattern, matchErr)
 		}
 		if !matched {
 			return nil
 		}
 
 		// Get the commit time for this tag
-		commitTime, err := g.getTagTime(ref)
-		if err != nil {
-			// Skip tags we can't resolve
-			return nil
+		commitTime, timeErr := g.getTagTime(ref)
+		if timeErr != nil {
+			// Skip tags we can't resolve (intentionally ignore error)
+			return nil //nolint:nilerr // Skipping unresolvable tags is expected behavior
 		}
 
 		if latestTag == "" || commitTime.After(latestTime) {
@@ -244,28 +241,28 @@ func (g *GitVCS) convertCommit(c *object.Commit) *model.PACCommit {
 }
 
 // commitMatchesFilter checks if a commit touches any of the configured filter paths.
-func (g *GitVCS) commitMatchesFilter(c *object.Commit) (bool, error) {
+func (g *GitVCS) commitMatchesFilter(c *object.Commit) bool {
 	if len(g.settings.FilterPaths) == 0 {
-		return true, nil
+		return true
 	}
 
 	// Get the files changed in this commit
 	stats, err := c.Stats()
 	if err != nil {
 		// If we can't get stats, include the commit to be safe
-		return true, nil
+		return true
 	}
 
 	for _, stat := range stats {
 		for _, filterPath := range g.settings.FilterPaths {
 			// Check if the file path matches the filter
 			if matchesPath(stat.Name, filterPath) {
-				return true, nil
+				return true
 			}
 		}
 	}
 
-	return false, nil
+	return false
 }
 
 // matchesPath checks if a file path matches a filter path pattern.
@@ -280,6 +277,10 @@ func matchesPath(filePath, filterPath string) bool {
 	}
 
 	// Try glob matching
-	matched, _ := filepath.Match(filterPath, filePath)
+	matched, err := filepath.Match(filterPath, filePath)
+	if err != nil {
+		// Invalid pattern, no match
+		return false
+	}
 	return matched
 }

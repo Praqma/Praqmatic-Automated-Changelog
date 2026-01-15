@@ -184,8 +184,8 @@ func TestGenerator_Generate_WritesFile(t *testing.T) {
 	// Create a temp template file
 	templateContent := "# Report\nCount: {{ pac_c_count }}"
 	templatePath := filepath.Join(tmpDir, "template.md")
-	if err := os.WriteFile(templatePath, []byte(templateContent), 0644); err != nil {
-		t.Fatalf("failed to write template: %v", err)
+	if writeErr := os.WriteFile(templatePath, []byte(templateContent), 0o644); writeErr != nil {
+		t.Fatalf("failed to write template: %v", writeErr)
 	}
 
 	outputPath := filepath.Join(tmpDir, "output", "report.md")

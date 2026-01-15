@@ -13,7 +13,7 @@ import (
 )
 
 // createTestRepo creates a temporary git repository with test commits.
-func createTestRepo(t *testing.T) (string, func()) {
+func createTestRepo(t *testing.T) (repoPath string, cleanup func()) {
 	t.Helper()
 
 	// Create temp directory
@@ -22,7 +22,7 @@ func createTestRepo(t *testing.T) (string, func()) {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
 
-	cleanup := func() {
+	cleanup = func() {
 		os.RemoveAll(tmpDir)
 	}
 
@@ -42,15 +42,15 @@ func createTestRepo(t *testing.T) (string, func()) {
 
 	// Create initial file
 	testFile := filepath.Join(tmpDir, "README.md")
-	if err := os.WriteFile(testFile, []byte("# Test\n"), 0644); err != nil {
+	if writeErr := os.WriteFile(testFile, []byte("# Test\n"), 0o644); writeErr != nil {
 		cleanup()
-		t.Fatalf("failed to write file: %v", err)
+		t.Fatalf("failed to write file: %v", writeErr)
 	}
 
 	// Stage and commit
-	if _, err := worktree.Add("README.md"); err != nil {
+	if _, addErr := worktree.Add("README.md"); addErr != nil {
 		cleanup()
-		t.Fatalf("failed to add file: %v", err)
+		t.Fatalf("failed to add file: %v", addErr)
 	}
 
 	sig := &object.Signature{
@@ -70,14 +70,14 @@ func createTestRepo(t *testing.T) (string, func()) {
 	// Create more commits
 	for i := 1; i <= 3; i++ {
 		content := []byte("# Test\n\nCommit " + string(rune('0'+i)) + "\n")
-		if err := os.WriteFile(testFile, content, 0644); err != nil {
+		if writeErr := os.WriteFile(testFile, content, 0o644); writeErr != nil {
 			cleanup()
-			t.Fatalf("failed to write file: %v", err)
+			t.Fatalf("failed to write file: %v", writeErr)
 		}
 
-		if _, err := worktree.Add("README.md"); err != nil {
+		if _, addErr := worktree.Add("README.md"); addErr != nil {
 			cleanup()
-			t.Fatalf("failed to add file: %v", err)
+			t.Fatalf("failed to add file: %v", addErr)
 		}
 
 		sig := &object.Signature{
@@ -99,7 +99,7 @@ func createTestRepo(t *testing.T) (string, func()) {
 }
 
 // createTestRepoWithTags creates a test repo with tags.
-func createTestRepoWithTags(t *testing.T) (string, func()) {
+func createTestRepoWithTags(t *testing.T) (repoPath string, cleanup func()) {
 	t.Helper()
 
 	tmpDir, cleanup := createTestRepo(t)
@@ -118,10 +118,13 @@ func createTestRepoWithTags(t *testing.T) (string, func()) {
 	}
 
 	var commits []*object.Commit
-	iter.ForEach(func(c *object.Commit) error {
+	if err := iter.ForEach(func(c *object.Commit) error {
 		commits = append(commits, c)
 		return nil
-	})
+	}); err != nil {
+		cleanup()
+		t.Fatalf("failed to iterate commits: %v", err)
+	}
 
 	// Create tags on different commits
 	if len(commits) >= 2 {
@@ -196,13 +199,21 @@ func TestGitVCS_GetDelta(t *testing.T) {
 	}
 
 	// Get all commits
-	repo, _ := git.PlainOpen(tmpDir)
-	iter, _ := repo.Log(&git.LogOptions{})
+	repo, err := git.PlainOpen(tmpDir)
+	if err != nil {
+		t.Fatalf("failed to open repo: %v", err)
+	}
+	iter, err := repo.Log(&git.LogOptions{})
+	if err != nil {
+		t.Fatalf("failed to get log: %v", err)
+	}
 	var allCommits []*object.Commit
-	iter.ForEach(func(c *object.Commit) error {
+	if iterErr := iter.ForEach(func(c *object.Commit) error {
 		allCommits = append(allCommits, c)
 		return nil
-	})
+	}); iterErr != nil {
+		t.Fatalf("failed to iterate commits: %v", iterErr)
+	}
 
 	if len(allCommits) < 2 {
 		t.Fatal("expected at least 2 commits in test repo")
@@ -253,13 +264,21 @@ func TestGitVCS_GetDelta_DefaultToHead(t *testing.T) {
 	}
 
 	// Get oldest commit
-	repo, _ := git.PlainOpen(tmpDir)
-	iter, _ := repo.Log(&git.LogOptions{})
+	repo, err := git.PlainOpen(tmpDir)
+	if err != nil {
+		t.Fatalf("failed to open repo: %v", err)
+	}
+	iter, err := repo.Log(&git.LogOptions{})
+	if err != nil {
+		t.Fatalf("failed to get log: %v", err)
+	}
 	var allCommits []*object.Commit
-	iter.ForEach(func(c *object.Commit) error {
+	if iterErr := iter.ForEach(func(c *object.Commit) error {
 		allCommits = append(allCommits, c)
 		return nil
-	})
+	}); iterErr != nil {
+		t.Fatalf("failed to iterate commits: %v", iterErr)
+	}
 
 	oldestSHA := allCommits[len(allCommits)-1].Hash.String()
 
@@ -380,9 +399,18 @@ func TestConvertCommit(t *testing.T) {
 	}
 
 	// Get a commit
-	repo, _ := git.PlainOpen(tmpDir)
-	head, _ := repo.Head()
-	commit, _ := repo.CommitObject(head.Hash())
+	repo, err := git.PlainOpen(tmpDir)
+	if err != nil {
+		t.Fatalf("failed to open repo: %v", err)
+	}
+	head, err := repo.Head()
+	if err != nil {
+		t.Fatalf("failed to get head: %v", err)
+	}
+	commit, err := repo.CommitObject(head.Hash())
+	if err != nil {
+		t.Fatalf("failed to get commit: %v", err)
+	}
 
 	pacCommit := vcs.convertCommit(commit)
 

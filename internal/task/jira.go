@@ -20,9 +20,9 @@ type JiraTaskSystem struct {
 }
 
 // NewJiraTaskSystem creates a new JiraTaskSystem.
-func NewJiraTaskSystem(cfg config.TaskSystemConfig) *JiraTaskSystem {
+func NewJiraTaskSystem(cfg *config.TaskSystemConfig) *JiraTaskSystem {
 	return &JiraTaskSystem{
-		config: cfg,
+		config: *cfg,
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -82,7 +82,7 @@ func (j *JiraTaskSystem) fetchTaskData(taskID string) (map[string]any, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}

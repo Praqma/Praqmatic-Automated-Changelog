@@ -61,7 +61,7 @@ func ExtractTaskIDs(message string, regexConfigs []config.RegexConfig) []TaskMat
 
 // parseRubyRegex parses a Ruby-style regex pattern: /pattern/flags
 // Returns the pattern and flags separately.
-func parseRubyRegex(rubyPattern string) (pattern string, flags string) {
+func parseRubyRegex(rubyPattern string) (pattern, flags string) {
 	rubyPattern = strings.TrimSpace(rubyPattern)
 
 	// Check if it's in Ruby format: /pattern/flags
@@ -85,7 +85,7 @@ func parseRubyRegex(rubyPattern string) (pattern string, flags string) {
 
 // SplitByDelimiter splits a string by the configured delimiter pattern.
 // The delimiter can be a regex pattern in Ruby format (e.g., '/,|\s/').
-func SplitByDelimiter(input string, delimiterPattern string) []string {
+func SplitByDelimiter(input, delimiterPattern string) []string {
 	if delimiterPattern == "" {
 		return []string{input}
 	}

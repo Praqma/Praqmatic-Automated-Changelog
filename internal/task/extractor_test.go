@@ -111,7 +111,7 @@ func TestCreateTaskSystem(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ts, err := CreateTaskSystem(tt.config)
+			ts, err := CreateTaskSystem(&tt.config)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -130,7 +130,7 @@ func TestCreateTaskSystem(t *testing.T) {
 
 func TestNoneTaskSystem_Apply(t *testing.T) {
 	cfg := config.TaskSystemConfig{Name: "none"}
-	ts := NewNoneTaskSystem(cfg)
+	ts := NewNoneTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	task := tasks.FindOrCreate("TASK-1")

@@ -61,11 +61,11 @@ func (g *Generator) generateTemplate(tmplCfg config.TemplateConfig, settings *co
 	if tmplCfg.Output != "" {
 		// Ensure output directory exists
 		outputDir := filepath.Dir(tmplCfg.Output)
-		if err := os.MkdirAll(outputDir, 0755); err != nil {
+		if err := os.MkdirAll(outputDir, 0o755); err != nil {
 			return fmt.Errorf("failed to create output directory: %w", err)
 		}
 
-		if err := os.WriteFile(tmplCfg.Output, output, 0644); err != nil {
+		if err := os.WriteFile(tmplCfg.Output, output, 0o600); err != nil {
 			return fmt.Errorf("failed to write output file %s: %w", tmplCfg.Output, err)
 		}
 		logging.Info("Generated: %s", tmplCfg.Output)

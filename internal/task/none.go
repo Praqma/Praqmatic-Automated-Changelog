@@ -12,8 +12,8 @@ type NoneTaskSystem struct {
 }
 
 // NewNoneTaskSystem creates a new NoneTaskSystem.
-func NewNoneTaskSystem(cfg config.TaskSystemConfig) *NoneTaskSystem {
-	return &NoneTaskSystem{config: cfg}
+func NewNoneTaskSystem(cfg *config.TaskSystemConfig) *NoneTaskSystem {
+	return &NoneTaskSystem{config: *cfg}
 }
 
 // Name returns the task system name.

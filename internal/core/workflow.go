@@ -1,5 +1,4 @@
-// Package core provides the main PAC workflow orchestration.package core
-
+// Package core provides the main PAC workflow orchestration.
 package core
 
 import (
@@ -107,18 +106,18 @@ func RunFromLatestTag(settings *config.Settings, pattern, newestRef string) (*Re
 func applyTaskSystems(settings *config.Settings, tasks *model.PACTaskCollection) bool {
 	allOK := true
 
-	for _, tsCfg := range settings.TaskSystems {
-		ts, err := task.CreateTaskSystem(tsCfg)
+	for i := range settings.TaskSystems {
+		ts, err := task.CreateTaskSystem(&settings.TaskSystems[i])
 		if err != nil {
-			logging.Warn("Failed to create task system %s: %v", tsCfg.Name, err)
+			logging.Warn("Failed to create task system %s: %v", settings.TaskSystems[i].Name, err)
 			allOK = false
 			continue
 		}
 
-		logging.Verbosef(1, "Applying task system: %s", tsCfg.Name)
+		logging.Verbosef(1, "Applying task system: %s", settings.TaskSystems[i].Name)
 
 		if err := ts.Apply(tasks); err != nil {
-			logging.Warn("Task system %s encountered errors: %v", tsCfg.Name, err)
+			logging.Warn("Task system %s encountered errors: %v", settings.TaskSystems[i].Name, err)
 			allOK = false
 		}
 	}

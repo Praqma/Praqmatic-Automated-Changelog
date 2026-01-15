@@ -14,7 +14,7 @@ func TestJiraTaskSystem_Name(t *testing.T) {
 	cfg := config.TaskSystemConfig{
 		Name: "jira-test",
 	}
-	jira := NewJiraTaskSystem(cfg)
+	jira := NewJiraTaskSystem(&cfg)
 
 	if got := jira.Name(); got != "jira-test" {
 		t.Errorf("Name() = %q, want %q", got, "jira-test")
@@ -25,7 +25,7 @@ func TestJiraTaskSystem_Apply_SkipsUnreferenced(t *testing.T) {
 	cfg := config.TaskSystemConfig{
 		Name: "jira",
 	}
-	jira := NewJiraTaskSystem(cfg)
+	jira := NewJiraTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	// Create unreferenced task (empty ID)
@@ -42,7 +42,7 @@ func TestJiraTaskSystem_Apply_SkipsNonApplying(t *testing.T) {
 	cfg := config.TaskSystemConfig{
 		Name: "jira",
 	}
-	jira := NewJiraTaskSystem(cfg)
+	jira := NewJiraTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	task := tasks.FindOrCreate("TASK-1")
@@ -80,7 +80,9 @@ func TestJiraTaskSystem_Apply_WithMockServer(t *testing.T) {
 			},
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			t.Errorf("failed to encode response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -90,7 +92,7 @@ func TestJiraTaskSystem_Apply_WithMockServer(t *testing.T) {
 		Username:    "testuser",
 		Password:    "testpass",
 	}
-	jira := NewJiraTaskSystem(cfg)
+	jira := NewJiraTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	task := tasks.FindOrCreate("TASK-123")
@@ -126,7 +128,7 @@ func TestJiraTaskSystem_Apply_ServerError(t *testing.T) {
 		Name:        "jira",
 		QueryString: server.URL + "/rest/api/2/issue/#{task_id}",
 	}
-	jira := NewJiraTaskSystem(cfg)
+	jira := NewJiraTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	task := tasks.FindOrCreate("TASK-123")
@@ -146,7 +148,9 @@ func TestJiraTaskSystem_Apply_ServerError(t *testing.T) {
 func TestJiraTaskSystem_Apply_InvalidJSON(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte("not valid json"))
+		if _, err := w.Write([]byte("not valid json")); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -154,7 +158,7 @@ func TestJiraTaskSystem_Apply_InvalidJSON(t *testing.T) {
 		Name:        "jira",
 		QueryString: server.URL + "/rest/api/2/issue/#{task_id}",
 	}
-	jira := NewJiraTaskSystem(cfg)
+	jira := NewJiraTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	task := tasks.FindOrCreate("TASK-123")
@@ -170,7 +174,7 @@ func TestNoneTaskSystem_Name(t *testing.T) {
 	cfg := config.TaskSystemConfig{
 		Name: "none-test",
 	}
-	none := NewNoneTaskSystem(cfg)
+	none := NewNoneTaskSystem(&cfg)
 
 	if got := none.Name(); got != "none-test" {
 		t.Errorf("Name() = %q, want %q", got, "none-test")
@@ -181,7 +185,7 @@ func TestNoneTaskSystem_Apply_PreservesLabels(t *testing.T) {
 	cfg := config.TaskSystemConfig{
 		Name: "none",
 	}
-	none := NewNoneTaskSystem(cfg)
+	none := NewNoneTaskSystem(&cfg)
 
 	tasks := model.NewPACTaskCollection()
 	task := tasks.FindOrCreate("TASK-1")
@@ -204,7 +208,7 @@ func TestCreateTaskSystem_None(t *testing.T) {
 		Name: "none",
 	}
 
-	ts, err := CreateTaskSystem(cfg)
+	ts, err := CreateTaskSystem(&cfg)
 	if err != nil {
 		t.Fatalf("CreateTaskSystem() error = %v", err)
 	}
@@ -219,7 +223,7 @@ func TestCreateTaskSystem_Jira(t *testing.T) {
 		Name: "jira",
 	}
 
-	ts, err := CreateTaskSystem(cfg)
+	ts, err := CreateTaskSystem(&cfg)
 	if err != nil {
 		t.Fatalf("CreateTaskSystem() error = %v", err)
 	}
@@ -234,7 +238,7 @@ func TestCreateTaskSystem_Unknown(t *testing.T) {
 		Name: "unknown-system",
 	}
 
-	ts, err := CreateTaskSystem(cfg)
+	ts, err := CreateTaskSystem(&cfg)
 	if err != nil {
 		t.Fatalf("CreateTaskSystem() error = %v", err)
 	}

@@ -219,7 +219,7 @@ func TestGitHubMarkdownTemplate(t *testing.T) {
 	}
 
 	// Skip if template is empty (placeholder)
-	if len(strings.TrimSpace(string(content))) == 0 {
+	if strings.TrimSpace(string(content)) == "" {
 		t.Skip("GitHub template is empty (placeholder file)")
 	}
 
@@ -243,7 +243,7 @@ func TestGitHubMarkdownTemplate(t *testing.T) {
 	}
 
 	// Just verify it renders without error and has some content
-	if len(output) == 0 {
+	if output == "" {
 		t.Error("GitHub template rendered empty output")
 	}
 }

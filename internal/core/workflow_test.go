@@ -48,8 +48,8 @@ func TestRun_WithRealRepo(t *testing.T) {
 	templateContent := `# Changelog
 Tasks: {{ tasks.referenced | size }}
 `
-	if err := os.WriteFile(settings.Templates[0].Location, []byte(templateContent), 0644); err != nil {
-		t.Fatalf("failed to write template: %v", err)
+	if writeErr := os.WriteFile(settings.Templates[0].Location, []byte(templateContent), 0o644); writeErr != nil {
+		t.Fatalf("failed to write template: %v", writeErr)
 	}
 
 	// Run the workflow
@@ -105,8 +105,8 @@ func TestRunFromLatestTag_WithRealRepo(t *testing.T) {
 	}
 
 	// Create template
-	if err := os.WriteFile(settings.Templates[0].Location, []byte("# Test"), 0644); err != nil {
-		t.Fatalf("failed to write template: %v", err)
+	if writeErr := os.WriteFile(settings.Templates[0].Location, []byte("# Test"), 0o644); writeErr != nil {
+		t.Fatalf("failed to write template: %v", writeErr)
 	}
 
 	// Run from latest tag
@@ -154,8 +154,8 @@ func TestRun_StrictMode(t *testing.T) {
 	}
 
 	// Create template
-	if err := os.WriteFile(settings.Templates[0].Location, []byte("# Test"), 0644); err != nil {
-		t.Fatalf("failed to write template: %v", err)
+	if writeErr := os.WriteFile(settings.Templates[0].Location, []byte("# Test"), 0o644); writeErr != nil {
+		t.Fatalf("failed to write template: %v", writeErr)
 	}
 
 	// Run should fail in strict mode when task system fails
@@ -246,7 +246,7 @@ func runGit(t *testing.T, dir string, args ...string) {
 func writeFile(t *testing.T, dir, name, content string) {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatalf("failed to write file %s: %v", path, err)
 	}
 }
