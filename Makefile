@@ -46,14 +46,15 @@ $(PLATFORMS):
 release: build-all
 	@echo "Creating release archives..."
 	@mkdir -p $(BUILD_DIR)/release
+	ls -la $(BUILD_DIR)
 	@for platform in $(PLATFORMS); do \
 		GOOS=$$(echo $$platform | cut -d'/' -f1); \
 		GOARCH=$$(echo $$platform | cut -d'/' -f2); \
 		if [ "$$GOOS" = "windows" ]; then \
 			EXT=".exe"; \
-			cd $(BUILD_DIR) && zip -q release/$(BINARY_NAME)-$(VERSION)-$$GOOS-$$GOARCH.zip $(BINARY_NAME)-$$GOOS-$$GOARCH$$EXT && cd ..; \
+			cd $(BUILD_DIR) && zip -q release/$(BINARY_NAME)-$(VERSION)-$$GOOS-$$GOARCH.zip $$GOOS-$$GOARCH/$(BINARY_NAME)$$EXT && cd ..; \
 		else \
-			cd $(BUILD_DIR) && tar -czf release/$(BINARY_NAME)-$(VERSION)-$$GOOS-$$GOARCH.tar.gz $(BINARY_NAME)-$$GOOS-$$GOARCH && cd ..; \
+			cd $(BUILD_DIR) && tar -czf release/$(BINARY_NAME)-$(VERSION)-$$GOOS-$$GOARCH.tar.gz $$GOOS-$$GOARCH/$(BINARY_NAME) && cd ..; \
 		fi; \
 	done
 	@echo "Release archives created in $(BUILD_DIR)/release/"
