@@ -55,11 +55,11 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: ${{ github.event.inputs.dry_run == 'true' && 'release --snapshot --clean' || 'release --clean' }}
+          # Skip chocolatey - it requires Windows. Built separately in publish-chocolatey job.
+          args: ${{ github.event.inputs.dry_run == 'true' && 'release --snapshot --clean --skip=chocolatey' || 'release --clean --skip=chocolatey' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
           WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
 
       - name: Upload artifacts
@@ -74,25 +74,79 @@ jobs:
     name: Publish to Chocolatey
     runs-on: windows-latest
     needs: release
-    if: ${{ !contains(github.ref, '-') }} # Skip prereleases
+    if: ${{ !contains(github.ref, '-') && github.event.inputs.dry_run != 'true' }} # Skip prereleases and dry runs
     environment: chocolatey-publish
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          name: dist
-          path: dist/
+          fetch-depth: 0
 
-      - name: Find and publish nupkg
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build Chocolatey package
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --clean --single-target
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and publish Chocolatey package
         shell: pwsh
         run: |
-          $nupkg = Get-ChildItem -Path dist -Filter "*.nupkg" -Recurse | Select-Object -First 1
-          if ($nupkg) {
-            Write-Host "Publishing $($nupkg.FullName) to Chocolatey..."
-            choco push $nupkg.FullName --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
-          } else {
-            Write-Host "No .nupkg file found"
-            exit 1
-          }
+          # Get version from tag
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          
+          # Create nuspec
+          $nuspecContent = @"
+          <?xml version="1.0"?>
+          <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+            <metadata>
+              <id>pac</id>
+              <version>$version</version>
+              <title>PAC - Praqmatic Automated Changelog</title>
+              <authors>Praqma</authors>
+              <owners>Praqma</owners>
+              <projectUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog</projectUrl>
+              <licenseUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/main/LICENSE</licenseUrl>
+              <requireLicenseAcceptance>false</requireLicenseAcceptance>
+              <description>PAC (Praqmatic Automated Changelog) generates changelogs from git commits.</description>
+              <tags>changelog git automation devops cli</tags>
+            </metadata>
+            <files>
+              <file src="tools\**" target="tools" />
+            </files>
+          </package>
+          "@
+          
+          # Create directory structure
+          New-Item -ItemType Directory -Force -Path "choco/tools"
+          $nuspecContent | Out-File -FilePath "choco/pac.nuspec" -Encoding UTF8
+          
+          # Copy binary
+          Copy-Item "dist/pac_windows_amd64_v1/pac.exe" "choco/tools/pac.exe"
+          
+          # Create install script
+          @"
+          `$toolsDir = Split-Path -Parent `$MyInvocation.MyCommand.Definition
+          `$exePath = Join-Path `$toolsDir 'pac.exe'
+          Install-BinFile -Name 'pac' -Path `$exePath
+          "@ | Out-File -FilePath "choco/tools/chocolateyInstall.ps1" -Encoding UTF8
+          
+          # Create uninstall script
+          @"
+          Uninstall-BinFile -Name 'pac'
+          "@ | Out-File -FilePath "choco/tools/chocolateyUninstall.ps1" -Encoding UTF8
+          
+          # Pack and push
+          cd choco
+          choco pack
+          choco push pac.$version.nupkg --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
