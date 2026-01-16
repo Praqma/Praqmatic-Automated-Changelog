@@ -1,0 +1,69 @@
+# PAC Makefile for Winget Package Manager
+# Target for building Windows Package Manager manifests
+
+# Build Windows package for Winget (Windows Package Manager)
+.PHONY: winget
+winget:
+	@echo "Building Windows package for winget (version $(VERSION))..."
+	@# Build Windows amd64 binary
+	@mkdir -p $(BUILD_DIR)
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 $(GO) build $(GOFLAGS) $(LDFLAGS) \
+		-o $(BUILD_DIR)/$(BINARY_NAME).exe ./cmd/pac
+	@# Calculate SHA256 hash
+	$(eval BINARY_SHA256 := $(shell sha256sum $(BUILD_DIR)/$(BINARY_NAME).exe | cut -d' ' -f1))
+	@echo "Binary SHA256: $(BINARY_SHA256)"
+	@# Create winget manifest structure
+	$(eval PUBLISHER := Praqma)
+	$(eval PKGID := $(PUBLISHER).$(BINARY_NAME))
+	$(eval PKGDIR := $(BUILD_DIR)/winget/$(PUBLISHER)/$(BINARY_NAME))
+	@rm -rf $(BUILD_DIR)/winget
+	@mkdir -p $(PKGDIR)/$(VERSION)
+	@# Copy binary into package
+	@cp $(BUILD_DIR)/$(BINARY_NAME).exe $(PKGDIR)/$(VERSION)/
+	@# Create installer manifest
+	@echo "PackageIdentifier: $(PKGID)" > $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "PackageVersion: $(VERSION)" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "Platform:" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "- Windows.Desktop" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "MinimumOSVersion: 10.0.0.0" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "InstallerType: portable" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "Commands:" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "- pac" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "Installers:" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "- Architecture: x64" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "  InstallerUrl: pac.exe" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "  InstallerSha256: $(BINARY_SHA256)" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "  InstallerLocale: en-US" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "ManifestType: installer" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@echo "ManifestVersion: 1.4.0" >> $(PKGDIR)/$(VERSION)/installer.yaml
+	@# Create locale manifest (en-US)
+	@echo "PackageIdentifier: $(PKGID)" > $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "PackageVersion: $(VERSION)" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "PackageLocale: en-US" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "Publisher: Praqma" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "PublisherUrl: https://www.praqma.com" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "PublisherSupportUrl: https://github.com/Praqma/Praqmatic-Automated-Changelog/issues" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "Author: Praqma" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "PackageName: PAC" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "PackageUrl: https://github.com/Praqma/Praqmatic-Automated-Changelog" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "License: MIT" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "LicenseUrl: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/main/LICENSE" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "ShortDescription: Praqmatic Automated Changelog Generator" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "Description: PAC is a tool for generating automated changelogs from version control system commits. It extracts task references from commit messages and generates formatted changelogs in various formats (Markdown, HTML)." >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "Moniker: pac" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "Tags:" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "- changelog" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "- changelog-generator" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "- git" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "- automation" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "ManifestType: locale" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@echo "ManifestVersion: 1.4.0" >> $(PKGDIR)/$(VERSION)/locale.en-US.yaml
+	@# Create version manifest
+	@echo "PackageIdentifier: $(PKGID)" > $(PKGDIR)/$(VERSION)/package.yaml
+	@echo "PackageVersion: $(VERSION)" >> $(PKGDIR)/$(VERSION)/package.yaml
+	@echo "DefaultLocale: en-US" >> $(PKGDIR)/$(VERSION)/package.yaml
+	@echo "ManifestType: version" >> $(PKGDIR)/$(VERSION)/package.yaml
+	@echo "ManifestVersion: 1.4.0" >> $(PKGDIR)/$(VERSION)/package.yaml
+	@echo "Winget manifests created in $(PKGDIR)/$(VERSION)/"
+	@echo "Files created:"
+	@ls -lh $(PKGDIR)/$(VERSION)/
