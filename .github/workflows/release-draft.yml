@@ -96,61 +96,62 @@ jobs:
         id: release_notes
         run: |
           VERSION=${{ steps.version.outputs.version }}
-          RELEASE_NOTES="# PAC v${VERSION} Release
+          cat > /tmp/release_notes.md <<'RELEASE_EOF'
+# PAC v$VERSION Release
 
 ## Binaries
 
 Available binaries for download:
 
 ### Linux
-- \`pac-linux-amd64\` - Linux x86_64
-- \`pac-linux-arm64\` - Linux ARM64
+- pac-linux-amd64 - Linux x86_64
+- pac-linux-arm64 - Linux ARM64
 
 ### macOS
-- \`pac-darwin-amd64\` - macOS Intel
-- \`pac-darwin-arm64\` - macOS Apple Silicon
+- pac-darwin-amd64 - macOS Intel
+- pac-darwin-arm64 - macOS Apple Silicon
 
 ### Windows
-- \`pac-windows-amd64.exe\` - Windows x86_64
+- pac-windows-amd64.exe - Windows x86_64
 
 ### Packages
-- \`pac_${VERSION}_amd64.deb\` - Debian/Ubuntu package
-- \`pac-chocolatey-${VERSION}.tar.gz\` - Chocolatey package
-- \`pac-winget-${VERSION}.tar.gz\` - Windows Package Manager manifests
+- pac_$VERSION_amd64.deb - Debian/Ubuntu package
+- pac-chocolatey-$VERSION.tar.gz - Chocolatey package
+- pac-winget-$VERSION.tar.gz - Windows Package Manager manifests
 
 ## Installation
 
 ### Binary Installation
 Download the binary for your platform and run:
-\`\`\`bash
+```bash
 chmod +x pac-linux-amd64  # On Linux/macOS
 ./pac-linux-amd64 --help
-\`\`\`
+```
 
 ### Package Installation
 
 #### Debian/Ubuntu
-\`\`\`bash
-sudo dpkg -i pac_${VERSION}_amd64.deb
-\`\`\`
+```bash
+sudo dpkg -i pac_$VERSION_amd64.deb
+```
 
 #### Chocolatey
-\`\`\`powershell
+```powershell
 choco install pac
-\`\`\`
+```
 
 ## Verification
-Download the \`SHA256SUMS\` file and verify the integrity of your downloaded binary:
+Download the SHA256SUMS file and verify the integrity of your downloaded binary:
 
-\`\`\`bash
+```bash
 sha256sum -c SHA256SUMS
-\`\`\`
+```
 
 ## Changes
 See the full changelog: [CHANGELOG.md](./CHANGELOG.md)
-"
+RELEASE_EOF
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          cat /tmp/release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create Draft Release
