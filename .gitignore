@@ -3,6 +3,7 @@
 changelog.pdf
 changelog.html
 bin
+dist
 coverage
 test/reports
 test/resources/stop_task_system*

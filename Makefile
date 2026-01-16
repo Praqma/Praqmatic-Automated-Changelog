@@ -1,64 +1,42 @@
 # PAC (Praqmatic Automated Changelog) Makefile
-# Supports building for multiple platforms
+# Simplified Makefile that uses GoReleaser for builds and releases
 
 BINARY_NAME := pac
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 BUILD_DIR := ./bin
+DIST_DIR := ./dist
 GO := go
 GOFLAGS := -trimpath
 LDFLAGS := -ldflags "-s -w -X main.Version=$(VERSION)"
-
-# Platforms for cross-compilation
-PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 
 # Default target
 .PHONY: all
 all: build
 
-# Include modular Makefiles for packaging and Docker
--include Makefile.deb
--include Makefile.chocolatey
--include Makefile.winget
--include Makefile.docker
+# ============================================================================
+# Development Targets
+# ============================================================================
 
-# Build for current platform
+# Build for current platform (fast, for development)
 .PHONY: build
 build:
 	$(GO) build $(GOFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/pac
 
-# Build for all platforms
-.PHONY: build-all
-build-all: $(PLATFORMS)
+# Run the application
+.PHONY: run
+run: build
+	$(BUILD_DIR)/$(BINARY_NAME) $(ARGS)
 
-# Cross-compilation targets
-.PHONY: $(PLATFORMS)
-$(PLATFORMS):
-	$(eval GOOS := $(word 1,$(subst /, ,$@)))
-	$(eval GOARCH := $(word 2,$(subst /, ,$@)))
-	$(eval EXT := $(if $(filter windows,$(GOOS)),.exe,))
-	@echo "Building for $(GOOS)/$(GOARCH)..."
-	@mkdir -p $(BUILD_DIR)
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build $(GOFLAGS) $(LDFLAGS) \
-		-o $(BUILD_DIR)/$(GOOS)-$(GOARCH)/$(BINARY_NAME)$(EXT) ./cmd/pac
+# Install to GOPATH/bin
+.PHONY: install
+install:
+	$(GO) install $(GOFLAGS) $(LDFLAGS) ./cmd/pac
 
-# Create release archives
-.PHONY: release
-release: build-all
-	@echo "Creating release archives..."
-	@mkdir -p $(BUILD_DIR)/release
-	@for platform in $(PLATFORMS); do \
-		GOOS=$$(echo $$platform | cut -d'/' -f1); \
-		GOARCH=$$(echo $$platform | cut -d'/' -f2); \
-		if [ "$$GOOS" = "windows" ]; then \
-			EXT=".exe"; \
-			cd $(BUILD_DIR) && zip -q release/$(BINARY_NAME)-$(VERSION)-$$GOOS-$$GOARCH.zip $(BINARY_NAME)-$$GOOS-$$GOARCH$$EXT && cd ..; \
-		else \
-			cd $(BUILD_DIR) && tar -czf release/$(BINARY_NAME)-$(VERSION)-$$GOOS-$$GOARCH.tar.gz $(BINARY_NAME)-$$GOOS-$$GOARCH && cd ..; \
-		fi; \
-	done
-	@echo "Release archives created in $(BUILD_DIR)/release/"
+# ============================================================================
+# Testing Targets
+# ============================================================================
 
-# Run tests
+# Run all tests
 .PHONY: test
 test:
 	$(GO) test -v ./...
@@ -78,18 +56,61 @@ test-race:
 # Run integration tests
 .PHONY: test-integration
 test-integration:
-	$(GO) test -v ./internal/integration/... ./test/...
+	$(GO) test -v -tags=integration ./test/...
 
-# Install to GOPATH/bin
-.PHONY: install
-install:
-	$(GO) install $(GOFLAGS) $(LDFLAGS) ./cmd/pac
+# ============================================================================
+# GoReleaser Targets (Primary build/release method)
+# ============================================================================
 
-# Clean build artifacts
-.PHONY: clean
-clean:
-	rm -rf $(BUILD_DIR)
-	rm -f coverage.out coverage.html
+# Check GoReleaser configuration
+.PHONY: release-check
+release-check:
+	@which goreleaser > /dev/null || (echo "Installing goreleaser..." && go install github.com/goreleaser/goreleaser@latest)
+	goreleaser check
+
+# Build snapshot (all platforms, no publish)
+.PHONY: snapshot
+snapshot:
+	@which goreleaser > /dev/null || (echo "Installing goreleaser..." && go install github.com/goreleaser/goreleaser@latest)
+	goreleaser release --snapshot --clean
+
+# Build for a single platform (fast local testing)
+.PHONY: snapshot-single
+snapshot-single:
+	@which goreleaser > /dev/null || (echo "Installing goreleaser..." && go install github.com/goreleaser/goreleaser@latest)
+	goreleaser build --snapshot --clean --single-target
+
+# Full release (requires tag and GitHub token)
+.PHONY: release
+release:
+	@which goreleaser > /dev/null || (echo "Installing goreleaser..." && go install github.com/goreleaser/goreleaser@latest)
+	goreleaser release --clean
+
+# ============================================================================
+# Docker Targets
+# ============================================================================
+
+# Build Docker image for local testing
+.PHONY: docker
+docker:
+	docker build -t $(BINARY_NAME):$(VERSION) -t $(BINARY_NAME):latest .
+
+# Build multi-arch Docker image (requires buildx)
+.PHONY: docker-multiarch
+docker-multiarch:
+	docker buildx build --platform linux/amd64,linux/arm64 \
+		-t $(BINARY_NAME):$(VERSION) \
+		-t $(BINARY_NAME):latest \
+		--push .
+
+# Run Docker container
+.PHONY: docker-run
+docker-run:
+	docker run --rm -v $(PWD):/repo $(BINARY_NAME):latest $(ARGS)
+
+# ============================================================================
+# Code Quality Targets
+# ============================================================================
 
 # Run linter
 .PHONY: lint
@@ -103,6 +124,15 @@ fmt:
 	$(GO) fmt ./...
 	@which goimports > /dev/null && goimports -w . || true
 
+# Vet code
+.PHONY: vet
+vet:
+	$(GO) vet ./...
+
+# ============================================================================
+# Dependency Management
+# ============================================================================
+
 # Check for outdated dependencies
 .PHONY: deps-check
 deps-check:
@@ -114,56 +144,81 @@ deps-update:
 	$(GO) get -u ./...
 	$(GO) mod tidy
 
-# Generate (if any code generation is needed)
-.PHONY: generate
-generate:
-	$(GO) generate ./...
+# Download dependencies
+.PHONY: deps
+deps:
+	$(GO) mod download
+
+# ============================================================================
+# Cleanup
+# ============================================================================
+
+# Clean build artifacts
+.PHONY: clean
+clean:
+	rm -rf $(BUILD_DIR)
+	rm -rf $(DIST_DIR)
+	rm -f coverage.out coverage.html
+
+# ============================================================================
+# Utilities
+# ============================================================================
 
 # Show version
 .PHONY: version
 version:
 	@echo $(VERSION)
 
-# Run the application
-.PHONY: run
-run: build
-	$(BUILD_DIR)/$(BINARY_NAME) $(ARGS)
+# Generate (if any code generation is needed)
+.PHONY: generate
+generate:
+	$(GO) generate ./...
 
-# Show help
+# ============================================================================
+# Help
+# ============================================================================
+
 .PHONY: help
 help:
 	@echo "PAC (Praqmatic Automated Changelog) Build System"
 	@echo ""
-	@echo "Build Targets:"
-	@echo "  build          Build for current platform"
-	@echo "  build-all      Build for all platforms (linux, darwin, windows)"
-	@echo "  release        Create release archives for all platforms"
-	@echo "  install        Install to GOPATH/bin"
+	@echo "Development Targets:"
+	@echo "  build           Build for current platform"
+	@echo "  run             Build and run (use ARGS='...' for arguments)"
+	@echo "  install         Install to GOPATH/bin"
 	@echo ""
 	@echo "Testing Targets:"
-	@echo "  test           Run all tests"
-	@echo "  test-coverage  Run tests with coverage report"
-	@echo "  test-race      Run tests with race detector"
+	@echo "  test            Run all tests"
+	@echo "  test-coverage   Run tests with coverage report"
+	@echo "  test-race       Run tests with race detector"
 	@echo "  test-integration Run integration tests"
 	@echo ""
-	@echo "Package Targets (see Makefile.packages):"
-	@echo "  deb            Build Debian package (.deb)"
-	@echo "  winget         Create Windows Package Manager manifests"
-	@echo "  chocolatey     Create Chocolatey package"
+	@echo "GoReleaser Targets (Recommended for releases):"
+	@echo "  release-check   Validate GoReleaser configuration"
+	@echo "  snapshot        Build snapshot for all platforms (no publish)"
+	@echo "  snapshot-single Build snapshot for current platform only"
+	@echo "  release         Full release (requires tag and GITHUB_TOKEN)"
 	@echo ""
-	@echo "Docker Targets (see Makefile.docker):"
-	@echo "  docker         Build Docker image"
+	@echo "Docker Targets:"
+	@echo "  docker          Build Docker image for local testing"
 	@echo "  docker-multiarch Build multi-arch Docker image"
+	@echo "  docker-run      Run Docker container"
 	@echo ""
-	@echo "Maintenance Targets:"
-	@echo "  clean          Remove build artifacts"
-	@echo "  lint           Run golangci-lint"
-	@echo "  fmt            Format code"
-	@echo "  deps-check     Check for outdated dependencies"
-	@echo "  deps-update    Update dependencies"
-	@echo "  version        Show version"
-	@echo "  help           Show this help"
+	@echo "Code Quality:"
+	@echo "  lint            Run golangci-lint"
+	@echo "  fmt             Format code"
+	@echo "  vet             Run go vet"
+	@echo ""
+	@echo "Dependency Management:"
+	@echo "  deps            Download dependencies"
+	@echo "  deps-check      Check for outdated dependencies"
+	@echo "  deps-update     Update dependencies"
+	@echo ""
+	@echo "Utilities:"
+	@echo "  clean           Remove build artifacts"
+	@echo "  version         Show version"
+	@echo "  help            Show this help"
 	@echo ""
 	@echo "Variables:"
-	@echo "  VERSION        Override version (default: git describe)"
-	@echo "  ARGS           Arguments for 'run' target"
+	@echo "  VERSION         Override version (default: git describe)"
+	@echo "  ARGS            Arguments for 'run' and 'docker-run' targets"
