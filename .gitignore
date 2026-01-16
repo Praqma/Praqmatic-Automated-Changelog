@@ -15,3 +15,4 @@ default-generated.*
 .idea/
 demorepo
 .out
+**/coverage.out
