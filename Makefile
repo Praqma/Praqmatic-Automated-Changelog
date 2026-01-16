@@ -15,6 +15,12 @@ PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 .PHONY: all
 all: build
 
+# Include modular Makefiles for packaging and Docker
+-include Makefile.deb
+-include Makefile.chocolatey
+-include Makefile.winget
+-include Makefile.docker
+
 # Build for current platform
 .PHONY: build
 build:
@@ -113,48 +119,46 @@ deps-update:
 generate:
 	$(GO) generate ./...
 
-# Build Docker image
-.PHONY: docker
-docker:
-	docker build -t $(BINARY_NAME):$(VERSION) -t $(BINARY_NAME):latest .
-
-# Build multi-arch Docker image (requires buildx)
-.PHONY: docker-multiarch
-docker-multiarch:
-	docker buildx build --platform linux/amd64,linux/arm64 \
-		-t $(BINARY_NAME):$(VERSION) \
-		-t $(BINARY_NAME):latest \
-		--push .
+# Show version
+.PHONY: version
+version:
+	@echo $(VERSION)
 
 # Run the application
 .PHONY: run
 run: build
 	$(BUILD_DIR)/$(BINARY_NAME) $(ARGS)
 
-# Show version
-.PHONY: version
-version:
-	@echo $(VERSION)
-
 # Show help
 .PHONY: help
 help:
 	@echo "PAC (Praqmatic Automated Changelog) Build System"
 	@echo ""
-	@echo "Targets:"
+	@echo "Build Targets:"
 	@echo "  build          Build for current platform"
 	@echo "  build-all      Build for all platforms (linux, darwin, windows)"
 	@echo "  release        Create release archives for all platforms"
+	@echo "  install        Install to GOPATH/bin"
+	@echo ""
+	@echo "Testing Targets:"
 	@echo "  test           Run all tests"
 	@echo "  test-coverage  Run tests with coverage report"
 	@echo "  test-race      Run tests with race detector"
 	@echo "  test-integration Run integration tests"
-	@echo "  install        Install to GOPATH/bin"
+	@echo ""
+	@echo "Package Targets (see Makefile.packages):"
+	@echo "  deb            Build Debian package (.deb)"
+	@echo "  winget         Create Windows Package Manager manifests"
+	@echo "  chocolatey     Create Chocolatey package"
+	@echo ""
+	@echo "Docker Targets (see Makefile.docker):"
+	@echo "  docker         Build Docker image"
+	@echo "  docker-multiarch Build multi-arch Docker image"
+	@echo ""
+	@echo "Maintenance Targets:"
 	@echo "  clean          Remove build artifacts"
 	@echo "  lint           Run golangci-lint"
 	@echo "  fmt            Format code"
-	@echo "  docker         Build Docker image"
-	@echo "  docker-multiarch Build multi-arch Docker image"
 	@echo "  deps-check     Check for outdated dependencies"
 	@echo "  deps-update    Update dependencies"
 	@echo "  version        Show version"
