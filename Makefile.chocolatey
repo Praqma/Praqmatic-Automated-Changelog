@@ -1,0 +1,83 @@
+# PAC Makefile for Chocolatey Package
+# Target for building Chocolatey packages
+
+# Build Chocolatey package
+.PHONY: chocolatey
+chocolatey:
+	@echo "Building Chocolatey package for version $(VERSION)..."
+	@# Build Windows amd64 binary
+	@mkdir -p $(BUILD_DIR)
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 $(GO) build $(GOFLAGS) $(LDFLAGS) \
+		-o $(BUILD_DIR)/$(BINARY_NAME).exe ./cmd/pac
+	@# Calculate SHA256 hash
+	$(eval BINARY_SHA256 := $(shell sha256sum $(BUILD_DIR)/$(BINARY_NAME).exe | cut -d' ' -f1))
+	@echo "Binary SHA256: $(BINARY_SHA256)"
+	@# Create Chocolatey package structure
+	$(eval PKGDIR := $(BUILD_DIR)/chocolatey/pac)
+	@rm -rf $(BUILD_DIR)/chocolatey
+	@mkdir -p $(PKGDIR)/$(VERSION)/tools
+	@# Copy binary into tools directory
+	@cp $(BUILD_DIR)/$(BINARY_NAME).exe $(PKGDIR)/$(VERSION)/tools/
+	@# Create .nuspec file
+	@echo '<?xml version="1.0" encoding="utf-8"?>' > $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '  <metadata>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <id>pac</id>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <version>$(VERSION)</version>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <packageSourceUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog</packageSourceUrl>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <owners>Praqma</owners>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <title>PAC - Praqmatic Automated Changelog</title>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <authors>Praqma</authors>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <projectUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog</projectUrl>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <licenseUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/main/LICENSE</licenseUrl>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <requireLicenseAcceptance>false</requireLicenseAcceptance>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <projectSourceUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog</projectSourceUrl>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <docsUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog/tree/main/docs</docsUrl>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <bugTrackerUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog/issues</bugTrackerUrl>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <tags>changelog changelog-generator git automation devops</tags>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <summary>Praqmatic Automated Changelog Generator</summary>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <description>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      PAC is a tool for generating automated changelogs from version control system commits.' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      It extracts task references from commit messages and generates formatted changelogs in various formats (Markdown, HTML).' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      Features include:' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      - Git integration' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      - Task reference extraction (Jira, regex patterns)' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      - Template-based output generation' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '      - Multiple output formats (Markdown, HTML)' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    </description>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '  </metadata>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '  <files>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '    <file src="tools/**" target="tools" />' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '  </files>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@echo '</package>' >> $(PKGDIR)/$(VERSION)/pac.nuspec
+	@# Create install script
+	@echo '$$toolsDir = "$(DOLLAR)(Split-Path -parent $DOLLAR(MyInvocation.MyCommand.Definition))"' > $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '$$packageArgs = @{' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '  packageName   = "pac"' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '  unzipLocation = "$$toolsDir"' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '  file          = "$$toolsDir\pac.exe"' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '}' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '# Copy to Program Files' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo '$$binPath = "$$env:ChocolateyInstall\bin"' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@echo 'Copy-Item -Path "$$toolsDir\pac.exe" -Destination "$$binPath\pac.exe" -Force' >> $(PKGDIR)/$(VERSION)/tools/chocolateyinstall.ps1
+	@# Create uninstall script
+	@echo '$$binPath = "$$env:ChocolateyInstall\bin"' > $(PKGDIR)/$(VERSION)/tools/chocolateyuninstall.ps1
+	@echo 'Remove-Item -Path "$$binPath\pac.exe" -Force -ErrorAction SilentlyContinue' >> $(PKGDIR)/$(VERSION)/tools/chocolateyuninstall.ps1
+	@# Create VERIFICATION.txt
+	@echo 'VERIFICATION' > $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo '' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo 'Verification is intended to assist the Chocolatey moderators and community' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo 'in verifying that this package''s contents are trustworthy.' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo '' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo 'Package binary SHA256: $(BINARY_SHA256)' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo '' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo 'To verify this file:' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo '  certUtil -hashfile pac.exe SHA256' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo '' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo 'Source: https://github.com/Praqma/Praqmatic-Automated-Changelog' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo 'Package Source: https://github.com/Praqma/Praqmatic-Automated-Changelog' >> $(PKGDIR)/$(VERSION)/VERIFICATION.txt
+	@echo "Chocolatey package created in $(PKGDIR)/$(VERSION)/"
+	@echo "Files created:"
+	@ls -lh $(PKGDIR)/$(VERSION)/
