@@ -97,59 +97,59 @@ jobs:
         run: |
           VERSION=${{ steps.version.outputs.version }}
           cat > /tmp/release_notes.md <<'RELEASE_EOF'
-# PAC v$VERSION Release
+          # PAC v$VERSION Release
 
-## Binaries
+          ## Binaries
 
-Available binaries for download:
+          Available binaries for download:
 
-### Linux
-- pac-linux-amd64 - Linux x86_64
-- pac-linux-arm64 - Linux ARM64
+          ### Linux
+          - pac-linux-amd64 - Linux x86_64
+          - pac-linux-arm64 - Linux ARM64
 
-### macOS
-- pac-darwin-amd64 - macOS Intel
-- pac-darwin-arm64 - macOS Apple Silicon
+          ### macOS
+          - pac-darwin-amd64 - macOS Intel
+          - pac-darwin-arm64 - macOS Apple Silicon
 
-### Windows
-- pac-windows-amd64.exe - Windows x86_64
+          ### Windows
+          - pac-windows-amd64.exe - Windows x86_64
 
-### Packages
-- pac_$VERSION_amd64.deb - Debian/Ubuntu package
-- pac-chocolatey-$VERSION.tar.gz - Chocolatey package
-- pac-winget-$VERSION.tar.gz - Windows Package Manager manifests
+          ### Packages
+          - pac_$VERSION_amd64.deb - Debian/Ubuntu package
+          - pac-chocolatey-$VERSION.tar.gz - Chocolatey package
+          - pac-winget-$VERSION.tar.gz - Windows Package Manager manifests
 
-## Installation
+          ## Installation
 
-### Binary Installation
-Download the binary for your platform and run:
-```bash
-chmod +x pac-linux-amd64  # On Linux/macOS
-./pac-linux-amd64 --help
-```
+          ### Binary Installation
+          Download the binary for your platform and run:
+          ```bash
+          chmod +x pac-linux-amd64  # On Linux/macOS
+          ./pac-linux-amd64 --help
+          ```
 
-### Package Installation
+          ### Package Installation
 
-#### Debian/Ubuntu
-```bash
-sudo dpkg -i pac_$VERSION_amd64.deb
-```
+          #### Debian/Ubuntu
+          ```bash
+          sudo dpkg -i pac_$VERSION_amd64.deb
+          ```
 
-#### Chocolatey
-```powershell
-choco install pac
-```
+          #### Chocolatey
+          ```powershell
+          choco install pac
+          ```
 
-## Verification
-Download the SHA256SUMS file and verify the integrity of your downloaded binary:
+          ## Verification
+          Download the SHA256SUMS file and verify the integrity of your downloaded binary:
 
-```bash
-sha256sum -c SHA256SUMS
-```
+          ```bash
+          sha256sum -c SHA256SUMS
+          ```
 
-## Changes
-See the full changelog: [CHANGELOG.md](./CHANGELOG.md)
-RELEASE_EOF
+          ## Changes
+          See the full changelog: [CHANGELOG.md](./CHANGELOG.md)
+          RELEASE_EOF
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           cat /tmp/release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
