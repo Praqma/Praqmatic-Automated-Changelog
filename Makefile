@@ -39,7 +39,7 @@ $(PLATFORMS):
 	@echo "Building for $(GOOS)/$(GOARCH)..."
 	@mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build $(GOFLAGS) $(LDFLAGS) \
-		-o $(BUILD_DIR)/$(BINARY_NAME)-$(GOOS)-$(GOARCH)$(EXT) ./cmd/pac
+		-o $(BUILD_DIR)/$(GOOS)-$(GOARCH)/$(BINARY_NAME)$(EXT) ./cmd/pac
 
 # Create release archives
 .PHONY: release
