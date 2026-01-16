@@ -57,21 +57,21 @@ jobs:
           make deb VERSION=${VERSION}
           cp bin/pac_${VERSION}_amd64.deb dist/
 
-      - name: Build Chocolatey package
-        run: |
-          VERSION=${{ steps.version.outputs.version }}
-          make chocolatey VERSION=${VERSION}
-          cd bin/chocolatey/pac/${VERSION}
-          tar -czf pac-chocolatey-${VERSION}.tar.gz .
-          cp pac-chocolatey-${VERSION}.tar.gz "${{ github.workspace }}/dist/"
+      # - name: Build Chocolatey package
+      #   run: |
+      #     VERSION=${{ steps.version.outputs.version }}
+      #     make chocolatey VERSION=${VERSION}
+      #     cd bin/chocolatey/pac/${VERSION}
+      #     tar -czf pac-chocolatey-${VERSION}.tar.gz .
+      #     cp pac-chocolatey-${VERSION}.tar.gz "${{ github.workspace }}/dist/"
 
-      - name: Build Winget manifests
-        run: |
-          VERSION=${{ steps.version.outputs.version }}
-          make winget VERSION=${VERSION}
-          cd bin/winget/Praqma/pac/${VERSION}
-          tar -czf pac-winget-${VERSION}.tar.gz .
-          cp pac-winget-${VERSION}.tar.gz "${{ github.workspace }}/dist/"
+      # - name: Build Winget manifests
+      #   run: |
+      #     VERSION=${{ steps.version.outputs.version }}
+      #     make winget VERSION=${VERSION}
+      #     cd bin/winget/Praqma/pac/${VERSION}
+      #     tar -czf pac-winget-${VERSION}.tar.gz .
+      #     cp pac-winget-${VERSION}.tar.gz "${{ github.workspace }}/dist/"
 
       - name: Create checksums
         run: |
