@@ -37,28 +37,16 @@ jobs:
           VERSION=${{ steps.version.outputs.version }}
           echo "Building version: ${VERSION}"
           
+          # Use Makefile to build for all platforms
+          make build-all VERSION=${VERSION}
+          
+          # Copy binaries to dist directory with proper naming
           mkdir -p dist
-          
-          # Define platforms
-          platforms="linux/amd64:linux-amd64 linux/arm64:linux-arm64 darwin/amd64:darwin-amd64 darwin/arm64:darwin-arm64 windows/amd64:windows-amd64"
-          
-          for platform in $platforms; do
-            GOOS="${platform%/*}"
-            GOARCH="${platform##*/}"
-            GOARCH="${GOARCH##*:}"
-            SUFFIX="${platform##*:}"
-            
-            BINARY_NAME="pac-${SUFFIX}"
-            if [ "$GOOS" = "windows" ]; then
-              BINARY_NAME="pac-${SUFFIX}.exe"
-            fi
-            
-            echo "Building for $GOOS/$GOARCH -> $BINARY_NAME"
-            GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build \
-              -trimpath \
-              -ldflags "-s -w -X main.Version=${VERSION}" \
-              -o "dist/${BINARY_NAME}" ./cmd/pac
-          done
+          cp bin/linux-amd64/pac dist/pac-linux-amd64
+          cp bin/linux-arm64/pac dist/pac-linux-arm64
+          cp bin/darwin-amd64/pac dist/pac-darwin-amd64
+          cp bin/darwin-arm64/pac dist/pac-darwin-arm64
+          cp bin/windows-amd64/pac.exe dist/pac-windows-amd64.exe
           
           echo "Built binaries:"
           ls -lh dist/
