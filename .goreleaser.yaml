@@ -82,7 +82,7 @@ checksum:
 
 # Snapshot configuration for development builds
 snapshot:
-  version_template: "{{ incpatch .Version }}-dev"
+  version_template: "{{ .Version }}-{{ .ShortCommit }}-dev"
 
 # Changelog configuration
 changelog:
@@ -256,7 +256,7 @@ homebrew_casks:
         pac --help
       
       For configuration options, see:
-        https://github.com/Praqma/Praqmatic-Automated-Changelog#configuration
+        https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/docs/configuration.md
     hooks:
       post:
         # Remove quarantine bit for unsigned binary
@@ -265,39 +265,9 @@ homebrew_casks:
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/pac"]
           end
 
-# Chocolatey packages configuration
-chocolateys:
-  - name: pac
-    ids:
-      - default
-    package_source_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    owners: Praqma
-    title: PAC - Praqmatic Automated Changelog
-    authors: Praqma
-    project_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    icon_url: https://raw.githubusercontent.com/Praqma/Praqmatic-Automated-Changelog/master/docs/icon.png
-    copyright: 2024 Praqma
-    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/LICENSE
-    require_license_acceptance: false
-    project_source_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    docs_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/tree/master/docs
-    bug_tracker_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/issues
-    tags: "changelog changelog-generator git automation devops cli"
-    summary: Praqmatic Automated Changelog Generator
-    description: |
-      PAC (Praqmatic Automated Changelog) is a tool for generating automated 
-      changelogs from version control system commits.
-      
-      Features include:
-      - Git integration
-      - Task reference extraction (Jira, regex patterns)
-      - Template-based output generation
-      - Multiple output formats (Markdown, HTML)
-    release_notes: "https://github.com/Praqma/Praqmatic-Automated-Changelog/releases/tag/v{{ .Version }}"
-    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
-    source_repo: "https://push.chocolatey.org/"
-    skip_publish: true
-    goamd64: v1
+# NOTE: Chocolatey packaging is handled separately in the GitHub Actions workflow
+# because it requires Windows to run the choco CLI for both packing and pushing.
+# See .github/workflows/release.yml publish-chocolatey job.
 
 # Winget configuration
 winget:
@@ -342,10 +312,7 @@ dockers_v2:
       - "ghcr.io/praqma/pac"
     tags:
       - "{{ .Version }}"
-      - "{{ .Major }}.{{ .Minor }}"
-      - "{{ .Major }}"
-      - "{{ if not .Prerelease }}latest{{ end }}"
-      - "{{ if .IsSnapshot }}dev{{ end }}"
+      - "{{ if and (not .IsSnapshot) (not .Prerelease) }}latest{{ end }}"
     platforms:
       - linux/amd64
       - linux/arm64

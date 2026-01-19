@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# GoReleaser configuration for Windows-specific packaging (Chocolatey)
+# This runs separately on Windows runners since choco CLI requires Windows.
+
+version: 2
+
+project_name: pac
+
+# Git configuration
+git:
+  ignore_tags:
+    - "dev"
+
+# Environment variables
+env:
+  - CGO_ENABLED=0
+
+# Build configuration - only Windows
+builds:
+  - id: pac-windows
+    main: ./cmd/pac
+    binary: pac
+    goos:
+      - windows
+    goarch:
+      - amd64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.Version={{ .Version }}
+      - -X main.Commit={{ .ShortCommit }}
+      - -X main.Date={{ .Date }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+# Skip archiving - we just need the binary for Chocolatey
+archives:
+  - id: windows-binary
+    formats:
+      - binary
+    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
+
+# Chocolatey packages configuration
+chocolateys:
+  - name: pac
+    ids:
+      - pac-windows
+    package_source_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
+    owners: Praqma
+    title: PAC - Praqmatic Automated Changelog
+    authors: Praqma
+    project_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
+    icon_url: https://raw.githubusercontent.com/Praqma/Praqmatic-Automated-Changelog/master/docs/icon.png
+    copyright: 2025 Praqma
+    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/LICENSE
+    require_license_acceptance: false
+    project_source_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
+    docs_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/tree/master/docs
+    bug_tracker_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/issues
+    tags: "changelog changelog-generator git automation devops cli"
+    summary: Praqmatic Automated Changelog Generator
+    description: |
+      PAC (Praqmatic Automated Changelog) is a tool for generating automated 
+      changelogs from version control system commits.
+      
+      Features include:
+      - Git integration
+      - Task reference extraction (Jira, regex patterns)
+      - Template-based output generation
+      - Multiple output formats (Markdown, HTML)
+    release_notes: "https://github.com/Praqma/Praqmatic-Automated-Changelog/releases/tag/v{{ .Version }}"
+    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false
+    goamd64: v1
+
+# Disable other publishers for this config
+release:
+  disable: true
+
+checksum:
+  disable: true
+
+snapshot:
+  version_template: "{{ .Version }}-{{ .ShortCommit }}-dev"

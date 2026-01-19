@@ -7,6 +7,11 @@ on:
     branches: [master, main, develop]
   pull_request:
     branches: [master, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -18,6 +23,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,13 +31,13 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version-file: go.mod
           cache: true
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v1.62.0
           args: --timeout=5m
 
       - name: Check formatting
@@ -48,6 +54,7 @@ jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -84,6 +91,7 @@ jobs:
   goreleaser-check:
     name: GoReleaser Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [lint, test]
     steps:
       - name: Checkout code
@@ -94,7 +102,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version-file: go.mod
           cache: true
 
       - name: Check GoReleaser config
@@ -119,6 +127,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [lint, test]
     strategy:
       matrix:
@@ -135,7 +144,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version-file: go.mod
           cache: true
 
       - name: Build
@@ -160,6 +169,7 @@ jobs:
   integration:
     name: Integration Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [build]
     steps:
       - name: Checkout code
@@ -170,7 +180,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version-file: go.mod
           cache: true
 
       - name: Run integration tests
@@ -182,6 +192,7 @@ jobs:
   docker:
     name: Docker Build Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [lint, test]
     steps:
       - name: Checkout code

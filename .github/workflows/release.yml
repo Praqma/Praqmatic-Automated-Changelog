@@ -14,6 +14,10 @@ on:
         default: true
         type: boolean
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   packages: write
@@ -23,6 +27,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,8 +45,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          install: true
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -55,8 +58,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          # Skip chocolatey - it requires Windows. Built separately in publish-chocolatey job.
-          args: ${{ github.event.inputs.dry_run == 'true' && 'release --snapshot --clean --skip=chocolatey' || 'release --clean --skip=chocolatey' }}
+          args: ${{ github.event.inputs.dry_run == 'true' && 'release --snapshot --clean' || 'release --clean' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
@@ -70,12 +72,25 @@ jobs:
           path: dist/
           retention-days: 7
 
-  # Optional: Publish to Chocolatey after manual review
+      - name: Verify release artifacts
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          echo "=== Release Summary ==="
+          echo "Tag: ${{ github.ref_name }}"
+          echo ""
+          echo "=== Generated Artifacts ==="
+          ls -la dist/ | head -30
+          echo ""
+          echo "=== Checksums ==="
+          cat dist/checksums.txt 2>/dev/null || echo "No checksums file found"
+
+  # Chocolatey requires Windows to run choco CLI for both packing and pushing
   publish-chocolatey:
     name: Publish to Chocolatey
     runs-on: windows-latest
+    timeout-minutes: 30
     needs: release
-    if: ${{ !contains(github.ref, '-') && github.event.inputs.dry_run != 'true' }} # Skip prereleases and dry runs
+    if: ${{ !contains(github.ref, '-') && github.event.inputs.dry_run != 'true' }}
     environment: chocolatey-publish
     steps:
       - name: Checkout
@@ -89,65 +104,13 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Build Chocolatey package
+      - name: Run GoReleaser for Chocolatey
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: build --clean --single-target
+          args: release --clean --config .goreleaser.windows.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and publish Chocolatey package
-        shell: pwsh
-        run: |
-          # Get version from tag
-          $version = "${{ github.ref_name }}".TrimStart("v")
-          
-          # Create nuspec
-          $nuspecContent = @"
-          <?xml version="1.0"?>
-          <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-            <metadata>
-              <id>pac</id>
-              <version>$version</version>
-              <title>PAC - Praqmatic Automated Changelog</title>
-              <authors>Praqma</authors>
-              <owners>Praqma</owners>
-              <projectUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog</projectUrl>
-              <licenseUrl>https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/main/LICENSE</licenseUrl>
-              <requireLicenseAcceptance>false</requireLicenseAcceptance>
-              <description>PAC (Praqmatic Automated Changelog) generates changelogs from git commits.</description>
-              <tags>changelog git automation devops cli</tags>
-            </metadata>
-            <files>
-              <file src="tools\**" target="tools" />
-            </files>
-          </package>
-          "@
-          
-          # Create directory structure
-          New-Item -ItemType Directory -Force -Path "choco/tools"
-          $nuspecContent | Out-File -FilePath "choco/pac.nuspec" -Encoding UTF8
-          
-          # Copy binary
-          Copy-Item "dist/pac_windows_amd64_v1/pac.exe" "choco/tools/pac.exe"
-          
-          # Create install script
-          @"
-          `$toolsDir = Split-Path -Parent `$MyInvocation.MyCommand.Definition
-          `$exePath = Join-Path `$toolsDir 'pac.exe'
-          Install-BinFile -Name 'pac' -Path `$exePath
-          "@ | Out-File -FilePath "choco/tools/chocolateyInstall.ps1" -Encoding UTF8
-          
-          # Create uninstall script
-          @"
-          Uninstall-BinFile -Name 'pac'
-          "@ | Out-File -FilePath "choco/tools/chocolateyUninstall.ps1" -Encoding UTF8
-          
-          # Pack and push
-          cd choco
-          choco pack
-          choco push pac.$version.nupkg --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
-        env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
