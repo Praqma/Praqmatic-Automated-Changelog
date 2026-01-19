@@ -7,7 +7,7 @@ Issue tracking:
 [![CI](https://github.com/Praqma/Praqmatic-Automated-Changelog/actions/workflows/ci.yml/badge.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Praqma/Praqmatic-Automated-Changelog)](https://goreportcard.com/report/github.com/Praqma/Praqmatic-Automated-Changelog)
 
-# Praqmatic Automated Changelog (PAC)
+# <img src="./docs/icon.png" width="100" style="vertical-align: middle;"> Praqmatic Automated Changelog (PAC)
 
 Tool for creating automated, but pragmatic, changelogs.
 

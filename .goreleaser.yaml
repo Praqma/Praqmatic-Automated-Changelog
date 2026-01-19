@@ -275,12 +275,12 @@ chocolateys:
     title: PAC - Praqmatic Automated Changelog
     authors: Praqma
     project_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    icon_url: https://raw.githubusercontent.com/Praqma/Praqmatic-Automated-Changelog/main/docs/icon.png
+    icon_url: https://raw.githubusercontent.com/Praqma/Praqmatic-Automated-Changelog/master/docs/icon.png
     copyright: 2024 Praqma
-    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/main/LICENSE
+    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/LICENSE
     require_license_acceptance: false
     project_source_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    docs_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/tree/main/docs
+    docs_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/tree/master/docs
     bug_tracker_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/issues
     tags: "changelog changelog-generator git automation devops cli"
     summary: Praqmatic Automated Changelog Generator
@@ -313,7 +313,7 @@ winget:
       PAC (Praqmatic Automated Changelog) is a tool for generating automated 
       changelogs from version control system commits. It extracts task references 
       from commit messages and generates formatted changelogs in various formats.
-    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/main/LICENSE
+    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/LICENSE
     copyright: Copyright (c) 2024 Praqma
     tags:
       - changelog
