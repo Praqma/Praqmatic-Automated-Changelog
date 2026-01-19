@@ -1,136 +1,120 @@
-# golangci-lint configuration for PAC
-# https://golangci-lint.run/usage/configuration/
-
+version: "2"
 run:
-  timeout: 5m
-  tests: true
   modules-download-mode: readonly
-
-output:
-  formats:
-    - format: colored-line-number
-  sort-results: true
-
+  tests: true
 linters:
   enable:
-    # Default linters
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
-    
-    # Additional linters
-    - bodyclose       # Check HTTP response body is closed
-    - dupl            # Code duplication detector
-    - errorlint       # Error handling best practices
-    - exhaustive      # Check switch exhaustiveness
-    - gocognit        # Cognitive complexity
-    - goconst         # Find repeated strings that could be constants
-    - gocritic        # Opinionated linter
-    - gocyclo         # Cyclomatic complexity
-    - gofmt           # Check formatting
-    - goimports       # Check imports ordering
-    - gosec           # Security linter
-    - misspell        # Spell checker
-    - nakedret        # Naked returns in large functions
-    - nilerr          # Check nil error returns
-    - nolintlint      # Check nolint directives
-    - prealloc        # Slice preallocation
-    - predeclared     # Find shadowed predeclared identifiers
-    - revive          # Replacement for golint
-    - unconvert       # Remove unnecessary type conversions
-    - unparam         # Unused function parameters
-    - whitespace      # Whitespace issues
-
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
-  
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment  # Too noisy for this project
-  
-  gocyclo:
-    min-complexity: 15
-  
-  gocognit:
-    min-complexity: 20
-  
-  dupl:
-    threshold: 100
-  
-  goconst:
-    min-len: 3
-    min-occurrences: 3
-  
-  misspell:
-    locale: US
-  
-  nakedret:
-    max-func-lines: 30
-  
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-      - performance
-    disabled-checks:
-      - whyNoLint
-  
-  revive:
+    - bodyclose
+    - dupl
+    - errorlint
+    - exhaustive
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - misspell
+    - nakedret
+    - nilerr
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - unconvert
+    - unparam
+    - whitespace
+  settings:
+    dupl:
+      threshold: 100
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    gocognit:
+      min-complexity: 20
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    gocritic:
+      disabled-checks:
+        - whyNoLint
+        - importShadow
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+    gocyclo:
+      min-complexity: 15
+    gosec:
+      excludes:
+        - G104
+        - G304
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+    misspell:
+      locale: US
+    nakedret:
+      max-func-lines: 30
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: if-return
+        - name: increment-decrement
+        - name: var-naming
+        - name: var-declaration
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: indent-error-flow
+        - name: errorf
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
-      - name: blank-imports
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: dot-imports
-      - name: error-return
-      - name: error-strings
-      - name: error-naming
-      - name: exported
-      - name: if-return
-      - name: increment-decrement
-      - name: var-naming
-      - name: var-declaration
-      - name: package-comments
-      - name: range
-      - name: receiver-naming
-      - name: time-naming
-      - name: unexported-return
-      - name: indent-error-flow
-      - name: errorf
-  
-  gosec:
-    excludes:
-      - G104  # Audit errors not checked (too noisy with defer)
-      - G304  # File path provided as taint input (intentional in CLI)
-
+      - linters:
+          - dupl
+          - gocognit
+          - goconst
+          - gocyclo
+          - gosec
+        path: _test\.go
+      - linters:
+          - dupl
+          - gosec
+        path: test/
+      - linters:
+          - gocognit
+          - gocyclo
+        path: cmd/
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-rules:
-    # Ignore certain linters in test files
-    - path: _test\.go
-      linters:
-        - dupl
-        - gosec
-        - goconst
-        - gocognit
-        - gocyclo
-    
-    # Ignore test helpers
-    - path: test/
-      linters:
-        - dupl
-        - gosec
-    
-    # Allow longer functions in main
-    - path: cmd/
-      linters:
-        - gocyclo
-        - gocognit
-  
   max-issues-per-linter: 50
   max-same-issues: 5
   new: false
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

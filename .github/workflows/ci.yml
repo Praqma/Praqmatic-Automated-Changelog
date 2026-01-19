@@ -35,9 +35,9 @@ jobs:
           cache: true
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.62.0
+          version: v2.8.0
           args: --timeout=5m
 
       - name: Check formatting
