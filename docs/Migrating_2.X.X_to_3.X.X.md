@@ -25,7 +25,7 @@ With the removal of `date`, there is no longer any reason to have `date_template
 ## New format (date_template removed)
 
 ```YAML
-:general:
+general:
   changelog_name: "changelog"
   changelog_formats:
     - "html"

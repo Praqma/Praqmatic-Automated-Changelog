@@ -26,7 +26,7 @@ Your existing YAML configuration files work without changes:
 
 :vcs:
   :type: git
-  :repo_location: '.'
+  repo_location: '.'
 ```
 
 ### Templates ✅
@@ -188,11 +188,11 @@ If your template output differs, check for:
 The Go version uses the same authentication mechanism:
 
 ```yaml
-:task_systems:
-  - :name: jira
-    :query_string: 'https://jira.example.com/rest/api/2/issue/#{task_id}'
-    :usr: myuser
-    :pw: mypassword
+task_systems:
+  - name: jira
+    query_string: 'https://jira.example.com/rest/api/2/issue/#{task_id}'
+    usr: myuser
+    pw: mypassword
 ```
 
 Ensure your credentials are correctly specified. You can also use environment variables or the `-c` flag.

@@ -146,9 +146,9 @@ chmod +x /path/to/pac
 PAC needs to run from within a Git repository, or you need to specify the repository location in your settings:
 
 ```yaml
-:vcs:
-  :type: git
-  :repo_location: '/path/to/your/repo'
+vcs:
+  type: git
+  repo_location: '/path/to/your/repo'
 ```
 
 ### TLS/SSL errors

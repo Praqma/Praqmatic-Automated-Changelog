@@ -65,7 +65,7 @@ You can find more examples on PAC templates in the `templates` folder.
 
 ## Extra PAC variables
 
-If you have defined the `:properties:` section in your configuration file or are running PAC with the `--properties` switch. You will also have the following variables available in your templates:
+If you have defined the `properties:` section in your configuration file or are running PAC with the `--properties` switch. You will also have the following variables available in your templates:
 
 - `properties.*` The `*` should be substituted with the name of your variable.
 

@@ -262,11 +262,11 @@ func TestGitHubTaskSystem_Apply(t *testing.T) {
 Add usage example to documentation:
 
 ```yaml
-:task_systems:
-  - :name: github
-    :query_string: 'https://api.github.com/repos/owner/repo/issues/#{task_id}'
-    :pw: 'ghp_your_token_here'
-    :regex:
+task_systems:
+  - name: github
+    query_string: 'https://api.github.com/repos/owner/repo/issues/#{task_id}'
+    pw: 'ghp_your_token_here'
+    regex:
       - { pattern: '/#(\d+)/', label: issue }
 ```
 

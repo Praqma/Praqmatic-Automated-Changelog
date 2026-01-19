@@ -5,46 +5,46 @@ Each configuration part is explained below so you can pick and choose for your o
 
 Configuration file is YAML, so the : (colons), - (dash) and indentation matters.
 
-	:general:
-	  :strict: false
+	general:
+	  strict: false
 
-	:properties:
+	properties:
 		title: 'Changelog name'
 		product: 'Awesome product'
 
-	:templates:
+	templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
 	  - { location: templates/default.md, output: default.md }
 	  - { location: templates/default_html.html, pdf: true, output: default.html }
 
-	:task_systems:
+	task_systems:
 	  - 
-	    :name: none	    
-	    :regex:
+	    name: none	    
+	    regex:
 	      - { pattern: '/Issue:\s*(\d+)/i', label: none }
 	      - { pattern: '/Issue:\s*(none)/i', label: none }
 	      - { pattern: '/(#\d+)/', label: none }
 	      - { pattern: '/us:(\d+)/', label: none }
-	    :delimiter: '/,|\s/'
+	    delimiter: '/,|\s/'
 	  -
-	    :name: jira
-	    :debug: false
-	    :query_string: "http//your.server.hostname/jira/rest/api/latest/#{task_id}"
-	    :usr: "user"  
-	    :pw: "password"
-	    :regex:
+	    name: jira
+	    debug: false
+	    query_string: "http//your.server.hostname/jira/rest/api/latest/#{task_id}"
+	    usr: "user"  
+	    pw: "password"
+	    regex:
 	    - { pattern: '/PRJ-(\d+)/i', label: jira }      
 	  -
-	    :name: trac
-	    :trac_url: "https://my.trac.site"
-	    :trac_usr: "user"
-	    :trac_pwd: "pass"
-	    :regex:
+	    name: trac
+	    trac_url: "https://my.trac.site"
+	    trac_usr: "user"
+	    trac_pwd: "pass"
+	    regex:
 	    - { pattern: '/Ticket-(\d+)/i', label: trac }
 
-	:vcs:
-	  :type: git
-	  :repo_location: '.'
+	vcs:
+	  type: git
+	  repo_location: '.'
 
 ## General
 
@@ -87,14 +87,14 @@ A task system configuration must specify:
 * **`regex`** (_section is required_) is a list of regular expressions used to find the tasks in the SCM commits. Each entry is in the form: `{ pattern: <pattern>, label: <label> }`:
  * **`pattern`** (_one regexp is required_) is the reg exp used for matching tasks
  * **`label`** (_required_) is used to group the results, and be used for selecting, grouping and iteration in the templates. See [How to use labels](label_configuration.md)
-* **`debug`** (_optional_) can be set to true (`:debug: true`) to print out to standard out the raw data returned from the task system. Useful information when writing themplates, so you can see what raw data is available with `dot`s in the templates. See [Using debug to inspect raw task system data](templates#using-debug-to-inspect-raw-task-system-data)
+* **`debug`** (_optional_) can be set to true (`debug: true`) to print out to standard out the raw data returned from the task system. Useful information when writing themplates, so you can see what raw data is available with `dot`s in the templates. See [Using debug to inspect raw task system data](templates#using-debug-to-inspect-raw-task-system-data)
 * **`delimiter`** (_optional_) an regex used to split commits further after the first match. PAC 1.x didn't support greedy matching, in order to match e.g. `#1,#2,#3`, one would have to specify a regex as the split delimiter. We generally discourage the use of this flag. 
 
 Help writing regexp using Ruby IRB see this litle howto: [Howto write regexp using IRB](howto_write_regexp_using_irb.md)
 
 ### JIRA specific configuration
 
-For JIRA task system (`:name: 'jira'`) the following is _required_ configuration:
+For JIRA task system (`name: 'jira'`) the following is _required_ configuration:
 
 * **`query_string`** as the location of your JIRA instance. _Always_ have the `task_id` in the string as in the example. Is is replaced by PAC with the task id captured by the regular expressions.
 * **`usr`** is the JIRA user ID. The user must have read permission to the issues.
@@ -104,7 +104,7 @@ _There is usually no required configuration to do in your JIRA_.
 
 ### Trac specific configuration
 
-For Trac task system (`:name: 'trac'`) the following is _required_ configuration:
+For Trac task system (`name: 'trac'`) the following is _required_ configuration:
 
 * **`trac_url`** is the base Trac location
 * **`trac_usr`** is the Trac user ID, and the user must have `XML_RPC` permissions

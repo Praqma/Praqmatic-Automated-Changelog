@@ -44,20 +44,20 @@ To start generating changelogs you'll need to:
 This is an example of a simple configuration file. It collects task references from commits using the configured regex and create a changelog based on the configured template.
 This simple example do not extract data from task systems.
 
-	:general:
+	general:
 
-	:templates:
+	templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
 
-	:task_systems:
+	task_systems:
 	  -
-	    :name: none
-	    :regex:
+	    name: none
+	    regex:
 	      - { pattern: '/PAC\-(\d+)', label: none }
 
-	:vcs:
-	  :type: git
-	  :repo_location: '.'
+	vcs:
+	  type: git
+	  repo_location: '.'
 
 More about configuration in [Configuration](docs/configuration.md).
 

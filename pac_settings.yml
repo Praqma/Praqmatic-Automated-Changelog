@@ -1,19 +1,19 @@
-:general:
-  :strict: false
+general:
+  strict: false
  
-:templates:
+templates:
   - { location: templates/default_html.html }
 
-:task_systems:
+task_systems:
   -
-    :name: none
-    :query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
-    :usr:
-    :pw: 
-    :regex:
+    name: none
+    query_string: "https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}"
+    usr:
+    pw: 
+    regex:
     - { pattern: '/#(\d+)/i', label: github }
 
-:vcs:
-  :type: git
-  :filter_paths:
+vcs:
+  type: git
+  filter_paths:
     - 'lib/'

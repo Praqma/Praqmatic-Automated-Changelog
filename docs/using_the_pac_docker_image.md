@@ -69,7 +69,7 @@ Running this command will produce a report that takes all commits from 3 commits
 The relevant PAC configuration file matching the above needs templates defined as follows if we assume you've created a template `~/pac-templates/my-template.md`:
 
 ```
-  :templates:
+  templates:
     - { location: '/pac-templates/my-template.md', output: my-changelog.md }
 ```
 
