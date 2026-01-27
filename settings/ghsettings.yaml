@@ -1,0 +1,13 @@
+general:
+    strict: false
+templates:
+    - location: templates/ghtemplate.md
+task_systems:
+    - name: github
+      query_string: https://api.github.com/repos/Praqma/Praqmatic-Automated-Changelog/issues/#{task_id}
+      # pw: "your-github-token" # Use a personal access token or GitHub App token
+      regex:
+        - pattern: /#(\d+)/
+          label: github
+vcs:
+    type: git

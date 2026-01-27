@@ -20,7 +20,14 @@ task_systems:
     usr: "user"  
     pw: "password"
     regex:
-    - { pattern: '/(PRJ-\d+)/i', label: jira }        
+    - { pattern: '/(PRJ-\d+)/i', label: jira }
+  -
+    name: github
+    query_string: "https://api.github.com/repos/OWNER/REPO/issues/#{task_id}"
+    # pw: "your-github-token" # Use a personal access token or GitHub App token
+    regex:
+    - { pattern: '/(#\d+)/', label: github }
+    - { pattern: '/([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+#\d+)/', label: github }
   
 vcs:
   type: git

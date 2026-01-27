@@ -16,6 +16,8 @@ func CreateTaskSystem(cfg *config.TaskSystemConfig) (System, error) {
 		return NewNoneTaskSystem(cfg), nil
 	case "jira":
 		return NewJiraTaskSystem(cfg), nil
+	case "github":
+		return NewGitHubTaskSystem(cfg), nil
 	default:
 		// For unknown task systems, treat them like "none" (regex-only)
 		// This maintains compatibility with custom named task systems

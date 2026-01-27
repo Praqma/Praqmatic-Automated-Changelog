@@ -35,6 +35,12 @@ Configuration file is YAML, so the : (colons), - (dash) and indentation matters.
 	    regex:
 	    - { pattern: '/PRJ-(\d+)/i', label: jira }      
 	  -
+	    name: github
+	    query_string: "https://api.github.com/repos/myorg/myrepo/issues/#{task_id}"
+	    pw: "ghp_xxxxxxxxxxxx"
+	    regex:
+	    - { pattern: '/(#\d+)/', label: github }
+	  -
 	    name: trac
 	    trac_url: "https://my.trac.site"
 	    trac_usr: "user"
@@ -83,7 +89,7 @@ One or more task system configurations. Note the - (dash) before each.
 
 A task system configuration must specify:
 
-* **`name`** (_required_) one of `trac`, `jira`, `none`. Selects task system to extract data for collected tasks in the SCM commits. The `none` is special as it do not extract data from any task system. You only have the collected task references from the SCM commit messages.
+* **`name`** (_required_) one of `github`, `jira`, `trac`, `none`. Selects task system to extract data for collected tasks in the SCM commits. The `none` is special as it do not extract data from any task system. You only have the collected task references from the SCM commit messages.
 * **`regex`** (_section is required_) is a list of regular expressions used to find the tasks in the SCM commits. Each entry is in the form: `{ pattern: <pattern>, label: <label> }`:
  * **`pattern`** (_one regexp is required_) is the reg exp used for matching tasks
  * **`label`** (_required_) is used to group the results, and be used for selecting, grouping and iteration in the templates. See [How to use labels](label_configuration.md)
@@ -101,6 +107,31 @@ For JIRA task system (`name: 'jira'`) the following is _required_ configuration:
 * **`pw`** is the password of the above JIRA user. It needs to be plain text.
 
 _There is usually no required configuration to do in your JIRA_.
+
+### GitHub specific configuration
+
+For GitHub task system (`name: 'github'`) the following is the configuration:
+
+* **`query_string`** (_required_) is the GitHub API URL template for fetching issues. Use `#{task_id}` as a placeholder for the issue number. Example: `https://api.github.com/repos/OWNER/REPO/issues/#{task_id}`
+* **`pw`** (_recommended_) is a GitHub personal access token or GitHub App token. While public repositories can be accessed without authentication, using a token increases rate limits (from 60 to 5000 requests/hour) and enables access to private repositories.
+
+**Example configuration:**
+
+```yaml
+task_systems:
+  -
+    name: github
+    query_string: "https://api.github.com/repos/myorg/myrepo/issues/#{task_id}"
+    pw: "ghp_xxxxxxxxxxxx"  # Your GitHub personal access token
+    regex:
+    - { pattern: '/(#\d+)/', label: github }
+    - { pattern: '/([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+#\d+)/', label: github }  # For cross-repo references
+```
+
+**Notes:**
+- The first regex pattern `/(#\d+)/` matches standard issue references like `#123`
+- The second regex pattern matches full repository references like `owner/repo#123`
+- When using full repository references (e.g., `owner/repo#123`), PAC will automatically construct the correct API URL even without a `query_string`
 
 ### Trac specific configuration
 
