@@ -26,8 +26,8 @@ func TestLoadSettings_DefaultSettings(t *testing.T) {
 	}
 
 	// Verify task systems are loaded
-	if len(settings.TaskSystems) != 2 {
-		t.Errorf("expected 2 task systems, got %d", len(settings.TaskSystems))
+	if len(settings.TaskSystems) != 3 {
+		t.Errorf("expected 3 task systems, got %d", len(settings.TaskSystems))
 	}
 
 	// Verify first task system is "none"
