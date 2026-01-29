@@ -10,7 +10,7 @@ PAC uses [GoReleaser](https://goreleaser.com/) to automate the entire build and 
 - Archive creation (tar.gz, zip)
 - Linux packages (deb, rpm, apk)
 - Docker images (multi-arch)
-- Package manager integrations (Homebrew, Chocolatey, Winget)
+- Package manager integrations (Homebrew, Chocolatey)
 - GitHub releases with changelogs
 
 ## Release Types
@@ -82,16 +82,6 @@ choco install pac
 
 # Install specific version
 choco install pac --version=4.0.0
-```
-
-### Winget (Windows)
-
-```powershell
-# Install latest stable
-winget install Praqma.pac
-
-# Install specific version
-winget install Praqma.pac --version 4.0.0
 ```
 
 ### Debian/Ubuntu
@@ -172,14 +162,12 @@ For the GitHub Actions workflows to work, you need to configure these secrets:
 | `GITHUB_TOKEN` | Automatic | GitHub releases, Docker images (ghcr.io) |
 | `HOMEBREW_TAP_GITHUB_TOKEN` | PAT with repo access | Homebrew tap updates |
 | `CHOCOLATEY_API_KEY` | Chocolatey API key | Chocolatey publishing |
-| `WINGET_GITHUB_TOKEN` | PAT with repo access | Winget manifest updates |
 
 ### External Repositories
 
 You need to create these repositories for package managers:
 
 1. **Homebrew Tap**: `Praqma/homebrew-tap`
-3. **Winget Manifests**: `Praqma/winget-pkgs` (or submit to official winget-pkgs)
 
 ## Changelog Generation
 

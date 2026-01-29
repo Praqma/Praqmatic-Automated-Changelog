@@ -151,11 +151,6 @@ release:
     choco install pac
     ```
     
-    **Windows (Winget):**
-    ```powershell
-    winget install Praqma.pac
-    ```
-    
     **Docker:**
     ```bash
     docker pull ghcr.io/praqma/pac:{{ .Version }}
@@ -163,10 +158,10 @@ release:
     
     **Debian/Ubuntu:**
     ```bash
-    # Download the .deb file from below and install
-    sudo dpkg -i pac_{{ .Version }}_amd64.deb
+    curl -LO https://github.com/Praqma/Praqmatic-Automated-Changelog/releases/download/v{{ .Version }}/pac_{{ .Version }}_<PLATFORM>.deb && \
+    sudo dpkg -i pac_{{ .Version }}_<PLATFORM>.deb
     ```
-    
+
     #### Install Specific Version
     
     For all platforms, you can download the specific binaries from the assets below.
@@ -268,39 +263,6 @@ homebrew_casks:
 # NOTE: Chocolatey packaging is handled separately in the GitHub Actions workflow
 # because it requires Windows to run the choco CLI for both packing and pushing.
 # See .github/workflows/release.yml publish-chocolatey job.
-
-# Winget configuration
-winget:
-  - name: pac
-    publisher: Praqma
-    short_description: Praqmatic Automated Changelog Generator
-    license: MIT
-    publisher_url: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    publisher_support_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/issues
-    package_identifier: Praqma.pac
-    homepage: https://github.com/Praqma/Praqmatic-Automated-Changelog
-    description: |-
-      PAC (Praqmatic Automated Changelog) is a tool for generating automated 
-      changelogs from version control system commits. It extracts task references 
-      from commit messages and generates formatted changelogs in various formats.
-    license_url: https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/LICENSE
-    copyright: Copyright (c) 2024 Praqma
-    tags:
-      - changelog
-      - git
-      - automation
-      - cli
-      - devops
-    repository:
-      owner: Praqma
-      name: winget-pkgs
-      token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    commit_msg_template: "{{ .PackageIdentifier }}: {{ .Tag }}"
-    skip_upload: auto
-    goamd64: v1
 
 # Docker images using the new v2 API
 dockers_v2:
