@@ -188,7 +188,10 @@ func TestGitHubTaskSystem_Apply_ServerError(t *testing.T) {
 func TestGitHubTaskSystem_Apply_InvalidJSON(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte("not valid json"))
+		_, err := w.Write([]byte("not valid json"))
+		if err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 

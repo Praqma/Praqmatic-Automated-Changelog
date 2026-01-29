@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/config"
-	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/logging"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/model"
 )
 
@@ -37,42 +36,7 @@ func (g *GitHubTaskSystem) Name() string {
 
 // Apply fetches data from GitHub for each task that applies to this system.
 func (g *GitHubTaskSystem) Apply(tasks *model.PACTaskCollection) error {
-	var errors []string
-
-	for _, task := range tasks.Tasks {
-		// Skip unreferenced commits (empty task ID)
-		if task.TaskID == "" {
-			continue
-		}
-
-		// Skip tasks that don't apply to this system
-		if !task.AppliesTo[g.config.Name] {
-			continue
-		}
-
-		// Fetch data from GitHub
-		data, err := g.fetchIssueData(task.TaskID)
-		if err != nil {
-			logging.Warn("GitHub error for %s: %v", task.TaskID, err)
-			// Mark task as unknown when fetch fails
-			task.ClearLabels()
-			task.AddLabel("unknown")
-			errors = append(errors, fmt.Sprintf("%s: %v", task.TaskID, err))
-			continue
-		}
-
-		// Populate task with GitHub data
-		task.Data = data
-		task.Attributes["data"] = data
-
-		logging.Info("Applied GitHub issue data to %s", task.TaskID)
-	}
-
-	if len(errors) > 0 {
-		return fmt.Errorf("github errors: %s", strings.Join(errors, "; "))
-	}
-
-	return nil
+	return applyTasks(tasks, g.config.Name, g.fetchIssueData)
 }
 
 // fetchIssueData retrieves issue data from the GitHub API.

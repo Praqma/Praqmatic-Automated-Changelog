@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/config"
-	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/logging"
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/model"
 )
 
@@ -36,42 +35,7 @@ func (j *JiraTaskSystem) Name() string {
 
 // Apply fetches data from Jira for each task that applies to this system.
 func (j *JiraTaskSystem) Apply(tasks *model.PACTaskCollection) error {
-	var errors []string
-
-	for _, task := range tasks.Tasks {
-		// Skip unreferenced commits (empty task ID)
-		if task.TaskID == "" {
-			continue
-		}
-
-		// Skip tasks that don't apply to this system
-		if !task.AppliesTo[j.config.Name] {
-			continue
-		}
-
-		// Fetch data from Jira
-		data, err := j.fetchTaskData(task.TaskID)
-		if err != nil {
-			logging.Warn("Jira error for %s: %v", task.TaskID, err)
-			// Mark task as unknown when fetch fails
-			task.ClearLabels()
-			task.AddLabel("unknown")
-			errors = append(errors, fmt.Sprintf("%s: %v", task.TaskID, err))
-			continue
-		}
-
-		// Populate task with Jira data
-		task.Data = data
-		task.Attributes["data"] = data
-
-		logging.Info("Applied Jira data to %s", task.TaskID)
-	}
-
-	if len(errors) > 0 {
-		return fmt.Errorf("jira errors: %s", strings.Join(errors, "; "))
-	}
-
-	return nil
+	return applyTasks(tasks, j.config.Name, j.fetchTaskData)
 }
 
 // fetchTaskData retrieves task data from the Jira API.
