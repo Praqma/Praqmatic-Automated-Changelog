@@ -56,5 +56,5 @@ func init() {
 		"Decrease verbosity (can be repeated)")
 
 	rootCmd.PersistentFlags().StringArrayVarP(&credentials, "credentials", "c", []string{},
-		"Override credentials: -c user -c password -c target (in groups of 3)")
+		"Override credentials: -c user -c password -c target (in groups of 3) or -c token -c target (in groups of 2)")
 }

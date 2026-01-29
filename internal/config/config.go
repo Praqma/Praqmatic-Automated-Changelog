@@ -128,23 +128,34 @@ func applyCredentialOverrides(settings *Settings, overrides []CredentialOverride
 }
 
 // ParseCredentialFlags parses -c flag arguments into CredentialOverride structs.
-// Format: -c user password target
+// Format: -c user -c password -c target
+// or: -c token -c target (for token-based auth)
 func ParseCredentialFlags(credentials []string) ([]CredentialOverride, error) {
 	if len(credentials) == 0 {
 		return nil, nil
 	}
 
-	if len(credentials)%3 != 0 {
-		return nil, fmt.Errorf("credentials must be provided in groups of 3: user password target")
+	if len(credentials)%3 != 0 && len(credentials)%2 != 0 {
+		return nil, fmt.Errorf("credentials must be provided in groups of 3: '-c user -c password -c target' or groups of 2: '-c token -c target'")
 	}
 
 	var overrides []CredentialOverride
-	for i := 0; i < len(credentials); i += 3 {
-		overrides = append(overrides, CredentialOverride{
-			Username: credentials[i],
-			Password: credentials[i+1],
-			Target:   credentials[i+2],
-		})
+
+	if len(credentials)%3 == 0 {
+		for i := 0; i < len(credentials); i += 3 {
+			overrides = append(overrides, CredentialOverride{
+				Username: credentials[i],
+				Password: credentials[i+1],
+				Target:   credentials[i+2],
+			})
+		}
+	} else {
+		for i := 0; i < len(credentials); i += 2 {
+			overrides = append(overrides, CredentialOverride{
+				Password: credentials[i],
+				Target:   credentials[i+1],
+			})
+		}
 	}
 
 	return overrides, nil

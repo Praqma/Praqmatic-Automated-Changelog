@@ -152,8 +152,14 @@ func TestParseCredentialFlags(t *testing.T) {
 			wantErr:     false,
 		},
 		{
+			name:        "token-based auth (2 credentials)",
+			credentials: []string{"token", "github"},
+			wantLen:     1,
+			wantErr:     false,
+		},
+		{
 			name:        "incomplete credentials",
-			credentials: []string{"user", "pass"},
+			credentials: []string{"user"},
 			wantLen:     0,
 			wantErr:     true,
 		},
