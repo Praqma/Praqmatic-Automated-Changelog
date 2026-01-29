@@ -242,7 +242,7 @@ homebrew_casks:
       - default
     repository:
       owner: Praqma
-      name: homebrew-praqma-tap
+      name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     commit_author:
       name: goreleaserbot

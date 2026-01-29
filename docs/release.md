@@ -178,7 +178,7 @@ For the GitHub Actions workflows to work, you need to configure these secrets:
 
 You need to create these repositories for package managers:
 
-1. **Homebrew Tap**: `Praqma/homebrew-praqma-tap`
+1. **Homebrew Tap**: `Praqma/homebrew-tap`
 3. **Winget Manifests**: `Praqma/winget-pkgs` (or submit to official winget-pkgs)
 
 ## Changelog Generation
