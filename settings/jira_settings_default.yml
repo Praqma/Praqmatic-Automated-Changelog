@@ -2,13 +2,12 @@ general:
   strict: false
  
 templates:
-  - { location: templates/default.md }
-  - { location: templates/default_html.html }
+  - { location: templates/jiratemplate.md }
 
 task_systems:
   -
     name: jira
-    query_string: "https://eficode.atlassian.net/rest/api/latest/issue/#{task_id}"
+    query_string: "https://<your_domain>.atlassian.net/rest/api/3/issue/#{task_id}"
     usr: "user"  
     pw: "password"
     regex:
