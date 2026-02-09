@@ -5,7 +5,7 @@
 ## Referenced Tasks
 
 {% for task in tasks.referenced %}
-### {{ task.task_id }} - {{ task.attributes.data.title }}
+### {{ task.task_id }} - {{ task.attributes.data.title }} ({{ task.attributes.data.state }})
 
 {% for commit in task.commits %}
 - {{ commit.header }}
