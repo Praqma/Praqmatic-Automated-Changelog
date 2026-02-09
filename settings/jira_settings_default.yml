@@ -1,0 +1,17 @@
+general:
+  strict: false
+ 
+templates:
+  - { location: templates/default.md }
+  - { location: templates/default_html.html }
+
+task_systems:
+  -
+    name: jira
+    query_string: "https://eficode.atlassian.net/rest/api/latest/issue/#{task_id}"
+    usr: "user"  
+    pw: "password"
+    regex:
+    - { pattern: '/(AOD-\d+)/i', label: jira }
+vcs:
+  type: git
