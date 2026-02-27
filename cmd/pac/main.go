@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/cmd"
+	"github.com/Praqma/Praqmatic-Automated-Changelog/internal/logging"
 )
 
 // Version is set at build time via -ldflags.
@@ -33,32 +34,40 @@ func main() {
 // flag before each one, capping at 2 extra values to avoid consuming
 // subcommands or positional arguments.
 func normalizeLegacyCredentialArgs(args []string) []string {
-	const maxExtraValues = 2 // legacy format: -c val1 val2 val3 → at most 2 extras
+	const maxExtraValues = 2
 
 	var result []string
 	i := 0
 	for i < len(args) {
-		arg := args[i]
-
-		if arg == "-c" || arg == "--credentials" {
-			result = append(result, arg)
+		if !isCredentialFlag(args[i]) {
+			result = append(result, args[i])
 			i++
-			if i < len(args) {
-				// First value (required).
-				result = append(result, args[i])
-				i++
+			continue
+		}
+
+		flag := args[i]
+		result = append(result, flag)
+		i++
+
+		if i >= len(args) {
+			break
+		}
+		result = append(result, args[i])
+		i++
+
+		// Re-insert the flag before up to maxExtraValues additional bare values.
+		for extra := 0; extra < maxExtraValues && i < len(args) && !strings.HasPrefix(args[i], "-"); extra++ {
+			if extra == 0 {
+				logging.Warn("deprecated: passing multiple values after %q is deprecated, use repeated %q flags instead (e.g. %s v1 %s v2 %s v3)", flag, flag, flag, flag, flag)
 			}
-			// Gather up to maxExtraValues additional bare values.
-			extra := 0
-			for extra < maxExtraValues && i < len(args) && !strings.HasPrefix(args[i], "-") {
-				result = append(result, arg, args[i])
-				i++
-				extra++
-			}
-		} else {
-			result = append(result, arg)
+			result = append(result, flag, args[i])
 			i++
 		}
 	}
 	return result
+}
+
+// isCredentialFlag reports whether arg is a credential flag (-c or --credentials).
+func isCredentialFlag(arg string) bool {
+	return arg == "-c" || arg == "--credentials"
 }
