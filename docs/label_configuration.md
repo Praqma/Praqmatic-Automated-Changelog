@@ -11,10 +11,10 @@ An use-case could be one repository, where several patterns for task references 
 
 Relevant configuration snippet:
 
-	:task_systems:
+	task_systems:
 	  - 
-	    :name: none	    
-	    :regex:
+	    name: none	    
+	    regex:
 	      - { pattern: '/EXCEL-(\d+)/i', label: excel }
 	      - { pattern: '/WORD-(\d+)/i ', label: word }
 	      - { pattern: '/POWERPOINT-(\d+)/i ', label: powerpoint }

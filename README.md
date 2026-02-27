@@ -4,10 +4,14 @@ maintainer: JKrag
 
 Issue tracking:
 [![Issues](https://img.shields.io/github/issues/Praqma/Praqmatic-Automated-Changelog.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/issues)
+[![CI](https://github.com/Praqma/Praqmatic-Automated-Changelog/actions/workflows/ci.yml/badge.svg)](https://github.com/Praqma/Praqmatic-Automated-Changelog/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Praqma/Praqmatic-Automated-Changelog)](https://goreportcard.com/report/github.com/Praqma/Praqmatic-Automated-Changelog)
 
-# Praqmatic Automated Changelog (PAC)
+# <img src="./docs/icon.png" width="100" style="vertical-align: middle;"> Praqmatic Automated Changelog (PAC)
 
 Tool for creating automated, but pragmatic, changelogs.
+
+PAC is written in Go, offering fast performance, no runtime dependencies, and cross-platform binaries.
 
 PAC collects task references from SCM commit messages and creates changelog reports with additional information extracted from other systems, like your task management system.
 Compared to other changelog solutions, PAC is very flexible and customizable. The design allows you to solve the problems of having an unchangeable SCM commit history with incorrect task references.
@@ -40,24 +44,22 @@ To start generating changelogs you'll need to:
 This is an example of a simple configuration file. It collects task references from commits using the configured regex and create a changelog based on the configured template.
 This simple example do not extract data from task systems.
 
-	:general:
+	general:
 
-	:templates:
+	templates:
 	  - { location: templates/default_id_report.md, output: ids.md }
 
-	:task_systems:
+	task_systems:
 	  -
-	    :name: none
-	    :regex:
+	    name: none
+	    regex:
 	      - { pattern: '/PAC\-(\d+)', label: none }
 
-	:vcs:
-	  :type: git
-	  :repo_location: '.'
+	vcs:
+	  type: git
+	  repo_location: '.'
 
 More about configuration in [Configuration](docs/configuration.md).
-
-Help writing regexp using Ruby IRB see this litle howto: [Howto write regexp using IRB](docs/howto_write_regexp_using_irb.md)
 
 ### Simple template
 
@@ -71,13 +73,48 @@ This example template simply lists the discovered issues as headers in a Markdow
 More about templates in [Templates](docs/templates.md).
 
 
+## Installation
+
+```bash
+# Using Go
+go install github.com/Praqma/Praqmatic-Automated-Changelog/cmd/pac@latest
+
+# Using Docker
+docker pull ghcr.io/praqma/pac:latest
+
+# Download pre-built binary from GitHub Releases
+# https://github.com/Praqma/Praqmatic-Automated-Changelog/releases
+```
+
+See [Installation Guide](docs/installation.md) for detailed instructions.
+
 ## Usage
 
-Basic usage examples for the PAC Ruby script, run PAC with the `--help` parameter for usage explanation.
+```bash
+# Generate changelog from a specific tag to HEAD
+pac from v1.0.0 --settings pac_settings.yml
 
-### Run PAC on Windows
+# Generate changelog from latest matching tag
+pac from-latest-tag "v*" --settings pac_settings.yml
 
-Detailed instructions can be found in [Installing PAC on Windows](docs/windows_instructions.md).
+# Output to specific file
+pac from v1.0.0 --settings pac_settings.yml
+
+# Increase verbosity for debugging
+pac from v1.0.0 -vvv
+
+# Override credentials for task system
+pac from v1.0.0 -c username -c password -c jira
+```
+
+### Docker Usage
+
+```bash
+docker run --rm \
+  -v $(pwd):/repo \
+  ghcr.io/praqma/pac:latest \
+  from v1.0.0 --settings pac_settings.yml
+```
 
 ## Support and maintenance
 
@@ -88,7 +125,7 @@ Detailed instructions can be found in [Installing PAC on Windows](docs/windows_i
 
 ## Developer information
 
-For details on design and development info see [Developer information](docs/developer_info.md)
+For details on design and development info see [Developer Guide](docs/development.md) and [Architecture](docs/architecture.md).
 
 See also [contributing file](/CONTRIBUTING.md).
 

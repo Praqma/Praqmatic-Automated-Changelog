@@ -1,0 +1,16 @@
+general:
+  strict: false
+ 
+templates:
+  - { location: templates/jiratemplate.md }
+
+task_systems:
+  -
+    name: jira
+    query_string: "https://<your_domain>.atlassian.net/rest/api/3/issue/#{task_id}"
+    usr: "user"  
+    pw: "password"
+    regex:
+    - { pattern: '/(AOD-\d+)/i', label: jira }
+vcs:
+  type: git

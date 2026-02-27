@@ -1,0 +1,70 @@
+# PAC Makefile for Debian Package
+# Target for building .deb packages
+
+# Build Debian package (.deb)
+.PHONY: deb
+deb:
+	@echo "Building Debian package for version $(VERSION)..."
+	@# Build Linux amd64 binary
+	@mkdir -p $(BUILD_DIR)
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GO) build $(GOFLAGS) $(LDFLAGS) \
+		-o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/pac
+	@# Create package structure
+	$(eval PKGNAME := $(BINARY_NAME))
+	$(eval ARCH := amd64)
+	$(eval PKGDIR := $(BUILD_DIR)/$(PKGNAME)_$(VERSION)_$(ARCH))
+	@rm -rf $(PKGDIR)
+	@mkdir -p $(PKGDIR)/DEBIAN
+	@mkdir -p $(PKGDIR)/usr/bin
+	@mkdir -p $(PKGDIR)/usr/share/doc/$(PKGNAME)
+	@mkdir -p $(PKGDIR)/usr/share/$(PKGNAME)/settings
+	@mkdir -p $(PKGDIR)/usr/share/$(PKGNAME)/templates
+	@# Copy files
+	@cp $(BUILD_DIR)/$(BINARY_NAME) $(PKGDIR)/usr/bin/
+	@chmod 755 $(PKGDIR)/usr/bin/$(BINARY_NAME)
+	@cp README.md LICENSE $(PKGDIR)/usr/share/doc/$(PKGNAME)/
+	@[ -f CHANGELOG.md ] && cp CHANGELOG.md $(PKGDIR)/usr/share/doc/$(PKGNAME)/ || true
+	@[ -f settings/default_settings.yml ] && cp settings/default_settings.yml $(PKGDIR)/usr/share/$(PKGNAME)/settings/ || true
+	@[ -d templates ] && cp -r templates/* $(PKGDIR)/usr/share/$(PKGNAME)/templates/ || true
+	@# Calculate installed size
+	$(eval INSTALLED_SIZE := $(shell du -sk $(PKGDIR) | cut -f1))
+	@# Create control file
+	@echo "Package: $(PKGNAME)" > $(PKGDIR)/DEBIAN/control
+	@echo "Version: $(VERSION)" >> $(PKGDIR)/DEBIAN/control
+	@echo "Section: utils" >> $(PKGDIR)/DEBIAN/control
+	@echo "Priority: optional" >> $(PKGDIR)/DEBIAN/control
+	@echo "Architecture: $(ARCH)" >> $(PKGDIR)/DEBIAN/control
+	@echo "Installed-Size: $(INSTALLED_SIZE)" >> $(PKGDIR)/DEBIAN/control
+	@echo "Maintainer: Praqma <info@praqma.com>" >> $(PKGDIR)/DEBIAN/control
+	@echo "Homepage: https://github.com/Praqma/Praqmatic-Automated-Changelog" >> $(PKGDIR)/DEBIAN/control
+	@echo "Description: Praqmatic Automated Changelog Generator" >> $(PKGDIR)/DEBIAN/control
+	@echo " PAC is a tool for generating automated changelogs from version control" >> $(PKGDIR)/DEBIAN/control
+	@echo " system commits. It extracts task references from commit messages and" >> $(PKGDIR)/DEBIAN/control
+	@echo " generates formatted changelogs in various formats (Markdown, HTML)." >> $(PKGDIR)/DEBIAN/control
+	@echo " ." >> $(PKGDIR)/DEBIAN/control
+	@echo " Features include:" >> $(PKGDIR)/DEBIAN/control
+	@echo "  - Git integration" >> $(PKGDIR)/DEBIAN/control
+	@echo "  - Task reference extraction (Jira, regex patterns)" >> $(PKGDIR)/DEBIAN/control
+	@echo "  - Template-based output generation" >> $(PKGDIR)/DEBIAN/control
+	@echo "  - Multiple output formats" >> $(PKGDIR)/DEBIAN/control
+	@# Create postinst script
+	@echo '#!/bin/sh' > $(PKGDIR)/DEBIAN/postinst
+	@echo 'set -e' >> $(PKGDIR)/DEBIAN/postinst
+	@echo 'if [ ! -L /usr/local/bin/pac ]; then' >> $(PKGDIR)/DEBIAN/postinst
+	@echo '    ln -sf /usr/bin/pac /usr/local/bin/pac 2>/dev/null || true' >> $(PKGDIR)/DEBIAN/postinst
+	@echo 'fi' >> $(PKGDIR)/DEBIAN/postinst
+	@echo 'exit 0' >> $(PKGDIR)/DEBIAN/postinst
+	@chmod 755 $(PKGDIR)/DEBIAN/postinst
+	@# Create prerm script
+	@echo '#!/bin/sh' > $(PKGDIR)/DEBIAN/prerm
+	@echo 'set -e' >> $(PKGDIR)/DEBIAN/prerm
+	@echo 'if [ -L /usr/local/bin/pac ]; then' >> $(PKGDIR)/DEBIAN/prerm
+	@echo '    rm -f /usr/local/bin/pac 2>/dev/null || true' >> $(PKGDIR)/DEBIAN/prerm
+	@echo 'fi' >> $(PKGDIR)/DEBIAN/prerm
+	@echo 'exit 0' >> $(PKGDIR)/DEBIAN/prerm
+	@chmod 755 $(PKGDIR)/DEBIAN/prerm
+	@# Build the package
+	@dpkg-deb --build --root-owner-group $(PKGDIR)
+	@rm -rf $(PKGDIR)
+	@echo "Debian package created: $(BUILD_DIR)/$(PKGNAME)_$(VERSION)_$(ARCH).deb"
+	@ls -lh $(BUILD_DIR)/$(PKGNAME)_$(VERSION)_$(ARCH).deb

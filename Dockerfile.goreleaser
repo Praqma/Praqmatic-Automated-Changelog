@@ -1,0 +1,40 @@
+# Multi-arch Dockerfile for GoReleaser
+# This Dockerfile is used by GoReleaser to build multi-platform images
+# The binary is pre-compiled by GoReleaser and copied into the image
+
+FROM alpine:3.21
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    git \
+    ca-certificates \
+    tzdata
+
+# Create non-root user for security
+RUN adduser -D -u 1000 -g pac pac
+
+# ARG for target platform - GoReleaser sets this automatically
+ARG TARGETPLATFORM
+
+# Copy the pre-compiled binary from the correct platform directory
+COPY ${TARGETPLATFORM}/pac /usr/local/bin/pac
+
+# Copy templates and settings
+COPY templates /usr/share/pac/templates
+COPY settings /usr/share/pac/settings
+
+# Set up working directory
+WORKDIR /repo
+
+# Ensure binary is executable
+RUN chmod +x /usr/local/bin/pac
+
+# Switch to non-root user
+USER pac
+
+# Set environment variables
+ENV PAC_TEMPLATES_DIR=/usr/share/pac/templates
+ENV PAC_SETTINGS_DIR=/usr/share/pac/settings
+
+ENTRYPOINT ["pac"]
+CMD ["--help"]

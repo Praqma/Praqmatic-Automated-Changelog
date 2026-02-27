@@ -2,7 +2,8 @@
 .settings
 changelog.pdf
 changelog.html
-pac
+bin
+dist
 coverage
 test/reports
 test/resources/stop_task_system*
@@ -14,3 +15,5 @@ default-generated.*
 .bundle
 .idea/
 demorepo
+.out
+**/coverage.out

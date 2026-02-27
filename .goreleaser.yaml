@@ -1,0 +1,292 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# GoReleaser configuration for PAC (Praqmatic Automated Changelog)
+# Documentation: https://goreleaser.com/customization/
+
+version: 2
+
+project_name: pac
+
+# Global metadata for the project
+metadata:
+  mod_timestamp: "{{ .CommitTimestamp }}"
+
+# Git configuration
+git:
+  ignore_tags:
+    - "dev"
+
+# Environment variables
+env:
+  - CGO_ENABLED=0
+
+# Before hooks - run before anything else
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+# Build configuration for Go
+builds:
+  - id: pac
+    main: ./cmd/pac
+    binary: pac
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - "7"
+    ignore:
+      - goos: windows
+        goarch: arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.Version={{ .Version }}
+      - -X main.Commit={{ .ShortCommit }}
+      - -X main.Date={{ .Date }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+# Archive configuration - create tar.gz and zip files
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+      - templates/**/*
+      - settings/**/*
+
+# Checksum configuration
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+# Snapshot configuration for development builds
+snapshot:
+  version_template: "{{ .Version }}-{{ .ShortCommit }}-dev"
+
+# Changelog configuration
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - "^style:"
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: "Features"
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: "Bug Fixes"
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: "Breaking Changes"
+      regexp: '^.*?(\([[:word:]]+\))??!:.+$'
+      order: 2
+    - title: "Other Changes"
+      order: 999
+
+# GitHub Release configuration
+release:
+  github:
+    owner: Praqma
+    name: Praqmatic-Automated-Changelog
+  
+  # Create draft releases by default - allows review before publishing
+  draft: true
+  
+  # Replace existing draft releases with the same name
+  replace_existing_draft: true
+  
+  # Prerelease detection
+  prerelease: auto
+  
+  # Make latest unless it's a prerelease
+  make_latest: "{{ not .Prerelease }}"
+  
+  # Release name
+  name_template: "PAC v{{ .Version }}"
+  
+  # Release header
+  header: |
+    ## PAC v{{ .Version }}
+    
+    Welcome to PAC (Praqmatic Automated Changelog) v{{ .Version }}!
+    
+    ### Installation
+    
+    #### Quick Install (Recommended)
+    
+    **macOS/Linux (Homebrew):**
+    ```bash
+    brew install praqma/tap/pac
+    ```
+    
+    **Windows (Chocolatey):**
+    ```powershell
+    choco install pac
+    ```
+    
+    **Docker:**
+    ```bash
+    docker pull ghcr.io/praqma/pac:{{ .Version }}
+    ```
+    
+    **Debian/Ubuntu:**
+    ```bash
+    curl -LO https://github.com/Praqma/Praqmatic-Automated-Changelog/releases/download/v{{ .Version }}/pac_{{ .Version }}_<PLATFORM>.deb && \
+    sudo dpkg -i pac_{{ .Version }}_<PLATFORM>.deb
+    ```
+
+    #### Install Specific Version
+    
+    For all platforms, you can download the specific binaries from the assets below.
+    
+    #### Install Latest Development Version
+    
+    To install the latest development version, use the nightly release:
+    ```bash
+    # Homebrew
+    brew install praqma/tap/pac --HEAD
+    
+    # Docker
+    docker pull ghcr.io/praqma/pac:nightly
+    ```
+
+  footer: |
+    ---
+    
+    **Full Changelog**: https://github.com/Praqma/Praqmatic-Automated-Changelog/compare/{{ .PreviousTag }}...{{ .Tag }}
+    
+    ### Checksums
+    
+    You can verify the checksums of the downloaded files using the `checksums.txt` file.
+    
+    ```bash
+    sha256sum -c checksums.txt --ignore-missing
+    ```
+
+# Linux packages via nFPM (deb, rpm, apk)
+nfpms:
+  - id: pac
+    package_name: pac
+    file_name_template: "{{ .ConventionalFileName }}"
+    vendor: Praqma
+    homepage: https://github.com/Praqma/Praqmatic-Automated-Changelog
+    maintainer: Praqma <support@praqma.com>
+    description: |-
+      PAC - Praqmatic Automated Changelog Generator
+      
+      PAC is a tool for generating automated changelogs from version control 
+      system commits. It extracts task references from commit messages and 
+      generates formatted changelogs in various formats (Markdown, HTML).
+    license: MIT
+    formats:
+      - deb
+      - rpm
+      - apk
+    bindir: /usr/bin
+    section: utils
+    priority: optional
+    dependencies:
+      - git
+    contents:
+      - src: ./templates/
+        dst: /usr/share/pac/templates/
+        type: tree
+      - src: ./settings/
+        dst: /usr/share/pac/settings/
+        type: tree
+      - src: ./README.md
+        dst: /usr/share/doc/pac/README.md
+      - src: ./LICENSE
+        dst: /usr/share/doc/pac/LICENSE
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+
+# Homebrew Casks configuration (replacing deprecated brews)
+homebrew_casks:
+  - name: pac
+    ids:
+      - default
+    repository:
+      owner: Praqma
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "Cask update for {{ .ProjectName }} version {{ .Tag }}"
+    homepage: https://github.com/Praqma/Praqmatic-Automated-Changelog
+    description: Praqmatic Automated Changelog - Generate changelogs from git commits
+    skip_upload: auto
+    caveats: |
+      To get started with PAC, run:
+        pac --help
+      
+      For configuration options, see:
+        https://github.com/Praqma/Praqmatic-Automated-Changelog/blob/master/docs/configuration.md
+    hooks:
+      post:
+        # Remove quarantine bit for unsigned binary
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/pac"]
+          end
+
+# NOTE: Chocolatey packaging is handled separately in the GitHub Actions workflow
+# because it requires Windows to run the choco CLI for both packing and pushing.
+# See .github/workflows/release.yml publish-chocolatey job.
+
+# Docker images using the new v2 API
+dockers_v2:
+  - id: pac-docker
+    dockerfile: Dockerfile.goreleaser
+    ids:
+      - pac
+    images:
+      - "ghcr.io/praqma/pac"
+    tags:
+      - "{{ .Version }}"
+      - "{{ if and (not .IsSnapshot) (not .Prerelease) }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.description: "Praqmatic Automated Changelog Generator"
+      org.opencontainers.image.url: "https://github.com/Praqma/Praqmatic-Automated-Changelog"
+      org.opencontainers.image.source: "https://github.com/Praqma/Praqmatic-Automated-Changelog"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.licenses: "MIT"
+    extra_files:
+      - templates
+      - settings

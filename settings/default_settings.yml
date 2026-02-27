@@ -1,26 +1,33 @@
-:general:
-  :strict: false
+general:
+  strict: false
  
-:templates:
+templates:
   - { location: templates/default.md }
   - { location: templates/default_html.html }
 
-:task_systems:
+task_systems:
   - 
-    :name: none
-    :regex:
+    name: none
+    regex:
       - { pattern: '/Issue:\s*(\d+)/i', label: none }
       - { pattern: '/Issue:\s*(none)/i', label: none }
       - { pattern: '/(#\d+)/', label: none }
       - { pattern: '/us:(\d+)/', label: none }
-    :delimiter: '/,|\s/'
+    delimiter: '/,|\s/'
   -
-    :name: jira
-    :query_string: "http://your.server.hostname/rest/api/latest/issue/#{task_id}"
-    :usr: "user"  
-    :pw: "password"
-    :regex:
-    - { pattern: '/(PRJ-\d+)/i', label: jira }        
+    name: jira
+    query_string: "http://your.server.hostname/rest/api/latest/issue/#{task_id}"
+    usr: "user"  
+    pw: "password"
+    regex:
+    - { pattern: '/(PRJ-\d+)/i', label: jira }
+  -
+    name: github
+    query_string: "https://api.github.com/repos/OWNER/REPO/issues/#{task_id}"
+    # pw: "your-github-token" # Use a personal access token or GitHub App token
+    regex:
+    - { pattern: '/(#\d+)/', label: github }
+    - { pattern: '/([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+#\d+)/', label: github }
   
-:vcs:
-  :type: git
+vcs:
+  type: git
